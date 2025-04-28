@@ -1,8 +1,7 @@
 use serde_json::Value;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
-
-pub const STORE_FILENAME: &str = "settings.json";
+use crate::constants::STORE_FILENAME;
 
 #[tauri::command]
 pub async fn store_get_key(app_handle: AppHandle, key: String) -> Option<Value> {

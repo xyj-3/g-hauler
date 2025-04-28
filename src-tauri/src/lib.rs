@@ -1,5 +1,5 @@
 mod config;
-mod paths;
+mod constants;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
