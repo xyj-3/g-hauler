@@ -1,16 +1,16 @@
 pub struct PlatformPath {
     pub windows: &'static str,
-    pub macos: &'static str,
+    // pub macos: &'static str,
 }
 
 impl PlatformPath {
     pub fn current(&self) -> &'static str {
         if cfg!(target_os = "windows") {
             self.windows
-        } else if cfg!(target_os = "macos") {
-            self.macos
         } else {
-            panic!("Unsupported operating system: this application only supports Windows and MacOS.");
+            panic!(
+                "Unsupported operating system: this application only supports Windows and MacOS."
+            );
         }
     }
 }
