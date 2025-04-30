@@ -5,6 +5,7 @@
   import TitleBar from '$components/TitleBar.svelte';
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
+  import SelectGHubLocation from '$components/SelectGHubLocation.svelte';
 
   type PathValidationResult = {
     install_path_exists: boolean;
@@ -20,6 +21,9 @@
   let showSplash = $state(true);
   let validationResult = $state<PathValidationResult | null>(null);
   let installPath = $state<string | null>(null);
+  let showInstallModal = $state(false);
+  function openInstallModal() { showInstallModal = true; }
+  function closeInstallModal() { showInstallModal = false; }
 
   async function fetchInstallPath() {
     const value = await invoke<string | null>('store_get_key', { key: 'lghub_install_path' });
@@ -64,14 +68,15 @@
     <div transition:fade={{ duration: 300 }}>
       <div class="fixed bottom-3 right-4 z-50 text-xs text-white font-light">
         {#if validationResult && validationResult.install_path_exists && installPath}
-          <div class="cursor-pointer">
+          <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left" onclick={openInstallModal}>
             G HUB install location: {installPath}
-          </div>
+          </button>
         {:else}
-          <div class="cursor-pointer hover:bg-blue-700/90 transition">
+          <button type="button" class="cursor-pointer hover:bg-blue-700/90 transition bg-transparent border-0 p-0 m-0 text-left" onclick={openInstallModal}>
             G HUB install location: Click to Select
-          </div>
+          </button>
         {/if}
+        <SelectGHubLocation open={showInstallModal} onClose={closeInstallModal} />
       </div>
       {@render children?.()}
     </div>
