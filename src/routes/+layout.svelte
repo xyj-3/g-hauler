@@ -5,6 +5,7 @@
   import TitleBar from '$components/TitleBar.svelte';
   import '../app.css';
 
+  let { children } = $props();
   let showSplash = $state(true);
   let mainContentReady = $state(false);
 
@@ -27,7 +28,7 @@
     </div>
   {:else}
     <div transition:fade={{ duration: 300 }}>
-      <slot />
+      {@render children?.()}
     </div>
   {/if}
 </div>
