@@ -19,6 +19,12 @@
   let { children } = $props();
   let showSplash = $state(true);
   let validationResult = $state<PathValidationResult | null>(null);
+  let installPath = $state<string | null>(null);
+
+  async function fetchInstallPath() {
+    const value = await invoke<string | null>('store_get_key', { key: 'lghub_install_path' });
+    installPath = value;
+  }
 
   onMount(() => {
     let splashDone = false;
@@ -38,6 +44,11 @@
     invoke<PathValidationResult>('validate_paths').then((result) => {
       validationResult = result;
       validationDone = true;
+      if (result.install_path_exists) {
+        fetchInstallPath();
+      } else {
+        installPath = null;
+      }
       hideSplashIfReady();
     });
   });
@@ -51,6 +62,17 @@
     </div>
   {:else}
     <div transition:fade={{ duration: 300 }}>
+      <div class="fixed bottom-3 right-4 z-50 text-xs text-white font-light">
+        {#if validationResult && validationResult.install_path_exists && installPath}
+          <div class="cursor-pointer">
+            G HUB install location: {installPath}
+          </div>
+        {:else}
+          <div class="cursor-pointer hover:bg-blue-700/90 transition">
+            G HUB install location: Click to Select
+          </div>
+        {/if}
+      </div>
       {@render children?.()}
     </div>
   {/if}
