@@ -1,5 +1,6 @@
 mod store;
 mod constants;
+mod validation;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -16,6 +17,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             crate::store::store_get_key,
             crate::store::store_set_key,
+            crate::validation::validate_paths,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

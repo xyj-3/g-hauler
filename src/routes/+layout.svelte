@@ -4,19 +4,42 @@
   import SplashScreen from '$components/SplashScreen.svelte';
   import TitleBar from '$components/TitleBar.svelte';
   import '../app.css';
+  import { invoke } from '@tauri-apps/api/core';
+
+  type PathValidationResult = {
+    install_path_exists: boolean;
+    data_path_exists: boolean;
+    applications_json_exists: boolean;
+    current_json_exists: boolean;
+    version_json_exists: boolean;
+    build_id: string | null;
+    images_dir_exists: boolean;
+  };
 
   let { children } = $props();
   let showSplash = $state(true);
-  let mainContentReady = $state(false);
+  let validationResult = $state<PathValidationResult | null>(null);
 
   onMount(() => {
-    mainContentReady = true;
-    const timer = setTimeout(() => {
-      showSplash = false;
-    }, 1000);
-    return () => {
-      clearTimeout(timer);
+    let splashDone = false;
+    let validationDone = false;
+
+    const hideSplashIfReady = () => {
+      if (splashDone && validationDone) {
+        showSplash = false;
+      }
     };
+
+    setTimeout(() => {
+      splashDone = true;
+      hideSplashIfReady();
+    }, 1000);
+
+    invoke<PathValidationResult>('validate_paths').then((result) => {
+      validationResult = result;
+      validationDone = true;
+      hideSplashIfReady();
+    });
   });
 </script>
 
