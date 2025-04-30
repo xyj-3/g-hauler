@@ -1,6 +1,10 @@
 // Store constants
 pub const STORE_FILENAME: &str = "settings.json";
 
+// Store keys
+pub const STORE_KEY_INSTALL_PATH: &str = "lghub_install_path";
+pub const STORE_KEY_DATA_PATH: &str = "lghub_data_path";
+
 // File paths
 pub const LGHUB_DEFAULT_PATH: &str = r"C:\Program Files\LGHUB";
 pub const LGHUB_DATA_PATH: &str = r"C:\ProgramData\LGHUB";
