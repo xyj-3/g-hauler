@@ -5,7 +5,7 @@
   import TitleBar from '$components/TitleBar.svelte';
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
-  import SelectGHubLocation from '$components/SelectGHubLocation.svelte';
+  import SelectGHubLoc from '$components/SelectGHubLocPopup.svelte';
 
   type PathValidationResult = {
     install_path_exists: boolean;
@@ -76,7 +76,7 @@
             G HUB install location: Click to Select
           </button>
         {/if}
-        <SelectGHubLocation open={showInstallModal} onClose={closeInstallModal} />
+        <SelectGHubLoc open={showInstallModal} onClose={closeInstallModal} />
       </div>
       {@render children?.()}
     </div>

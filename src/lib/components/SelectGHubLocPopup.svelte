@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Modal from './Modal.svelte';
+  import Modal from './Popup.svelte';
   export let open: boolean;
   export let onClose: () => void;
 </script>
