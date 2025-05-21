@@ -10,3 +10,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /.cursor
 .windsurfrules
+.github/copilot_instructions.md
