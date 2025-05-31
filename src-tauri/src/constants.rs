@@ -3,6 +3,8 @@ pub const STORE_FILENAME: &str = "settings.json";
 
 // Store keys
 pub const STORE_KEY_DATA_PATH: &str = "lghub_data_path";
+pub const STORE_KEY_BUILD_ID: &str = "build_id";
+pub const STORE_KEY_VERSION_NUMBER: &str = "version_number";
 
 // File paths
 pub const LGHUB_DATA_PATH: &str = r"C:\ProgramData\LGHUB";
