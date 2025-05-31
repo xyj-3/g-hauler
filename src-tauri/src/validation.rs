@@ -2,7 +2,6 @@ use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
 use crate::constants::{
-    STORE_KEY_INSTALL_PATH,
     STORE_KEY_DATA_PATH,
 };
 use tauri::AppHandle;
@@ -10,7 +9,6 @@ use tauri_plugin_store::StoreExt;
 
 #[derive(serde::Serialize)]
 pub struct PathValidationResult {
-    pub install_path_exists: bool,
     pub data_path_exists: bool,
     pub applications_json_exists: bool,
     pub current_json_exists: bool,
@@ -25,7 +23,6 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
         Ok(store) => store,
         Err(_) => {
             return PathValidationResult {
-                install_path_exists: false,
                 data_path_exists: false,
                 applications_json_exists: false,
                 current_json_exists: false,
@@ -35,21 +32,15 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
             };
         }
     };
-    let install_path = store.get(STORE_KEY_INSTALL_PATH)
-        .and_then(|v| v.as_str().map(|s| s.to_string()))
-        .unwrap();
     let data_path = store.get(STORE_KEY_DATA_PATH)
         .and_then(|v| v.as_str().map(|s| s.to_string()))
         .unwrap();
 
-    let install_path_exists = fs::metadata(&install_path).is_ok();
     let data_path_exists = fs::metadata(&data_path).is_ok();
 
-    let applications_json = PathBuf::from(&install_path).join("data/applications.json");
     let current_json = PathBuf::from(&data_path).join("current.json");
     let version_json = PathBuf::from(&data_path).join("version.json");
 
-    let applications_json_exists = fs::metadata(&applications_json).is_ok();
     let current_json_exists = fs::metadata(&current_json).is_ok();
     let version_json_exists = fs::metadata(&version_json).is_ok();
 
@@ -62,6 +53,16 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
         None
     };
 
+	let applications_json_exists = if let Some(ref build_id) = build_id {
+		let applications_json = PathBuf::from(&data_path)
+			.join("depots")
+			.join(build_id)
+			.join("core/LGHUB/data/applications.json");
+		fs::metadata(&applications_json).is_ok()
+	} else {
+		false
+	};
+
     let images_dir_exists = if let Some(ref build_id) = build_id {
         let images_dir = PathBuf::from(&data_path)
             .join("depots")
@@ -73,7 +74,6 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
     };
 
     PathValidationResult {
-        install_path_exists,
         data_path_exists,
         applications_json_exists,
         current_json_exists,

@@ -8,7 +8,6 @@
   import SelectGHubLoc from '$components/SelectGHubLocPopup.svelte';
 
   type PathValidationResult = {
-    install_path_exists: boolean;
     data_path_exists: boolean;
     applications_json_exists: boolean;
     current_json_exists: boolean;
@@ -20,14 +19,14 @@
   let { children } = $props();
   let showSplash = $state(true);
   let validationResult = $state<PathValidationResult | null>(null);
-  let installPath = $state<string | null>(null);
-  let showInstallModal = $state(false);
-  function openInstallModal() { showInstallModal = true; }
-  function closeInstallModal() { showInstallModal = false; }
+  let dataPath = $state<string | null>(null);
+  let showDataModal = $state(false);
+  function openDataModal() { showDataModal = true; }
+  function closeDataModal() { showDataModal = false; }
 
-  async function fetchInstallPath() {
-    const value = await invoke<string | null>('store_get_key', { key: 'lghub_install_path' });
-    installPath = value;
+  async function fetchDataPath() {
+    const value = await invoke<string | null>('store_get_key', { key: 'lghub_data_path' });
+    dataPath = value;
   }
 
   onMount(() => {
@@ -48,10 +47,10 @@
     invoke<PathValidationResult>('validate_paths').then((result) => {
       validationResult = result;
       validationDone = true;
-      if (result.install_path_exists) {
-        fetchInstallPath();
+      if (result.data_path_exists) {
+        fetchDataPath();
       } else {
-        installPath = null;
+        dataPath = null;
       }
       hideSplashIfReady();
     });
@@ -67,16 +66,16 @@
   {:else}
     <div transition:fade={{ duration: 300 }}>
       <div class="fixed bottom-3 right-4 z-50 text-xs text-white font-light">
-        {#if validationResult && validationResult.install_path_exists && installPath}
-          <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left" onclick={openInstallModal}>
-            G HUB install location: {installPath}
+        {#if validationResult && validationResult.data_path_exists && dataPath}
+          <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left" onclick={openDataModal}>
+            G HUB data location: {dataPath}
           </button>
         {:else}
-          <button type="button" class="cursor-pointer hover:bg-blue-700/90 transition bg-transparent border-0 p-0 m-0 text-left" onclick={openInstallModal}>
-            G HUB install location: Click to Select
+          <button type="button" class="cursor-pointer hover:bg-blue-700/90 transition bg-transparent border-0 p-0 m-0 text-left" onclick={openDataModal}>
+            G HUB data location: Click to Select
           </button>
         {/if}
-        <SelectGHubLoc open={showInstallModal} onClose={closeInstallModal} />
+        <SelectGHubLoc open={showDataModal} onClose={closeDataModal} on:pathChange={fetchDataPath} />
       </div>
       {@render children?.()}
     </div>
