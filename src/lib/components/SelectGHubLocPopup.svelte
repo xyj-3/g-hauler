@@ -4,13 +4,21 @@
   const STORE_KEY_DATA_PATH = 'lghub_data_path';
   import Modal from './Popup.svelte';
   import { invoke } from '@tauri-apps/api/core';
-
   const dispatch = createEventDispatcher();
   export let open: boolean;
   export let onClose: () => void;
   let lghubPath: string = '';
   let validation: any = null;
   let showDetails: boolean = false;
+
+  async function handleClose() {
+    try {
+      await invoke('store_set_key', { key: STORE_KEY_DATA_PATH, value: lghubPath });
+    } catch (e) {
+      console.error('Error saving path on close:', e);
+    }
+    onClose();
+  }
 
   onMount(async () => {
     try {
@@ -47,7 +55,7 @@
   }
 </script>
 
-<Modal {open} {onClose}>
+<Modal {open} onClose={handleClose}>
   <div class="flex flex-col gap-4">
     <div class="text-xl font-semibold text-white">G HUB Data Location</div>
     <div class="text-base text-neutral-200">Please select the G HUB data folder.</div>
