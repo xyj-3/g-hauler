@@ -29,55 +29,55 @@ pub struct Command {
 #[serde(untagged)]
 pub enum Detection {
     Steam { steam: SteamApp },
-    WinRegistry { winRegistry: WinRegistry },
-    EpicGames { epicGames: EpicGames },
-    OsxBundle { osxBundle: OsxBundle },
+    WinRegistry { win_registry: WinRegistry },
+    EpicGames { epic_games: EpicGames },
+    OsxBundle { osx_bundle: OsxBundle },
     Uplay { uplay: Uplay },
-    GogGalaxy { gogGalaxy: GogGalaxy },
-    HumbleApp { humbleApp: HumbleApp },
-    RiotGames { riotGames: RiotGames },
+    GogGalaxy { gog_galaxy: GogGalaxy },
+    HumbleApp { humble_app: HumbleApp },
+    RiotGames { riot_games: RiotGames },
     Glob { glob: String },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SteamApp {
-    pub appId: String,
+    pub app_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WinRegistry {
     pub executable: String,
-    pub registryKey: String,
-    pub registryPath: String,
+    pub registry_key: String,
+    pub registry_path: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EpicGames {
-    pub appName: String,
+    pub app_name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OsxBundle {
-    pub bundleId: String,
-    pub bundlePath: String,
+    pub bundle_id: String,
+    pub bundle_path: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Uplay {
-    pub appId: String,
+    pub app_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GogGalaxy {
-    pub productId: String,
+    pub product_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HumbleApp {
-    pub gameName: String,
+    pub game_name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RiotGames {
-    pub appName: String,
+    pub app_name: String,
 }
