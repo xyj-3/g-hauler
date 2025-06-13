@@ -4,7 +4,7 @@ use tauri_plugin_store::StoreExt;
 use crate::constants::{
     STORE_FILENAME,
     STORE_KEY_DATA_PATH,
-    LGHUB_DATA_PATH
+    LGHUB_DEFAULT_DATA_PATH
 };
 
 use serde_json::json;
@@ -14,7 +14,7 @@ pub async fn initialize_store(app_handle: &tauri::AppHandle) -> Result<(), tauri
     let mut changed = false;
 
     if store.get(STORE_KEY_DATA_PATH).is_none() {
-        store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DATA_PATH));
+        store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DEFAULT_DATA_PATH));
         changed = true;
     }
     if changed {
