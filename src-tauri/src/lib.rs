@@ -1,6 +1,11 @@
 mod store;
 mod constants;
 mod validation;
+mod applications;
+mod paths;
+mod ghub;
+
+use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -8,17 +13,21 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .manage(applications::AppState {
+            applications: Mutex::new(Vec::new()),
+        })
         .setup(|app| {
             let handle = app.handle();
             if let Err(e) = tauri::async_runtime::block_on(crate::store::initialize_store(&handle)) {
                 eprintln!("Failed to initialize store: {}", e);
             }
             Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![
+        }).invoke_handler(tauri::generate_handler![
             crate::store::store_get_key,
             crate::store::store_set_key,
             crate::validation::validate_paths,
+            crate::applications::load_applications_from_json,
+            crate::applications::get_applications,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
