@@ -23,19 +23,31 @@ pub async fn initialize_store(app_handle: &tauri::AppHandle) -> Result<(), tauri
     Ok(())
 }
 
-#[tauri::command]
-pub async fn store_get_key(app_handle: AppHandle, key: String) -> Option<Value> {
+// Internal synchronous function for use within Rust code
+pub fn get_store_key(app_handle: &AppHandle, key: &str) -> Option<Value> {
     match app_handle.store(STORE_FILENAME) {
-        Ok(store) => store.get(&key),
+        Ok(store) => store.get(key),
         Err(_) => None
     }
 }
 
-#[tauri::command]
-pub async fn store_set_key(app_handle: AppHandle, key: String, value: Value) -> Result<(), String> {
+// Internal synchronous function for use within Rust code
+pub fn set_store_key(app_handle: &AppHandle, key: &str, value: Value) -> Result<(), String> {
     let store = app_handle.store(STORE_FILENAME)
         .map_err(|e| format!("Failed to access store: {}", e))?;
-    store.set(key.clone(), value);
+    store.set(key, value);
     store.save()
         .map_err(|e| format!("Failed to save store: {}", e))
+}
+
+// Tauri command for frontend calls
+#[tauri::command]
+pub async fn store_get_key(app_handle: AppHandle, key: String) -> Option<Value> {
+    get_store_key(&app_handle, &key)
+}
+
+// Tauri command for frontend calls
+#[tauri::command]
+pub async fn store_set_key(app_handle: AppHandle, key: String, value: Value) -> Result<(), String> {
+    set_store_key(&app_handle, &key, value)
 }
