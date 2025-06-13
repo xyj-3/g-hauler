@@ -66,7 +66,7 @@
   {:else}
     <div transition:fade={{ duration: 300 }}>
       <div class="fixed bottom-3 right-4 z-50 text-xs text-white font-light">
-        {#if validationResult && validationResult.data_path_exists && dataPath}
+        {#if dataPath && validationResult && validationResult.data_path_exists && validationResult.applications_json_exists && validationResult.current_json_exists && validationResult.version_json_exists && validationResult.build_id && validationResult.images_dir_exists}
           <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left" onclick={openDataModal}>
             G HUB data location: {dataPath}
           </button>
