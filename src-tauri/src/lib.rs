@@ -21,12 +21,14 @@ pub fn run() {
             if let Err(e) = tauri::async_runtime::block_on(crate::store::initialize_store(&handle)) {
                 eprintln!("Failed to initialize store: {}", e);
             }
+            if let Err(e) = crate::applications::initialize_applications_on_startup(&handle) {
+                eprintln!("Failed to initialize applications: {}", e);
+            }
             Ok(())
         }).invoke_handler(tauri::generate_handler![
             crate::store::store_get_key,
             crate::store::store_set_key,
             crate::validation::validate_paths,
-            crate::applications::load_applications_from_json,
             crate::applications::get_applications,
         ])
         .run(tauri::generate_context!())
