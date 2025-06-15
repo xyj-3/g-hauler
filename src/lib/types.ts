@@ -31,7 +31,8 @@ export type Detection =
   | { gog_galaxy: GogGalaxy }
   | { humble_app: HumbleApp }
   | { riot_games: RiotGames }
-  | { glob: string };
+  | { glob: string }
+  | any;
 
 export interface SteamApp {
   app_id: string;
