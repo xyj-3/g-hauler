@@ -2,7 +2,7 @@ mod store;
 mod constants;
 mod validation;
 mod applications;
-mod paths;
+mod util;
 mod ghub;
 
 use std::sync::Mutex;
@@ -28,6 +28,7 @@ pub fn run() {
         }).invoke_handler(tauri::generate_handler![
             crate::store::store_get_key,
             crate::store::store_set_key,
+            crate::util::get_pipeline_path,
             crate::validation::validate_paths,
             crate::applications::get_applications,
         ])

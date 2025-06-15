@@ -2,7 +2,7 @@ use std::fs;
 use std::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, State, Manager};
-use crate::{paths::get_applications_json_path, paths::get_current_json_path};
+use crate::util::{get_applications_json_path, get_build_id};
 use crate::ghub::GHUBApp;
 
 pub struct AppState {
@@ -12,13 +12,6 @@ pub struct AppState {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApplicationsData {
     pub applications: Vec<GHUBApp>,
-}
-
-fn get_build_id_from_current_json(app_handle: &AppHandle) -> Option<String> {
-    let current_json_path = get_current_json_path(app_handle)?;
-    let content = fs::read_to_string(current_json_path).ok()?;
-    let json: serde_json::Value = serde_json::from_str(&content).ok()?;
-    json.get("buildId")?.as_str().map(|s| s.to_string())
 }
 
 fn store_applications_in_manager(app_handle: &AppHandle, applications: &[GHUBApp]) -> Result<(), String> {
@@ -92,7 +85,7 @@ pub fn get_stored_applications(app_handle: &AppHandle) -> Result<Vec<GHUBApp>, S
 
 pub fn initialize_applications_on_startup(app_handle: &AppHandle) -> Result<(), String> {
     // Try to get build_id and load applications
-    if let Some(build_id) = get_build_id_from_current_json(app_handle) {
+    if let Some(build_id) = get_build_id(app_handle) {
         match load_and_store_applications(app_handle, &build_id) {
             Ok(apps) => {
                 println!("Successfully loaded {} applications on startup", apps.len());
