@@ -35,15 +35,39 @@ pub struct Command {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Detection {
-    Steam { steam: SteamApp },
-    WinRegistry { #[serde(rename = "winRegistry")] win_registry: WinRegistry },
-    EpicGames { #[serde(rename = "epicGames")] epic_games: EpicGames },
-    OsxBundle { #[serde(rename = "osxBundle")] osx_bundle: OsxBundle },
-    Uplay { uplay: Uplay },
-    GogGalaxy { #[serde(rename = "gogGalaxy")] gog_galaxy: GogGalaxy },
-    HumbleApp { #[serde(rename = "humbleApp")] humble_app: HumbleApp },
-    RiotGames { #[serde(rename = "riotGames")] riot_games: RiotGames },
-    Glob { glob: String },
+    Steam {
+        steam: SteamApp,
+    },
+    WinRegistry {
+        #[serde(rename = "winRegistry")]
+        win_registry: WinRegistry,
+    },
+    EpicGames {
+        #[serde(rename = "epicGames")]
+        epic_games: EpicGames,
+    },
+    OsxBundle {
+        #[serde(rename = "osxBundle")]
+        osx_bundle: OsxBundle,
+    },
+    Uplay {
+        uplay: Uplay,
+    },
+    GogGalaxy {
+        #[serde(rename = "gogGalaxy")]
+        gog_galaxy: GogGalaxy,
+    },
+    HumbleApp {
+        #[serde(rename = "humbleApp")]
+        humble_app: HumbleApp,
+    },
+    RiotGames {
+        #[serde(rename = "riotGames")]
+        riot_games: RiotGames,
+    },
+    Glob {
+        glob: String,
+    },
     // Catch-all for unknown detection types
     Unknown(serde_json::Value),
 }

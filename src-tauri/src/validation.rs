@@ -1,9 +1,7 @@
+use crate::constants::STORE_KEY_DATA_PATH;
 use serde_json::Value;
 use std::fs;
 use std::path::PathBuf;
-use crate::constants::{
-    STORE_KEY_DATA_PATH,
-};
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
@@ -32,7 +30,8 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
             };
         }
     };
-    let data_path = store.get(STORE_KEY_DATA_PATH)
+    let data_path = store
+        .get(STORE_KEY_DATA_PATH)
         .and_then(|v| v.as_str().map(|s| s.to_string()))
         .unwrap();
 
@@ -48,27 +47,32 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
         fs::read_to_string(&current_json)
             .ok()
             .and_then(|content| serde_json::from_str::<Value>(&content).ok())
-            .and_then(|json| json.get("buildId").and_then(|v| v.as_str().map(|s| s.to_string())))
+            .and_then(|json| {
+                json.get("buildId")
+                    .and_then(|v| v.as_str().map(|s| s.to_string()))
+            })
     } else {
         None
     };
 
-	let applications_json_exists = if let Some(ref build_id) = build_id {
-		let applications_json = PathBuf::from(&data_path)
-			.join("depots")
-			.join(build_id)
-			.join("core/LGHUB/data/applications.json");
-		fs::metadata(&applications_json).is_ok()
-	} else {
-		false
-	};
+    let applications_json_exists = if let Some(ref build_id) = build_id {
+        let applications_json = PathBuf::from(&data_path)
+            .join("depots")
+            .join(build_id)
+            .join("core/LGHUB/data/applications.json");
+        fs::metadata(&applications_json).is_ok()
+    } else {
+        false
+    };
 
     let images_dir_exists = if let Some(ref build_id) = build_id {
         let images_dir = PathBuf::from(&data_path)
             .join("depots")
             .join(build_id)
             .join("core_apps/images");
-        fs::metadata(&images_dir).map(|m| m.is_dir()).unwrap_or(false)
+        fs::metadata(&images_dir)
+            .map(|m| m.is_dir())
+            .unwrap_or(false)
     } else {
         false
     };
