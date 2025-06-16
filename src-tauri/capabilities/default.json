@@ -15,6 +15,14 @@
     "opener:default",
     "store:default",
     "dialog:default",
-    "fs:default"
+    "fs:default",
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    }
   ]
 }
