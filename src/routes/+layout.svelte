@@ -57,14 +57,14 @@
   });
 </script>
 
-<div class="w-full h-screen overflow-hidden relative bg-neutral-900">
+<div class="w-full h-screen relative bg-neutral-900 flex flex-col">
   <TitleBar />
   {#if showSplash}
-    <div transition:fade={{ duration: 300 }}>
+    <div transition:fade={{ duration: 300 }} class="flex-1 overflow-hidden">
       <SplashScreen />
     </div>
   {:else}
-    <div transition:fade={{ duration: 300 }}>
+    <div transition:fade={{ duration: 300 }} class="flex-1 overflow-y-auto">
       <div class="fixed bottom-3 right-4 z-50 text-xs text-white font-light">
         {#if dataPath && validationResult && validationResult.data_path_exists && validationResult.applications_json_exists && validationResult.current_json_exists && validationResult.version_json_exists && validationResult.build_id && validationResult.images_dir_exists}
           <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left" onclick={openDataModal}>

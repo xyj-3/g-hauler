@@ -10,8 +10,11 @@
   }
 
   const { game, tabindex }: GameCardProps = $props();
-
-  let resolvedPosterUrl = $state(game.poster_url);
+  let cardElement = $state<HTMLDivElement>();
+  let isVisible = $state(false);
+  let imageLoaded = $state(false);
+  let resolvedPosterUrl = $state<string | null>(null);
+  let observer: IntersectionObserver;
 
   const handleCardClick = () => {
     console.log('Game selected:', game.name);
@@ -24,9 +27,12 @@
     }
   };
 
-  const handleImageError = (event: Event) => {
-    const img = event.target as HTMLImageElement;
-    img.src = '/favicon.png';
+  const handleImageLoad = () => {
+    imageLoaded = true;
+  };
+
+  const handleImageError = () => {
+    imageLoaded = false;
   };
 
   const resolvePipelineUrl = async (url: string): Promise<string> => {
@@ -55,39 +61,76 @@
       console.error('Failed to resolve pipeline image:', error);
     }
     return url;
-  };
-
-  onMount(async () => {
+  };  const loadContent = async () => {
     if (game.poster_url.startsWith('pipeline://')) {
       try {
         resolvedPosterUrl = await resolvePipelineUrl(game.poster_url);
-        console.log('Resolved poster URL:', resolvedPosterUrl);
       } catch (error) {
         console.error('Error resolving pipeline URL:', error);
+        resolvedPosterUrl = null;
       }
     }
+  };
+  
+  onMount(() => {
+    if (!cardElement) return;
+    
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // console.log(entry.intersectionRatio.toFixed(2));
+          // console.log(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            isVisible = true;
+            loadContent();
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '300px',
+        threshold: 0,
+      }
+    );
+    
+    observer.observe(cardElement);
+    
+    return () => {
+      if (observer && cardElement) {
+        observer.unobserve(cardElement);
+      }
+    };
   });
 </script>
 
 <div
+  bind:this={cardElement}
   class="cursor-pointer group transition-transform duration-300 hover:scale-102 w-40"
   onclick={handleCardClick}
   onkeydown={handleKeyDown}
   tabindex={tabindex}
   role="button"
   aria-label="Select {game.name}"
-><div class="relative aspect-[3/4] overflow-hidden rounded-md">
-        <img
-            src={resolvedPosterUrl}
-            alt="{game.name} poster"
-            class="w-full h-full object-cover"
-            onerror={handleImageError}
-            loading="lazy"
-        />
-    </div>
-    <div class="mt-2">
-        <h3 class="text-white font-medium text-sm leading-tight truncate" title={game.name}>
-            {game.name}
-        </h3>
-    </div>
+>
+  <div class="relative aspect-[3/4] overflow-hidden rounded-md">
+    <!-- Poster -->
+    <div class="absolute inset-0 bg-gray-700"></div>
+      {#if isVisible && resolvedPosterUrl}
+      <img
+        src={resolvedPosterUrl}
+        alt="{game.name} poster"
+        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+        class:opacity-0={!imageLoaded}
+        onload={handleImageLoad}
+        onerror={handleImageError}
+        loading="lazy"
+      />
+    {/if}
+  </div>
+  <!-- Name -->
+  <div class="mt-2">
+    <h3 class="text-white font-medium text-sm leading-tight truncate" title={game.name}>
+      {game.name}
+    </h3>
+  </div>
 </div>
