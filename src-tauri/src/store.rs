@@ -11,13 +11,17 @@ pub async fn initialize_store(
     let store = app_handle.store(STORE_FILENAME)?;
     let mut changed = false;
 
+    // Initialize default data path if not set
     if store.get(STORE_KEY_DATA_PATH).is_none() {
         store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DEFAULT_DATA_PATH));
         changed = true;
     }
+    
     if changed {
         store.save()?;
+        println!("Store initialized with default values");
     }
+    
     Ok(())
 }
 

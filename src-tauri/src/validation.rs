@@ -1,7 +1,7 @@
 use crate::constants::STORE_KEY_DATA_PATH;
+use crate::util::{get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path};
 use serde_json::Value;
 use std::fs;
-use std::path::PathBuf;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
@@ -30,22 +30,42 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
             };
         }
     };
-    let data_path = store
+    
+    let data_path = match store
         .get(STORE_KEY_DATA_PATH)
         .and_then(|v| v.as_str().map(|s| s.to_string()))
-        .unwrap();
-
+    {
+        Some(path) => path,
+        None => {
+            return PathValidationResult {
+                data_path_exists: false,
+                applications_json_exists: false,
+                current_json_exists: false,
+                version_json_exists: false,
+                build_id: None,
+                images_dir_exists: false,
+            };
+        }
+    };
+    
     let data_path_exists = fs::metadata(&data_path).is_ok();
 
-    let current_json = PathBuf::from(&data_path).join("current.json");
-    let version_json = PathBuf::from(&data_path).join("version.json");
+    let current_json_path = get_current_json_path(&app_handle);
+    let version_json_path = get_version_json_path(&app_handle);
 
-    let current_json_exists = fs::metadata(&current_json).is_ok();
-    let version_json_exists = fs::metadata(&version_json).is_ok();
+    let current_json_exists = current_json_path
+        .as_ref()
+        .map(|p| fs::metadata(p).is_ok())
+        .unwrap_or(false);
+    
+    let version_json_exists = version_json_path
+        .as_ref()
+        .map(|p| fs::metadata(p).is_ok())
+        .unwrap_or(false);
 
     let build_id = if current_json_exists {
-        fs::read_to_string(&current_json)
-            .ok()
+        current_json_path
+            .and_then(|path| fs::read_to_string(&path).ok())
             .and_then(|content| serde_json::from_str::<Value>(&content).ok())
             .and_then(|json| {
                 json.get("buildId")
@@ -54,25 +74,25 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
     } else {
         None
     };
-
+    
     let applications_json_exists = if let Some(ref build_id) = build_id {
-        let applications_json = PathBuf::from(&data_path)
-            .join("depots")
-            .join(build_id)
-            .join("core/LGHUB/data/applications.json");
-        fs::metadata(&applications_json).is_ok()
+        if let Some(applications_json_path) = get_applications_json_path(&app_handle, build_id) {
+            fs::metadata(&applications_json_path).is_ok()
+        } else {
+            false
+        }
     } else {
         false
     };
 
     let images_dir_exists = if let Some(ref build_id) = build_id {
-        let images_dir = PathBuf::from(&data_path)
-            .join("depots")
-            .join(build_id)
-            .join("core_apps/images");
-        fs::metadata(&images_dir)
-            .map(|m| m.is_dir())
-            .unwrap_or(false)
+        if let Some(images_dir_path) = get_images_dir_path(&app_handle, build_id) {
+            fs::metadata(&images_dir_path)
+                .map(|m| m.is_dir())
+                .unwrap_or(false)
+        } else {
+            false
+        }
     } else {
         false
     };
