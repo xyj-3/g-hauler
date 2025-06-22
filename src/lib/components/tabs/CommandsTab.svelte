@@ -108,6 +108,7 @@
                     onclick={() => handleDeleteCommand(command)}
                     class="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded"
                     title="Delete command"
+                    aria-label="Delete command"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

@@ -84,7 +84,7 @@
     }
   };
 
-  const handleBackdropClick = (event: MouseEvent) => {
+  const handleBackdropClick = (event: MouseEvent | KeyboardEvent) => {
     if (event.target === event.currentTarget) {
       handleClose();
     }
@@ -97,12 +97,15 @@
   <div 
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
     onclick={handleBackdropClick}
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modal-title"
+    onkeydown={handleBackdropClick}
+    role="button"
     tabindex="0"
+    aria-label="Close modal by clicking outside"
   >
-    <div class="bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modal-title">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-700">
         <h2 id="modal-title" class="text-xl font-semibold text-white">
@@ -117,17 +120,31 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </div>      <!-- Tabs -->
+      </div>
+      <!-- Tabs -->
       <div class="border-b border-gray-700">
-        <nav class="flex space-x-8 px-6" aria-label="Tabs">
+        <div class="flex space-x-8 px-6">
+          <button
+            onclick={() => activeTab = 'general'}
+            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'general' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+          >
+            General
+          </button>
           <button
             onclick={() => activeTab = 'commands'}
-            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors border-blue-500 text-blue-400"
+            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'commands' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
           >
             Commands
           </button>
-        </nav>
-      </div><!-- Content -->
+          <button
+            onclick={() => activeTab = 'detection'}
+            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'detection' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+          >
+            Detection
+          </button>
+        </div>
+      </div>
+      <!-- Content -->
       <div class="flex-1 overflow-y-auto p-6">
         {#if activeTab === 'general'}
           <GeneralTab game={editedGame} />
@@ -136,7 +153,8 @@
         {:else if activeTab === 'detection'}
           <DetectionTab game={editedGame} />
         {/if}
-      </div>      <!-- Footer -->
+      </div>
+      <!-- Footer -->
       <div class="flex justify-end space-x-3 p-6 border-t border-gray-700">
         <button
           onclick={handleClose}
