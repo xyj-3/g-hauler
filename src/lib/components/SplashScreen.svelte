@@ -14,7 +14,7 @@
   });
 </script>
 
-<div class="fixed inset-0 flex justify-center items-center bg-[#1a1a1a] z-[9999]">
+<div class="absolute inset-0 flex justify-center items-center bg-[#1a1a1a] z-[9999]">
   <div class="flex flex-col justify-center items-center gap-5">
     <div class="text-2xl font-bold text-white mb-2.5 tracking-wider">G-Hauler</div>
     <img 

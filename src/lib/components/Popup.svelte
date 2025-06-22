@@ -10,6 +10,7 @@
 {#if open}
   <div
     class="fixed inset-0 z-50 flex items-center justify-center"
+    style="top: 2rem;"
     role="dialog"
     aria-modal="true"
     tabindex="0"
