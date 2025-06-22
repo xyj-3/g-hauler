@@ -127,3 +127,82 @@ pub fn initialize_applications_on_startup(app_handle: &AppHandle) -> Result<(), 
 pub async fn get_applications(app_handle: AppHandle) -> Result<Vec<GHUBApp>, String> {
     get_stored_applications(&app_handle)
 }
+
+#[tauri::command]
+pub async fn update_application(
+    app_handle: AppHandle,
+    updated_app: GHUBApp,
+) -> Result<(), String> {
+    let state: State<AppState> = app_handle.state();
+    let mut apps = state
+        .applications
+        .lock()
+        .map_err(|e| format!("Failed to acquire lock on applications: {}", e))?;
+
+    // Find the application by application_id and update it
+    let app_index = apps
+        .iter()
+        .position(|app| app.application_id == updated_app.application_id)
+        .ok_or_else(|| {
+            format!(
+                "Application with ID '{}' not found",
+                updated_app.application_id
+            )
+        })?;
+
+    apps[app_index] = updated_app;
+    
+    println!("Successfully updated application with ID: {}", apps[app_index].application_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_application_by_id(
+    app_handle: AppHandle,
+    application_id: String,
+) -> Result<Option<GHUBApp>, String> {
+    let state: State<AppState> = app_handle.state();
+    let apps = state
+        .applications
+        .lock()
+        .map_err(|e| format!("Failed to acquire lock on applications: {}", e))?;
+
+    let app = apps
+        .iter()
+        .find(|app| app.application_id == application_id)
+        .cloned();
+
+    Ok(app)
+}
+
+#[tauri::command]
+pub async fn save_applications_to_disk(app_handle: AppHandle) -> Result<(), String> {
+    let build_id = get_build_id(&app_handle).ok_or("Failed to get build_id")?;
+    let json_path = get_applications_json_path(&app_handle, &build_id)
+        .ok_or("Failed to get applications.json path")?;
+
+    let state: State<AppState> = app_handle.state();
+    let apps = state
+        .applications
+        .lock()
+        .map_err(|e| format!("Failed to acquire lock on applications: {}", e))?;
+
+    let applications_data = ApplicationsData {
+        applications: apps.clone(),
+    };
+
+    let json_content = serde_json::to_string_pretty(&applications_data)
+        .map_err(|e| format!("Failed to serialize applications: {}", e))?;
+
+    // Create parent directory if it doesn't exist
+    if let Some(parent) = json_path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("Failed to create directory: {}", e))?;
+    }
+
+    fs::write(&json_path, json_content)
+        .map_err(|e| format!("Failed to write applications.json: {}", e))?;
+
+    println!("Successfully saved {} applications to disk", apps.len());
+    Ok(())
+}

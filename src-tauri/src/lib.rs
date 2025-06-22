@@ -34,6 +34,9 @@ pub fn run() {
             crate::util::get_pipeline_path,
             crate::validation::validate_paths,
             crate::applications::get_applications,
+            crate::applications::update_application,
+            crate::applications::get_application_by_id,
+            crate::applications::save_applications_to_disk,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

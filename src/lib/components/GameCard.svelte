@@ -3,21 +3,46 @@
   import { invoke } from '@tauri-apps/api/core';
   import { readFile } from '@tauri-apps/plugin-fs';
   import { onMount } from 'svelte';
-
+  import GameEditModal from './GameEditModal.svelte';
   interface GameCardProps {
     game: GHUBApp;
     tabindex?: number;
+    ongameUpdated?: (game: GHUBApp) => void;
   }
-
-  const { game, tabindex }: GameCardProps = $props();
+  const { game, tabindex, ongameUpdated }: GameCardProps = $props();
+  
   let cardElement = $state<HTMLDivElement>();
   let isVisible = $state(false);
   let imageLoaded = $state(false);
   let resolvedPosterUrl = $state<string | null>(null);
   let observer: IntersectionObserver;
+  let showEditModal = $state(false);
 
   const handleCardClick = () => {
     console.log('Game selected:', game.name);
+    showEditModal = true;
+  };
+
+  const handleModalClose = () => {
+    showEditModal = false;
+  };  const handleGameSave = async (updatedGame: GHUBApp) => {
+    try {
+      // Update the application in the backend memory
+      await invoke('update_application', { updatedApp: updatedGame });
+      console.log('Application updated successfully in backend memory');
+      
+      // Save to disk
+      await invoke('save_applications_to_disk');
+      console.log('Applications saved to disk successfully');
+      
+      // Update the frontend state
+      ongameUpdated?.(updatedGame);
+      showEditModal = false;
+    } catch (error) {
+      console.error('Failed to update application:', error);
+      // Rethrow the error so the modal can handle it
+      throw error;
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -134,3 +159,13 @@
     </h3>
   </div>
 </div>
+
+<!-- Edit Modal -->
+{#if showEditModal}
+  <GameEditModal 
+    {game} 
+    isOpen={showEditModal} 
+    onclose={handleModalClose}
+    onsave={handleGameSave}
+  />
+{/if}
