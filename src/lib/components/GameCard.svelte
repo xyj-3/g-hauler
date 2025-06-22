@@ -130,7 +130,7 @@
 
 <div
   bind:this={cardElement}
-  class="cursor-pointer group transition-transform duration-300 hover:scale-102 w-40"
+  class="cursor-pointer group w-40 transition-transform duration-200 hover:scale-105"
   onclick={handleCardClick}
   onkeydown={handleKeyDown}
   tabindex={tabindex}
@@ -138,9 +138,8 @@
   aria-label="Select {game.name}"
 >
   <div class="relative aspect-[3/4] overflow-hidden rounded-md">
-    <!-- Poster -->
     <div class="absolute inset-0 bg-gray-700"></div>
-      {#if isVisible && resolvedPosterUrl}
+    {#if isVisible && resolvedPosterUrl}
       <img
         src={resolvedPosterUrl}
         alt="{game.name} poster"
@@ -152,7 +151,6 @@
       />
     {/if}
   </div>
-  <!-- Name -->
   <div class="mt-2">
     <h3 class="text-white font-medium text-sm leading-tight truncate" title={game.name}>
       {game.name}
@@ -160,7 +158,6 @@
   </div>
 </div>
 
-<!-- Edit Modal -->
 {#if showEditModal}
   <GameEditModal 
     {game} 

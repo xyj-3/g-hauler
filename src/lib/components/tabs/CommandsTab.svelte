@@ -36,39 +36,34 @@
   const handleDeleteCommand = (commandToDelete: Command) => {
     game.commands = game.commands.filter(command => command !== commandToDelete);
   };
+  const parseKeystroke = (value: string) => value
+    .split('+')
+    .map(key => key.trim())
+    .filter(key => key.length > 0);
 
   const handleKeystrokeInputChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     keystrokeInput = target.value;
-    // Parse keystroke string into array (split by '+' and trim whitespace)
-    newCommand.keystroke = target.value
-      .split('+')
-      .map(key => key.trim())
-      .filter(key => key.length > 0);
-  };
-  const handleInlineEdit = (command: Command, field: 'name' | 'keystroke', value: string) => {
-    const commandIndex = game.commands.indexOf(command);
-    if (commandIndex !== -1) {
-      if (field === 'keystroke') {
-        game.commands[commandIndex].keystroke = value
-          .split('+')
-          .map(key => key.trim())
-          .filter(key => key.length > 0);
-      } else {
-        game.commands[commandIndex][field] = value;
-      }
-    }
+    newCommand.keystroke = parseKeystroke(target.value);
   };
 
   const handleInputBlur = (event: Event, command: Command, field: 'name' | 'keystroke') => {
     const target = event.target as HTMLInputElement;
-    if (target) {
-      handleInlineEdit(command, field, target.value);
+    if (!target) return;
+    
+    const commandIndex = game.commands.indexOf(command);
+    if (commandIndex === -1) return;
+    
+    if (field === 'keystroke') {
+      game.commands[commandIndex].keystroke = parseKeystroke(target.value);
+    } else {
+      game.commands[commandIndex][field] = target.value;
     }
   };
 </script>
 
-<div class="space-y-6">  <!-- Existing Commands Grouped by Category -->
+<div class="space-y-6">
+  <!-- Current Commands -->
   <div>
     <h3 class="text-lg font-medium text-white mb-4">Current Commands</h3>
     
@@ -80,36 +75,38 @@
           <div class="space-y-3">
             <h4 class="text-md font-semibold text-blue-300 border-b border-gray-600 pb-1">
               {category}
-            </h4>            <div class="space-y-1 pl-4">              {#each commands as command}                <div class="group bg-gray-700 rounded-md px-3 py-2 flex items-center hover:bg-gray-650 transition-colors relative">
-                  <div class="flex-1">                    <!-- Keys and Command on same row -->
-                    <div class="flex items-center space-x-1">                      <!-- Keystroke (editable) -->
-                      <div class="flex items-center space-x-2 basis-[30%] flex-shrink-0">
-                        <span class="text-xs text-gray-400 font-medium min-w-[40px]">Keys:</span>
-                        <input
-                          type="text"
-                          value={command.keystroke.join(' + ')}
-                          onblur={(e) => handleInputBlur(e, command, 'keystroke')}
-                          placeholder="e.g., Ctrl + S"
-                          class="bg-transparent text-gray-300 text-xs flex-1 focus:outline-none focus:bg-gray-600 focus:px-1 focus:py-0.5 focus:rounded transition-all"
-                        />
-                      </div>
-                      <!-- Command Name (editable) -->
-                      <div class="flex items-center space-x-2 basis-[70%] flex-shrink-0">
-                        <span class="text-xs text-gray-400 font-medium min-w-[60px]">Command:</span>
-                        <input
-                          type="text"
-                          value={command.name}
-                          onblur={(e) => handleInputBlur(e, command, 'name')}
-                          class="bg-transparent text-white font-medium text-xs flex-1 focus:outline-none focus:bg-gray-600 focus:px-1 focus:py-0.5 focus:rounded transition-all"
-                        />
-                      </div>
+            </h4>
+            <div class="space-y-1 pl-4">
+              {#each commands as command}
+                <div class="group bg-gray-700 rounded px-3 py-2 flex items-center hover:bg-gray-600 transition-colors">
+                  <div class="flex-1 flex items-center space-x-4">
+                    <!-- Keys Input -->
+                    <div class="flex items-center space-x-2 w-1/3">
+                      <span class="text-xs text-gray-400 font-medium">Keys:</span>
+                      <input
+                        type="text"
+                        value={command.keystroke.join(' + ')}
+                        onblur={(e) => handleInputBlur(e, command, 'keystroke')}
+                        placeholder="e.g., Ctrl + S"
+                        class="bg-transparent text-gray-300 text-xs flex-1 focus:outline-none focus:bg-gray-600 focus:px-1 focus:py-0.5 focus:rounded"
+                      />
+                    </div>
+                    <!-- Command Name Input -->
+                    <div class="flex items-center space-x-2 flex-1">
+                      <span class="text-xs text-gray-400 font-medium">Command:</span>
+                      <input
+                        type="text"
+                        value={command.name}
+                        onblur={(e) => handleInputBlur(e, command, 'name')}
+                        class="bg-transparent text-white font-medium text-xs flex-1 focus:outline-none focus:bg-gray-600 focus:px-1 focus:py-0.5 focus:rounded"
+                      />
                     </div>
                   </div>
                   
-                  <!-- Delete button (visible on hover) -->
+                  <!-- Delete Button -->
                   <button
                     onclick={() => handleDeleteCommand(command)}
-                    class="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-0.5 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded"
+                    class="opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded"
                     title="Delete command"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,8 +120,7 @@
         {/each}
       </div>
     {/if}
-  </div>
-  <!-- Add Command Form -->
+  </div>  <!-- Add Command Form -->
   <div class="bg-gray-700 rounded-lg p-4">
     <h3 class="text-lg font-medium text-white mb-4">Add New Command</h3>
     
@@ -132,8 +128,7 @@
       <div>
         <label for="command-name" class="block text-sm font-medium text-gray-300 mb-2">
           Command Name
-        </label>
-        <input
+        </label>        <input
           id="command-name"
           type="text"
           bind:value={newCommand.name}

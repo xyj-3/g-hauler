@@ -117,46 +117,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </div>
-
-      <!-- Tabs -->
+      </div>      <!-- Tabs -->
       <div class="border-b border-gray-700">
         <nav class="flex space-x-8 px-6" aria-label="Tabs">
-          <!-- <button
-            onclick={() => activeTab = 'general'}
-            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200"
-            class:border-blue-500={activeTab === 'general'}
-            class:text-blue-400={activeTab === 'general'}
-            class:border-transparent={activeTab !== 'general'}
-            class:text-gray-400={activeTab !== 'general'}
-            class:hover:text-gray-300={activeTab !== 'general'}
-          >
-            General
-          </button> -->
           <button
             onclick={() => activeTab = 'commands'}
-            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200"
-            class:border-blue-500={activeTab === 'commands'}
-            class:text-blue-400={activeTab === 'commands'}
-            class:border-transparent={activeTab !== 'commands'}
-            class:text-gray-400={activeTab !== 'commands'}
-            class:hover:text-gray-300={activeTab !== 'commands'}
+            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors border-blue-500 text-blue-400"
           >
             Commands
           </button>
-          <!-- <button
-            onclick={() => activeTab = 'detection'}
-            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200"
-            class:border-blue-500={activeTab === 'detection'}
-            class:text-blue-400={activeTab === 'detection'}
-            class:border-transparent={activeTab !== 'detection'}
-            class:text-gray-400={activeTab !== 'detection'}
-            class:hover:text-gray-300={activeTab !== 'detection'}
-          >
-            Detection
-          </button> -->
         </nav>
-      </div>      <!-- Content -->
+      </div><!-- Content -->
       <div class="flex-1 overflow-y-auto p-6">
         {#if activeTab === 'general'}
           <GeneralTab game={editedGame} />
@@ -165,9 +136,7 @@
         {:else if activeTab === 'detection'}
           <DetectionTab game={editedGame} />
         {/if}
-      </div>
-
-      <!-- Footer -->
+      </div>      <!-- Footer -->
       <div class="flex justify-end space-x-3 p-6 border-t border-gray-700">
         <button
           onclick={handleClose}
@@ -182,10 +151,7 @@
           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-500 disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2"
         >
           {#if isSaving}
-            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
             <span>Saving...</span>
           {:else}
             <span>Save Changes</span>
