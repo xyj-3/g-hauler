@@ -5,7 +5,7 @@
   import TitleBar from '$components/TitleBar.svelte';
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
-  import GHubDataLocPopup from '$components/GHubDataLocPopup.svelte';
+  import GHubDataLocModal from '$components/GHubDataLocModal.svelte';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -75,7 +75,7 @@
             G HUB data location: Click to Select
           </button>
         {/if}
-        <GHubDataLocPopup open={showDataModal} onClose={closeDataModal} on:pathChange={fetchDataPath} />
+        <GHubDataLocModal open={showDataModal} onClose={closeDataModal} on:pathChange={fetchDataPath} />
       </div>
       {@render children?.()}
     </div>
