@@ -76,7 +76,7 @@
             <h4 class="text-md font-semibold text-blue-300 border-b border-gray-600 pb-1">
               {category}
             </h4>
-            <div class="space-y-1 pl-4">
+            <div class="space-y-1">
               {#each commands as command}
                 <div class="group bg-gray-700 rounded px-3 py-2 flex items-center hover:bg-gray-600 transition-colors">
                   <div class="flex-1 flex items-center space-x-4">
