@@ -4,11 +4,13 @@
   import { readFile } from '@tauri-apps/plugin-fs';
   import { onMount } from 'svelte';
   import GameEditModal from './GameEditModal.svelte';
+  
   interface GameCardProps {
     game: GHUBApp;
     tabindex?: number;
     ongameUpdated?: (game: GHUBApp) => void;
   }
+
   const { game, tabindex, ongameUpdated }: GameCardProps = $props();
   
   let cardElement = $state<HTMLDivElement>();
@@ -25,7 +27,9 @@
 
   const handleModalClose = () => {
     showEditModal = false;
-  };  const handleGameSave = async (updatedGame: GHUBApp) => {
+  };
+  
+  const handleGameSave = async (updatedGame: GHUBApp) => {
     try {
       // Update the application in the backend memory
       await invoke('update_application', { updatedApp: updatedGame });
@@ -86,7 +90,9 @@
       console.error('Failed to resolve pipeline image:', error);
     }
     return url;
-  };  const loadContent = async () => {
+  };
+  
+  const loadContent = async () => {
     if (game.poster_url.startsWith('pipeline://')) {
       try {
         resolvedPosterUrl = await resolvePipelineUrl(game.poster_url);
