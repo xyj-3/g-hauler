@@ -33,7 +33,7 @@
   });
 </script>
 
-<main class="w-full text-white min-h-full p-8 pb-4">
+<main class="w-full text-white min-h-full px-8 pt-4 pb-4">
   <div class="max-w-7xl mx-auto">
     {#if loading}
       <div class="text-center h-screen flex flex-col items-center justify-center">
@@ -53,8 +53,7 @@
       </div>
     {:else if applications.length > 0}
       <!-- <div class="mb-6">
-        <h1 class="text-3xl font-bold mb-2">G Hauler</h1>
-        <p class="text-gray-400">{applications.length} {applications.length === 1 ? 'game' : 'games'} found</p>
+        <h1 class="text-4xl font-semibold mb-2 tracking-normal text-teal-400 font-sans">G Hauler</h1>
       </div> -->
         <!-- Responsive grid: 2 cols on small screens, 3 on medium, 4 on large, 5 on xl, 6 on 2xl -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 pb-4">
