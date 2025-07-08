@@ -14,7 +14,7 @@
 </script>
 
 <div data-tauri-drag-region class="flex items-center justify-center w-full h-8 bg-gray-900 relative">
-  <h1 class="text-sm font-medium text-teal-400 font-sans">G Hauler</h1>
+  <h1 data-tauri-drag-region class="text-sm font-medium text-teal-400 font-sans cursor-default">G Hauler</h1>
   <div class="absolute right-0 top-0 h-full flex items-center gap-1">
     <button aria-label="Minimize" class="w-10 h-full flex items-center justify-center hover:bg-white/10 transition" onclick={minimize}>
       <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><line x1="6" y1="12" x2="18" y2="12" /></svg>
