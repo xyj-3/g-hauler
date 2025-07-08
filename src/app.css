@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #111827;
+}
+
 /* Hide scrollbar arrows on WebKit browsers */
 ::-webkit-scrollbar-button {
   display: none;

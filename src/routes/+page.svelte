@@ -33,7 +33,7 @@
   });
 </script>
 
-<main class="w-full bg-gray-900 text-white min-h-full p-8 pb-4">
+<main class="w-full text-white min-h-full p-8 pb-4">
   <div class="max-w-7xl mx-auto">
     {#if loading}
       <div class="text-center h-screen flex flex-col items-center justify-center">

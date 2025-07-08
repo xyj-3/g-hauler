@@ -57,7 +57,7 @@
   });
 </script>
 
-<div class="w-full h-screen relative bg-neutral-900 flex flex-col">
+<div class="w-full h-screen relative bg-background flex flex-col">
   <TitleBar />
   {#if showSplash}
     <div transition:fade={{ duration: 300 }} class="flex-1 overflow-hidden relative">
@@ -69,7 +69,7 @@
         {@render children?.()}
       </div>
       <!-- Bottom Bar -->
-      <div class="bg-gray-900 px-4 py-2 text-xs text-white font-light flex justify-between items-center">
+      <div class="bg-color-background px-4 py-2 text-xs text-white font-light flex justify-between items-center">
         <div class="flex items-center space-x-4">
           {#if dataPath && validationResult && validationResult.data_path_exists && validationResult.applications_json_exists && validationResult.current_json_exists && validationResult.version_json_exists && validationResult.build_id && validationResult.images_dir_exists}
             <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left hover:text-blue-300 transition-colors" onclick={openDataModal}>
