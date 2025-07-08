@@ -2,6 +2,7 @@
 
 @theme {
   --color-background: #111827;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Hide scrollbar arrows on WebKit browsers */
