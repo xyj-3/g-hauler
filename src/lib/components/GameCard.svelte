@@ -136,14 +136,14 @@
 
 <div
   bind:this={cardElement}
-  class="cursor-pointer group w-40 transition-transform duration-200 hover:scale-105"
+  class="cursor-pointer group w-40 transition-transform duration-200 hover:scale-108"
   onclick={handleCardClick}
   onkeydown={handleKeyDown}
   tabindex={tabindex}
   role="button"
   aria-label="Select {game.name}"
 >
-  <div class="relative aspect-[3/4] overflow-hidden rounded-md">
+  <div class="relative aspect-[3/4] overflow-hidden rounded-sm">
     <div class="absolute inset-0 bg-gray-700"></div>
     {#if isVisible && resolvedPosterUrl}
       <img
