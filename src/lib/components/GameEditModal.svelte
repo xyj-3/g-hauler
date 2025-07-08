@@ -90,7 +90,7 @@
   <div class="max-h-[90vh] overflow-hidden flex flex-col" style="margin: -2rem;">
     <!-- Header -->
     <div class="flex items-center justify-between p-6 border-b border-gray-700">
-      <h2 id="modal-title" class="text-xl font-semibold text-white">
+      <h2 id="modal-title" class="text-xl font-semibold text-white font-dm-sans">
         Edit Game - {game.name}
       </h2>
       <button
@@ -108,19 +108,19 @@
       <div class="flex space-x-8 px-6">
         <button
           onclick={() => activeTab = 'general'}
-          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'general' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors font-dm-sans {activeTab === 'general' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
         >
           General
         </button>
         <button
           onclick={() => activeTab = 'commands'}
-          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'commands' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors font-dm-sans {activeTab === 'commands' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
         >
           Commands
         </button>
         <button
           onclick={() => activeTab = 'detection'}
-          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === 'detection' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors font-dm-sans {activeTab === 'detection' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
         >
           Detection
         </button>

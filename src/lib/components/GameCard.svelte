@@ -158,7 +158,7 @@
     {/if}
   </div>
   <div class="mt-2">
-    <h3 class="text-white font-medium text-sm leading-tight truncate" title={game.name}>
+    <h3 class="text-white font-medium text-sm leading-tight truncate font-dm-sans" title={game.name}>
       {game.name}
     </h3>
   </div>
