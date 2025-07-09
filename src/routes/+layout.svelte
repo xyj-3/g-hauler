@@ -65,8 +65,16 @@
     </div>
   {:else}
     <div transition:fade={{ duration: 300 }} class="flex-1 flex flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto relative">
-        {@render children?.()}
+      <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar Area -->
+        <div class="w-6 bg-gray-900 flex flex-col items-center py-1"></div>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <div class="flex-1 overflow-y-auto relative">
+            {@render children?.()}
+          </div>
+        </div>
       </div>
       <!-- Bottom Bar -->
       <div class="bg-color-background px-4 py-2 text-xs text-white font-light flex justify-between items-center">
