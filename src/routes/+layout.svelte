@@ -6,7 +6,8 @@
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
   import GHubDataLocModal from '$components/GHubDataLocModal.svelte';
-  import { Gamepad2 } from 'lucide-svelte';
+  import { Gamepad2, Info } from 'lucide-svelte';
+  import { siGithub, siDiscord } from 'simple-icons';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -86,7 +87,7 @@
         </div>
       </div>
       <!-- Bottom Bar -->
-      <div class="bg-color-background px-4 py-2 text-xs text-white font-light flex justify-between items-center">
+      <div class="bg-color-background px-4 h-8 text-xs text-white font-light flex justify-between items-center">
         <div class="flex items-center space-x-4">
           {#if dataPath && validationResult && validationResult.data_path_exists && validationResult.applications_json_exists && validationResult.current_json_exists && validationResult.version_json_exists && validationResult.build_id && validationResult.images_dir_exists}
             <button type="button" class="cursor-pointer bg-transparent border-0 p-0 m-0 text-left hover:text-blue-300 transition-colors" onclick={openDataModal}>
@@ -98,6 +99,25 @@
             </button>
           {/if}
         </div>
+        
+        <!-- Icons on the right -->
+        <!-- <div class="flex items-center space-x-2">
+          <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="About">
+            <Info class="w-4 h-4" />
+          </button>
+          <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="GitHub">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d={siGithub.path} />
+            </svg>
+          </button>
+          <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="Discord">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              <path d={siDiscord.path} />
+            </svg>
+          </button>
+        </div> -->
+
+        <!-- Build ID indicator -->
         <!-- <div class="text-neutral-400">
           {#if validationResult?.build_id}
             Build: {validationResult.build_id}
