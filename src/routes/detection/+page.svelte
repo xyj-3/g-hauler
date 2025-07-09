@@ -1,0 +1,1 @@
+<h1>Game Detection Patching</h1>
