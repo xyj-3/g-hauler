@@ -18,7 +18,8 @@
     "@tauri-apps/plugin-dialog": "^2",
     "@tauri-apps/plugin-fs": "~2",
     "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-store": "~2"
+    "@tauri-apps/plugin-store": "~2",
+    "lucide-svelte": "^0.525.0"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.6",
