@@ -7,6 +7,12 @@
   --font-dm-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
+@layer base {
+  h1, h2, h3 {
+    font-family: var(--font-dm-sans);
+  }
+}
+
 /* Hide scrollbar arrows on WebKit browsers */
 ::-webkit-scrollbar-button {
   display: none;

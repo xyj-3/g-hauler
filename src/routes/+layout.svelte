@@ -60,7 +60,7 @@
   });
 </script>
 
-<div class="w-full h-screen relative bg-background flex flex-col font-sans">
+<div class="w-full h-screen relative bg-background flex flex-col font-sans text-white">
   <TitleBar />
   {#if showSplash}
     <div transition:fade={{ duration: 300 }} class="flex-1 overflow-hidden relative">
