@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Gamepad2, Truck, Settings } from 'lucide-svelte';
-  import { page } from '$app/stores';
-  $: currentPath = $page.url.pathname;
+  import { page } from '$app/state';
+  const currentPath = $derived(page.url.pathname);
 </script>
 
 <div class="w-12 flex flex-col items-center justify-center relative h-full">

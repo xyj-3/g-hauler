@@ -2,12 +2,7 @@
   import GHubDataLocModal from '$components/GHubDataLocModal.svelte';
   import { Info } from 'lucide-svelte';
   import { siGithub, siDiscord } from 'simple-icons';
-  export let dataPath: string | null = null;
-  export let validationResult: any = null;
-  export let showDataModal: boolean = false;
-  export let openDataModal: () => void;
-  export let closeDataModal: () => void;
-  export let fetchDataPath: () => void;
+  let { dataPath = null, validationResult = null, showDataModal = false, openDataModal, closeDataModal, fetchDataPath } = $props();
 </script>
 
 <div class="bg-color-background px-4 h-8 text-xs text-white font-light flex justify-between items-center">
