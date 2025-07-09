@@ -85,7 +85,6 @@
   onClose={handleClose}
   showCloseButton={false}
   maxWidth="max-w-2xl"
-  backgroundColor="bg-gray-800"
 >
   <div class="max-h-[90vh] overflow-hidden flex flex-col" style="margin: -2rem;">
     <!-- Header -->

@@ -94,7 +94,7 @@
         </button>
       {/if}</div>
     {#if validation && showDetails}
-      <div class="text-sm text-white bg-neutral-900 rounded p-2 transition-all duration-200">
+      <div class="text-sm text-white rounded p-2 transition-all duration-200">
         <p>Target files:</p>
         <!-- <div>Path exists: {validation.data_path_exists ? '✅' : '❌'}</div> -->
         <div>applications.json: {validation.applications_json_exists ? '✅' : '❌'}</div>
