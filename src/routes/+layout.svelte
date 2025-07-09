@@ -6,6 +6,7 @@
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
   import GHubDataLocModal from '$components/GHubDataLocModal.svelte';
+  import { Gamepad2 } from 'lucide-svelte';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -67,7 +68,11 @@
     <div transition:fade={{ duration: 300 }} class="flex-1 flex flex-col overflow-hidden">
       <div class="flex-1 flex overflow-hidden">
         <!-- Sidebar Area -->
-        <div class="w-6 bg-gray-900 flex flex-col items-center py-1"></div>
+        <div class="w-12 bg-gray-900 flex flex-col items-center justify-start pt-4">
+          <div class="w-8 h-8 flex items-center justify-center">
+            <Gamepad2 class="w-7 h-7 text-teal-400" />
+          </div>
+        </div>
         
         <!-- Main Content Area -->
         <div class="flex-1 flex flex-col overflow-hidden">
