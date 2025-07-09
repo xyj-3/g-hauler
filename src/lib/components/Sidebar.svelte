@@ -4,7 +4,7 @@
   $: currentPath = $page.url.pathname;
 </script>
 
-<div class="w-12 bg-gray-900 flex flex-col items-center justify-center relative h-full">
+<div class="w-12 flex flex-col items-center justify-center relative h-full">
   <div class="flex flex-col items-center gap-4 py-8 relative">
     <!-- Vertical line positioned to the right of icons -->
     <div class="absolute -right-2 top-0 bottom-0 w-px bg-gray-700"></div>

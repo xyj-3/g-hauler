@@ -14,7 +14,7 @@
   }
 </script>
 
-<div data-tauri-drag-region class="flex items-center justify-center w-full h-8 bg-gray-900 relative">
+<div data-tauri-drag-region class="flex items-center justify-center w-full h-8 relative">
   <h1 data-tauri-drag-region class="text-sm font-medium text-teal cursor-default font-dm-sans">G Hauler</h1>
   
   <div class="absolute right-0 top-0 h-full flex items-center gap-1">
