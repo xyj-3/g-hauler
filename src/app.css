@@ -2,6 +2,7 @@
 
 @theme {
   --color-background: #111827;
+  --color-teal: #2dd4bf;
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-dm-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }

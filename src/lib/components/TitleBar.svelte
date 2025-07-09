@@ -15,7 +15,7 @@
 </script>
 
 <div data-tauri-drag-region class="flex items-center justify-center w-full h-8 bg-gray-900 relative">
-  <h1 data-tauri-drag-region class="text-sm font-medium text-teal-400 cursor-default font-dm-sans">G Hauler</h1>
+  <h1 data-tauri-drag-region class="text-sm font-medium text-teal cursor-default font-dm-sans">G Hauler</h1>
   
   <div class="absolute right-0 top-0 h-full flex items-center gap-1">
     <button aria-label="Minimize" class="w-10 h-full flex items-center justify-center hover:bg-white/10 transition" onclick={minimize}>

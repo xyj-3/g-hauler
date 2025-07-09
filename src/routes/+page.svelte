@@ -53,7 +53,7 @@
       </div>
     {:else if applications.length > 0}
       <!-- <div class="mb-6">
-        <h1 class="text-4xl font-semibold mb-2 tracking-normal text-teal-400 font-sans">G Hauler</h1>
+        <h1 class="text-4xl font-semibold mb-2 tracking-normal text-teal font-sans">G Hauler</h1>
       </div> -->
         <!-- Responsive grid: 2 cols on small screens, 3 on medium, 4 on large, 5 on xl, 6 on 2xl -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6 pb-4">
