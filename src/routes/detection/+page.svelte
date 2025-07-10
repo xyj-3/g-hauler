@@ -1,1 +1,3 @@
-<h1>Game Detection Patching</h1>
+<main>
+    <h1>Game Detection</h1>
+</main>

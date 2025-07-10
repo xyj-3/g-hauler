@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { open = false, onClose, showCloseButton = true, maxWidth = 'max-w-lg' } = $props();
+  let { open = false, onClose, showCloseButton = true, maxWidth = 'max-w-lg', children } = $props();
 
   function handleBackgroundClick(e: MouseEvent) {
     if (e.target === e.currentTarget) {
@@ -26,7 +26,7 @@
             </svg>
           </button>
         {/if}
-        <slot />
+        {@render children?.()}
       </div>
     </div>
   </div>

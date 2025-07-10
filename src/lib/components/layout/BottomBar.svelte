@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GHubDataLocModal from '$components/modal/GHubDataLocModal.svelte';
+  import GHubDirSelectModal from '$components/modal/GHubDirSelectModal.svelte';
   import { Info } from 'lucide-svelte';
   import { siGithub, siDiscord } from 'simple-icons';
   let { dataPath = null, validationResult = null, showDataModal = false, openDataModal, closeDataModal, fetchDataPath } = $props();
@@ -33,5 +33,5 @@
     </svg>
     </button>
   </div>
-  <GHubDataLocModal open={showDataModal} onClose={closeDataModal} on:pathChange={fetchDataPath} />
+  <GHubDirSelectModal open={showDataModal} onClose={closeDataModal} on:pathChange={fetchDataPath} />
 </div>

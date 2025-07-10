@@ -5,7 +5,6 @@
   import TitleBar from '$components/layout/TitleBar.svelte';
   import Sidebar from '$components/layout/Sidebar.svelte';
   import BottomBar from '$components/layout/BottomBar.svelte';
-  import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
 
   type PathValidationResult = {
@@ -59,13 +58,13 @@
 </script>
 
 <div class="w-full h-screen relative bg-background flex flex-col font-sans text-white">
-  <TitleBar />
   {#if showSplash}
     <div transition:fade={{ duration: 300 }} class="flex-1 overflow-hidden relative">
       <SplashScreen />
     </div>
   {:else}
     <div transition:fade={{ duration: 300 }} class="flex-1 flex flex-col overflow-hidden">
+      <TitleBar />
       <div class="flex-1 flex overflow-hidden">
         <!-- Sidebar Area -->
         <Sidebar />
