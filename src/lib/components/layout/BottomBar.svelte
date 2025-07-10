@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GHubDataLocModal from '$components/GHubDataLocModal.svelte';
+  import GHubDataLocModal from '$components/modal/GHubDataLocModal.svelte';
   import { Info } from 'lucide-svelte';
   import { siGithub, siDiscord } from 'simple-icons';
   let { dataPath = null, validationResult = null, showDataModal = false, openDataModal, closeDataModal, fetchDataPath } = $props();

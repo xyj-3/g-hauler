@@ -2,9 +2,9 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import SplashScreen from '$components/SplashScreen.svelte';
-  import TitleBar from '$components/TitleBar.svelte';
-  import Sidebar from '$components/Sidebar.svelte';
-  import BottomBar from '$components/BottomBar.svelte';
+  import TitleBar from '$components/layout/TitleBar.svelte';
+  import Sidebar from '$components/layout/Sidebar.svelte';
+  import BottomBar from '$components/layout/BottomBar.svelte';
   import '../app.css';
   import { invoke } from '@tauri-apps/api/core';
 
