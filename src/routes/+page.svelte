@@ -33,7 +33,7 @@
   });
 </script>
 
-<main class="w-full text-white min-h-full pl-6 pr-6 pt-4 pb-4">
+<main class="w-full text-white min-h-full pl-4 pr-6 pt-4 pb-4">
   <div class="max-w-7xl mx-auto">
     {#if error}
       <div class="text-center text-red-400 h-screen flex flex-col items-center justify-center">
