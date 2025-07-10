@@ -3,7 +3,7 @@
   import { invoke } from '@tauri-apps/api/core';
   import { readFile } from '@tauri-apps/plugin-fs';
   import { onMount } from 'svelte';
-  import GameEditModal from './GameEditModal.svelte';
+  import GameEditModal from '$components/modal/GameEditModal.svelte';
   
   interface GameCardProps {
     game: GHUBApp;

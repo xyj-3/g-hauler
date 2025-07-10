@@ -1,7 +1,7 @@
 <script lang="ts">
   import { open as openDialog } from '@tauri-apps/plugin-dialog';
   import { onMount, createEventDispatcher } from 'svelte';
-  import Modal from './Modal.svelte';
+  import Modal from '$components/modal/Modal.svelte';
   import { invoke } from '@tauri-apps/api/core';
 
   const STORE_KEY_DATA_PATH = 'lghub_data_path';

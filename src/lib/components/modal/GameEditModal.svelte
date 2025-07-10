@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { GHUBApp, Command } from '$lib/types';
-  import GeneralTab from './tabs/GeneralTab.svelte';
-  import CommandsTab from './tabs/CommandsTab.svelte';
-  import DetectionTab from './tabs/DetectionTab.svelte';
-  import Modal from './Modal.svelte';
+  import GeneralTab from '$components/tabs/GeneralTab.svelte';
+  import CommandsTab from '$components/tabs/CommandsTab.svelte';
+  import DetectionTab from '$components/tabs/DetectionTab.svelte';
+  import Modal from '$components/modal/Modal.svelte';
 
   interface GameEditModalProps {
     game: GHUBApp;
