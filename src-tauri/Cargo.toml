@@ -1,9 +1,12 @@
 [package]
 name = "g-hauler"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "A fast, lightweight desktop app for patching G HUB game detection and managing game data."
+authors = ["Julia Xu"]
 edition = "2021"
+license = "AGPL-3.0-only"
+repository = "https://github.com/xyj-3/g-hauler"
+keywords = ["G HUB", "Logitech G HUB", "Logitech", "Logitech devices", "gaming", "gaming devices", "game detection", "patching", "data management", "desktop app", "tauri"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
