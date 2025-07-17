@@ -25,15 +25,15 @@
   </div>
   <!-- Icons on the right -->
   <div class="flex items-center space-x-2">
-    <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="Info" onclick={openInfoModal}>
+    <button type="button" class="p-1 cursor-pointer hover:text-blue-300 transition-colors" title="Info" onclick={openInfoModal}>
       <Info class="w-4 h-4" />
     </button>
-    <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="GitHub" aria-label="GitHub">
+    <button type="button" class="p-1 cursor-pointer hover:text-blue-300 transition-colors" title="GitHub" aria-label="GitHub">
       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
         <path d={siGithub.path} />
       </svg>
     </button>
-    <button type="button" class="p-1 hover:text-blue-300 transition-colors" title="Discord" aria-label="Discord">
+    <button type="button" class="p-1 cursor-pointer hover:text-blue-300 transition-colors" title="Discord" aria-label="Discord">
       <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
         <path d={siDiscord.path} />
       </svg>
