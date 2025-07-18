@@ -24,47 +24,47 @@ export interface Command {
 
 export type Detection = 
   | { steam: SteamApp }
-  | { win_registry: WinRegistry }
-  | { epic_games: EpicGames }
-  | { osx_bundle: OsxBundle }
+  | { winRegistry: WinRegistry }
+  | { epicGames: EpicGames }
+  | { osxBundle: OsxBundle }
   | { uplay: Uplay }
-  | { gog_galaxy: GogGalaxy }
-  | { humble_app: HumbleApp }
-  | { riot_games: RiotGames }
+  | { gogGalaxy: GogGalaxy }
+  | { humbleApp: HumbleApp }
+  | { riotGames: RiotGames }
   | { glob: string }
   | any;
 
 export interface SteamApp {
-  app_id: string;
+  appId: string;
 }
 
 export interface WinRegistry {
   executable: string;
-  registry_key: string;
-  registry_path: string;
+  registryKey: string;
+  registryPath: string;
 }
 
 export interface EpicGames {
-  app_name: string;
+  appName: string;
 }
 
 export interface OsxBundle {
-  bundle_id: string;
-  bundle_path: string;
+  bundleId: string;
+  bundlePath: string;
 }
 
 export interface Uplay {
-  app_id: string;
+  appId: string;
 }
 
 export interface GogGalaxy {
-  product_id: string;
+  productId: string;
 }
 
 export interface HumbleApp {
-  game_name: string;
+  gameName: string;
 }
 
 export interface RiotGames {
-  app_name: string;
+  appName: string;
 }

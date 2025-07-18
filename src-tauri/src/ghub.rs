@@ -74,54 +74,52 @@ pub enum Detection {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SteamApp {
-    #[serde(rename = "appId")]
     pub app_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WinRegistry {
     pub executable: String,
-    #[serde(rename = "registryKey")]
     pub registry_key: String,
-    #[serde(rename = "registryPath")]
     pub registry_path: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EpicGames {
-    #[serde(rename = "appName")]
     pub app_name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct OsxBundle {
-    #[serde(rename = "bundleId")]
     pub bundle_id: String,
-    #[serde(rename = "bundlePath")]
     pub bundle_path: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Uplay {
-    #[serde(rename = "appId")]
     pub app_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GogGalaxy {
-    #[serde(rename = "productId")]
     pub product_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct HumbleApp {
-    #[serde(rename = "gameName")]
     pub game_name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RiotGames {
-    #[serde(rename = "appName")]
     pub app_name: String,
 }
