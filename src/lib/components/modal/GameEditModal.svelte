@@ -18,20 +18,20 @@
   const cloneGame = (gameObj: GHUBApp | null | undefined): GHUBApp => {
     if (!gameObj) {
       return {
-        application_id: '',
-        category_colors: [],
+        applicationId: '',
+        categoryColors: [],
         commands: [],
         detection: [],
         name: '',
-        poster_title_position: '',
-        poster_url: '',
+        posterTitlePosition: '',
+        posterUrl: '',
         version: 0
       };
     }
     
     return {
-      application_id: gameObj.application_id || '',
-      category_colors: (gameObj.category_colors || []).map(cc => ({ ...cc })),
+      applicationId: gameObj.applicationId || '',
+      categoryColors: (gameObj.categoryColors || []).map(cc => ({ ...cc })),
       commands: (gameObj.commands || []).map(cmd => ({
         category: cmd.category || '',
         keystroke: [...(cmd.keystroke || [])],
@@ -44,8 +44,8 @@
         return det;
       }),
       name: gameObj.name || '',
-      poster_title_position: gameObj.poster_title_position || '',
-      poster_url: gameObj.poster_url || '',
+      posterTitlePosition: gameObj.posterTitlePosition || '',
+      posterUrl: gameObj.posterUrl || '',
       version: gameObj.version || 0
     };
   };

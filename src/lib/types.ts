@@ -1,13 +1,13 @@
 // TypeScript interfaces matching the Rust structs
 
 export interface GHUBApp {
-  application_id: string;
-  category_colors: CategoryColor[];
+  applicationId: string;
+  categoryColors: CategoryColor[];
   commands: Command[];
   detection: Detection[];
   name: string;
-  poster_title_position: string;
-  poster_url: string;
+  posterTitlePosition: string;
+  posterUrl: string;
   version: number;
 }
 

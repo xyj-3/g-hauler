@@ -11,6 +11,19 @@
 <div class="space-y-6">
   <div>
     <label for="game-name" class="block text-sm font-medium text-gray-300 mb-2">
+      Application ID
+    </label>
+    <input
+      id="app-id"
+      type="text"
+      bind:value={game.applicationId}
+      readonly
+      class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+
+  <div>
+    <label for="game-name" class="block text-sm font-medium text-gray-300 mb-2">
       Game Name
     </label>
     <input
@@ -29,7 +42,7 @@
     <input
       id="poster-url"
       type="text"
-      bind:value={game.poster_url}
+      bind:value={game.posterUrl}
       placeholder="Enter poster URL"
       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     />
@@ -41,7 +54,7 @@
     </label>
     <select
       id="poster-title-position"
-      bind:value={game.poster_title_position}
+      bind:value={game.posterTitlePosition}
       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     >
       <option value="">Select position</option>

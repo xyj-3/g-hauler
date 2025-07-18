@@ -1,19 +1,20 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GHUBApp {
-    #[serde(rename = "applicationId", default)]
+    #[serde(default)]
     pub application_id: String,
-    #[serde(rename = "categoryColors", default)]
+    #[serde(default)]
     pub category_colors: Vec<CategoryColor>,
     #[serde(default)]
     pub commands: Vec<Command>,
     #[serde(default)]
     pub detection: Vec<Detection>,
     pub name: String,
-    #[serde(default)]
+    #[serde(alias = "poster_title_position", default)]
     pub poster_title_position: String,
-    #[serde(default)]
+    #[serde(alias = "poster_url", default)]
     pub poster_url: String,
     #[serde(default)]
     pub version: u32,

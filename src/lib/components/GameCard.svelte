@@ -91,14 +91,14 @@
     }
     return url;
   };
-  
+
   const loadContent = async () => {
-    if (game.poster_url.startsWith('pipeline://')) {
+    if (game.posterUrl.startsWith('pipeline://')) {
       try {
-        resolvedPosterUrl = await resolvePipelineUrl(game.poster_url);
-      } catch (error) {
-        console.error('Error resolving pipeline URL:', error);
-        resolvedPosterUrl = null;
+        resolvedPosterUrl = await resolvePipelineUrl(game.posterUrl);
+        } catch (error) {
+          console.error('Error resolving pipeline URL:', error);
+          resolvedPosterUrl = null;
       }
     }
   };

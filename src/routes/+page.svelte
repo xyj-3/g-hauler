@@ -21,7 +21,7 @@
     }
   };
   const handleGameUpdated = (updatedGame: GHUBApp) => {
-    const index = applications.findIndex(app => app.application_id === updatedGame.application_id);
+    const index = applications.findIndex(app => app.applicationId === updatedGame.applicationId);
     if (index !== -1) {
       applications[index] = updatedGame;
       applications = [...applications]; // Trigger reactivity
