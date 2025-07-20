@@ -201,7 +201,13 @@ pub async fn save_applications_to_disk(app_handle: AppHandle) -> Result<(), Stri
     }
 
     fs::write(&json_path, json_content)
-        .map_err(|e| format!("Failed to write applications.json: {}", e))?;
+        .map_err(|e| {
+            if e.kind() == std::io::ErrorKind::PermissionDenied {
+                format!("Permission denied writing to {}: {}. Please run as administrator or check folder permissions.", json_path.display(), e)
+            } else {
+                format!("Failed to write applications.json: {}", e)
+            }
+        })?;
 
     println!("Successfully saved {} applications to disk", apps.len());
     Ok(())
