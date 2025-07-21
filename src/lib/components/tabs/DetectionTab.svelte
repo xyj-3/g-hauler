@@ -23,11 +23,4 @@
       {/each}
     </div>
   {/if}
-  
-  <div class="bg-yellow-900 border-l-4 border-yellow-500 p-4">
-    <p class="text-sm text-yellow-200">
-      <strong>Note:</strong> Detection methods are complex structures that define how the game is found on the system. 
-      Editing these requires technical knowledge of the detection systems.
-    </p>
-  </div>
 </div>

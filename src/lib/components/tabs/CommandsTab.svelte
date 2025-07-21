@@ -122,10 +122,10 @@
       </div>
     {/if}
   </div>  <!-- Add Command Form -->
-  <div class="bg-gray-700 rounded-lg p-4">
-    <h3 class="text-lg font-medium text-white mb-4">Add New Command</h3>
+  <div class="bg-gray-700 rounded-lg p-3">
+    <h3 class="text-md font-medium text-white mb-3">Add New Command</h3>
     
-    <div class="space-y-4">
+    <div class="space-y-3">
       <div>
         <label for="command-name" class="block text-sm font-medium text-gray-300 mb-2">
           Command Name
@@ -134,7 +134,7 @@
           type="text"
           bind:value={newCommand.name}
           placeholder="e.g., Quick Save"
-          class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
@@ -147,7 +147,7 @@
           type="text"
           bind:value={newCommand.category}
           placeholder="e.g., Game Controls"
-          class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
@@ -161,7 +161,7 @@
           value={keystrokeInput}
           oninput={handleKeystrokeInputChange}
           placeholder="e.g., Ctrl + S or F5"
-          class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
         />
         <p class="text-xs text-gray-400 mt-1">
           Preview: {newCommand.keystroke.join(' + ') || 'None'}
@@ -171,7 +171,7 @@
       <button
         onclick={handleAddCommand}
         disabled={!newCommand.name.trim() || !newCommand.category.trim()}
-        class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded transition-colors"
+        class="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
       >
         Add Command
       </button>

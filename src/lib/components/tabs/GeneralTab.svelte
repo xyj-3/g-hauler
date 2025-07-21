@@ -18,7 +18,7 @@
       type="text"
       bind:value={game.applicationId}
       readonly
-      class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none"
     />
   </div>
 
@@ -35,7 +35,7 @@
     />
   </div>
 
-  <div>
+  <!-- <div>
     <label for="poster-url" class="block text-sm font-medium text-gray-300 mb-2">
       Poster URL
     </label>
@@ -46,9 +46,9 @@
       placeholder="Enter poster URL"
       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     />
-  </div>
+  </div> -->
 
-  <div>
+  <!-- <div>
     <label for="poster-title-position" class="block text-sm font-medium text-gray-300 mb-2">
       Poster Title Position
     </label>
@@ -59,9 +59,9 @@
       placeholder="Enter poster title position"
       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     />
-  </div>
+  </div> -->
 
-  <div>
+  <!-- <div>
     <label for="version" class="block text-sm font-medium text-gray-300 mb-2">
       Version
     </label>
@@ -72,6 +72,6 @@
       placeholder="Enter version number"
       class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
     />
-  </div>
+  </div> -->
 </div>
  
