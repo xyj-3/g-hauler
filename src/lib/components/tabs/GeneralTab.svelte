@@ -52,16 +52,13 @@
     <label for="poster-title-position" class="block text-sm font-medium text-gray-300 mb-2">
       Poster Title Position
     </label>
-    <select
+    <input
       id="poster-title-position"
+      type="text"
       bind:value={game.posterTitlePosition}
-      class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    >
-      <option value="">Select position</option>
-      <option value="top">Top</option>
-      <option value="bottom">Bottom</option>
-      <option value="overlay">Overlay</option>
-    </select>
+      placeholder="Enter poster title position"
+      class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
   </div>
 
   <div>
@@ -77,3 +74,4 @@
     />
   </div>
 </div>
+ 
