@@ -10,9 +10,11 @@
   let editingCommand = $state<{ categoryIndex: number; commandIndex: number } | null>(null);
   let newCommand = $state<Command>({ category: '', keystroke: [], name: '' });
   let keystrokeInput = $state('');
+  let showCategoryDropdown = $state(false);
   
   // Group commands by category
   let groupedCommands = $state<Record<string, Command[]>>({});
+  let existingCategories = $derived(Object.keys(groupedCommands));
   
   $effect(() => {
     const groups: Record<string, Command[]> = {};
@@ -30,7 +32,13 @@
       game.commands = [...game.commands, { ...newCommand }];
       newCommand = { category: '', keystroke: [], name: '' };
       keystrokeInput = '';
+      showCategoryDropdown = false;
     }
+  };
+
+  const selectCategory = (category: string) => {
+    newCommand.category = category;
+    showCategoryDropdown = false;
   };
 
   const handleDeleteCommand = (commandToDelete: Command) => {
@@ -138,17 +146,45 @@
         />
       </div>
 
-      <div>
+      <div class="relative">
         <label for="command-category" class="block text-sm font-medium text-gray-300 mb-2">
           Category
         </label>
-        <input
-          id="command-category"
-          type="text"
-          bind:value={newCommand.category}
-          placeholder="e.g., Game Controls"
-          class="w-full px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-        />
+        <div class="relative">
+          <input
+            id="command-category"
+            type="text"
+            bind:value={newCommand.category}
+            onfocus={() => showCategoryDropdown = true}
+            onblur={() => setTimeout(() => showCategoryDropdown = false, 200)}
+            onkeydown={(e) => { if (e.key === 'Enter' || e.key === 'Tab') showCategoryDropdown = false; }}
+            placeholder="Select or type category"
+            class="w-full px-2 py-1.5 bg-gray-600 border border-gray-500 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent pr-8"
+          />
+          <button
+            type="button"
+            onclick={() => showCategoryDropdown = !showCategoryDropdown}
+            class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-400 hover:text-white transition-colors"
+            aria-label="Toggle category dropdown"
+            >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+        {#if showCategoryDropdown && existingCategories.length > 0}
+          <div class="absolute z-10 w-full mt-1 bg-gray-600 border border-gray-500 rounded shadow-lg max-h-40 overflow-y-auto">
+            {#each existingCategories as category}
+              <button
+                type="button"
+                onclick={() => selectCategory(category)}
+                class="w-full text-left px-3 py-2 text-sm text-white hover:bg-gray-500 transition-colors"
+              >
+                {category}
+              </button>
+            {/each}
+          </div>
+        {/if}
       </div>
 
       <div>
