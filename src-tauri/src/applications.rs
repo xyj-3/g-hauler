@@ -1,19 +1,7 @@
-use crate::ghub::GHUBApp;
+use crate::models::{AppState, ApplicationsData, GHUBApp};
 use crate::util::{get_applications_json_path, get_build_id};
-use serde::{Deserialize, Serialize};
 use std::fs;
-use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
-
-pub struct AppState {
-    pub applications: Mutex<Vec<GHUBApp>>,
-    pub settings_db_data: Mutex<Option<ApplicationsData>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ApplicationsData {
-    pub applications: Vec<GHUBApp>,
-}
 
 fn store_applications_in_manager(
     app_handle: &AppHandle,

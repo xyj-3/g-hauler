@@ -1,6 +1,6 @@
 mod applications;
 mod constants;
-mod ghub;
+mod models;
 mod settings_db;
 mod store;
 mod util;
@@ -15,7 +15,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .manage(applications::AppState {
+        .manage(models::AppState {
             applications: Mutex::new(Vec::new()),
             settings_db_data: Mutex::new(None),
         })

@@ -1,6 +1,5 @@
 use crate::constants::LGHUB_SETTINGS_DB_PATH;
-use crate::ghub::GHUBApp;
-use crate::applications::{AppState, ApplicationsData};
+use crate::models::{AppState, ApplicationsData, GHUBApp};
 use rusqlite::Connection;
 use std::fs;
 use std::path::{Path, PathBuf};
