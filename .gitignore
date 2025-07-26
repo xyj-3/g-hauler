@@ -9,6 +9,6 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /.cursor
-.windsurfrules
-.github/instructions
-.github/copilot_instructions.md
+/.windsurfrules
+/.github/instructions
+/.claude
