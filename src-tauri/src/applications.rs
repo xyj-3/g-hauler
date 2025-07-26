@@ -7,9 +7,10 @@ use tauri::{AppHandle, Manager, State};
 
 pub struct AppState {
     pub applications: Mutex<Vec<GHUBApp>>,
+    pub settings_db_data: Mutex<Option<ApplicationsData>>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApplicationsData {
     pub applications: Vec<GHUBApp>,
 }
