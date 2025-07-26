@@ -118,10 +118,7 @@ pub async fn get_applications(app_handle: AppHandle) -> Result<Vec<GHUBApp>, Str
 }
 
 #[tauri::command]
-pub async fn update_application(
-    app_handle: AppHandle,
-    updated_app: GHUBApp,
-) -> Result<(), String> {
+pub async fn update_application(app_handle: AppHandle, updated_app: GHUBApp) -> Result<(), String> {
     let state: State<AppState> = app_handle.state();
     let mut apps = state
         .applications
@@ -140,8 +137,11 @@ pub async fn update_application(
         })?;
 
     apps[app_index] = updated_app;
-    
-    println!("Successfully updated application with ID: {}", apps[app_index].application_id);
+
+    println!(
+        "Successfully updated application with ID: {}",
+        apps[app_index].application_id
+    );
     Ok(())
 }
 
@@ -185,8 +185,7 @@ pub async fn save_applications_to_disk(app_handle: AppHandle) -> Result<(), Stri
 
     // Create parent directory if it doesn't exist
     if let Some(parent) = json_path.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|e| format!("Failed to create directory: {}", e))?;
+        fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
     }
 
     fs::write(&json_path, json_content)

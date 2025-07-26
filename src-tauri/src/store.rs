@@ -16,12 +16,12 @@ pub async fn initialize_store(
         store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DEFAULT_DATA_PATH));
         changed = true;
     }
-    
+
     if changed {
         store.save()?;
         println!("Store initialized with default values");
     }
-    
+
     Ok(())
 }
 

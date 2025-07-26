@@ -1,6 +1,8 @@
 use crate::constants::STORE_KEY_DATA_PATH;
 use crate::models::PathValidationResult;
-use crate::util::{get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path};
+use crate::util::{
+    get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path,
+};
 use serde_json::Value;
 use std::fs;
 use tauri::AppHandle;
@@ -21,7 +23,7 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
             };
         }
     };
-    
+
     let data_path = match store
         .get(STORE_KEY_DATA_PATH)
         .and_then(|v| v.as_str().map(|s| s.to_string()))
@@ -38,7 +40,7 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
             };
         }
     };
-    
+
     let data_path_exists = fs::metadata(&data_path).is_ok();
 
     let current_json_path = get_current_json_path(&app_handle);
@@ -48,7 +50,7 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
         .as_ref()
         .map(|p| fs::metadata(p).is_ok())
         .unwrap_or(false);
-    
+
     let version_json_exists = version_json_path
         .as_ref()
         .map(|p| fs::metadata(p).is_ok())
@@ -65,7 +67,7 @@ pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
     } else {
         None
     };
-    
+
     let applications_json_exists = if let Some(ref build_id) = build_id {
         if let Some(applications_json_path) = get_applications_json_path(&app_handle, build_id) {
             fs::metadata(&applications_json_path).is_ok()
