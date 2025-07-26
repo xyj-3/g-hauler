@@ -1,10 +1,7 @@
-mod applications;
+mod g_hub;
+mod g_hauler;
 mod constants;
 mod models;
-mod settings_db;
-mod store;
-mod util;
-mod validation;
 
 use std::sync::Mutex;
 
@@ -24,35 +21,35 @@ pub fn run() {
             let handle = app.handle();
 
             // Create backup of SQLite database on startup
-            if let Err(e) = crate::settings_db::backup_sqlite_on_startup() {
+            if let Err(e) = crate::g_hub::settings_db::backup_sqlite_on_startup() {
                 eprintln!("Failed to backup SQLite database: {}", e);
             }
 
             // Load SQLite data into app state
-            if let Err(e) = crate::settings_db::load_and_store_sqlite_data(&handle) {
+            if let Err(e) = crate::g_hub::settings_db::load_and_store_sqlite_data(&handle) {
                 eprintln!("Failed to load SQLite data: {}", e);
             }
 
-            if let Err(e) = tauri::async_runtime::block_on(crate::store::initialize_store(&handle))
+            if let Err(e) = tauri::async_runtime::block_on(crate::g_hauler::store::initialize_store(&handle))
             {
                 eprintln!("Failed to initialize store: {}", e);
             }
-            if let Err(e) = crate::applications::initialize_applications_on_startup(&handle) {
+            if let Err(e) = crate::g_hub::applications_json::initialize_applications_on_startup(&handle) {
                 eprintln!("Failed to initialize applications: {}", e);
             }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crate::store::store_get_key,
-            crate::store::store_set_key,
-            crate::util::get_pipeline_path,
-            crate::validation::validate_paths,
-            crate::applications::get_applications,
-            crate::applications::update_application,
-            crate::applications::get_application_by_id,
-            crate::applications::save_applications_to_disk,
-            crate::settings_db::load_applications_from_sqlite,
-            crate::settings_db::save_applications_to_sqlite,
+            crate::g_hauler::store::store_get_key,
+            crate::g_hauler::store::store_set_key,
+            crate::g_hub::util::get_pipeline_path,
+            crate::g_hauler::validation::validate_paths,
+            crate::g_hub::applications_json::get_applications,
+            crate::g_hub::applications_json::update_application,
+            crate::g_hub::applications_json::get_application_by_id,
+            crate::g_hub::applications_json::save_applications_to_disk,
+            crate::g_hub::settings_db::load_applications_from_sqlite,
+            crate::g_hub::settings_db::save_applications_to_sqlite,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

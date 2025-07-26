@@ -1,5 +1,5 @@
 use crate::constants::STORE_KEY_DATA_PATH;
-use crate::store::get_store_key;
+use crate::g_hauler::store::get_store_key;
 use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;

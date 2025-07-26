@@ -1,6 +1,6 @@
 use crate::constants::STORE_KEY_DATA_PATH;
 use crate::models::PathValidationResult;
-use crate::util::{
+use crate::g_hub::util::{
     get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path,
 };
 use serde_json::Value;

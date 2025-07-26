@@ -1,5 +1,5 @@
 use crate::models::{AppState, ApplicationsData, GHUBApp};
-use crate::util::{get_applications_json_path, get_build_id};
+use crate::g_hub::util::{get_applications_json_path, get_build_id};
 use std::fs;
 use tauri::{AppHandle, Manager, State};
 
