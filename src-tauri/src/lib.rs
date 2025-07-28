@@ -2,12 +2,22 @@ mod g_hub;
 mod g_hauler;
 mod constants;
 mod models;
+mod settings_db;
+mod store;
+mod util;
+mod validation;
+mod settings;
+
+mod autostart {
+    pub use crate::settings::auto_start::*;
+}
 
 use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_store::Builder::default().build())
@@ -50,6 +60,9 @@ pub fn run() {
             crate::g_hub::applications_json::save_applications_to_disk,
             crate::g_hub::settings_db::load_applications_from_sqlite,
             crate::g_hub::settings_db::save_applications_to_sqlite,
+            crate::autostart::enable_auto_start,
+            crate::autostart::disable_auto_start,
+            crate::autostart::is_auto_start_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
