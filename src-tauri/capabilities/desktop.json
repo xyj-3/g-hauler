@@ -9,6 +9,6 @@
     "main"
   ],
   "permissions": [
-    "autostart:default",
+    "autostart:default"
   ]
 }
