@@ -1,0 +1,87 @@
+name: "Build installers"
+
+# This workflow builds G Hauler desktop installers for Windows (and eventually macOS)
+# and uploads them as downloadable artifacts. This allows team members and 
+# contributors to test pre-release builds without needing to compile locally.
+#
+# The workflow runs:
+# - On pull requests targeting the main branch
+# - On every push to the main branch
+# - On manual trigger via GitHub Actions UI (workflow_dispatch)
+#
+# Currently configured for:
+# - Windows: Builds a NSIS (.exe) installer
+# - macOS: Build steps included but commented out for future use
+#
+# Artifacts are retained for 30 days and can be downloaded from the 
+# Actions run summary page.
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build-installers:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # - platform: "macos-latest" # for Arm based macs (M1 and above).
+          #   args: "--target aarch64-apple-darwin"
+          # - platform: "macos-latest" # for Intel based macs.
+          #   args: "--target x86_64-apple-darwin"
+          - platform: "windows-latest"
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install frontend dependencies
+        run: pnpm install
+
+      # If tagName and releaseId are omitted tauri-action will only build the app and won't try to upload any assets.
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: ${{ matrix.args }}
+      
+      - name: upload artifacts (Windows)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+          # src-tauri/target/release/bundle/msi/*.msi
+          retention-days: 30
+      
+      # - name: upload artifacts (macOS)
+      #   if: matrix.platform == 'macos-latest'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: macos-installers-${{ matrix.args == '--target aarch64-apple-darwin' && 'arm64' || 'x64' }}
+      #     path: |
+      #       src-tauri/target/*/release/bundle/dmg/*.dmg
+      #       src-tauri/target/*/release/bundle/macos/*.app
+      #     retention-days: 30
