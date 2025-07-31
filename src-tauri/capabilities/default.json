@@ -16,6 +16,7 @@
     "store:default",
     "dialog:default",
     "fs:default",
+    "autostart:default",
     {
       "identifier": "fs:allow-read-file",
       "allow": [
