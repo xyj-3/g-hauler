@@ -2,14 +2,9 @@ mod g_hub;
 mod g_hauler;
 mod constants;
 mod models;
-mod settings_db;
-mod store;
-mod util;
-mod validation;
-mod settings;
 
 mod autostart {
-    pub use crate::settings::auto_start::*;
+    pub use crate::g_hauler::auto_start::*;
 }
 
 use std::sync::Mutex;

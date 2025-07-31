@@ -1,46 +1,39 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
-  import Switch from '$components/ui/Switch.svelte';
+  import Setting from '$lib/components/Setting.svelte';
 
-  let autoStart = false;
-  let isLoading = true;
+  let autoStart = $state(false);
+  let isLoading = $state(true);
 
-  onMount(async () => {
-    try {
-      autoStart = await invoke<boolean>('is_auto_start_enabled');
-    } catch (error) {
-      console.error('Failed to fetch autostart state:', error);
-    } finally {
-      isLoading = false;
-    }
+  $effect(() => {
+    invoke<boolean>('is_auto_start_enabled')
+      .then(enabled => autoStart = enabled)
+      .catch(err => console.error('Failed to fetch autostart state:', err))
+      .finally(() => isLoading = false);
   });
 
-  async function handleAutoStartToggle(event: CustomEvent<{ checked: boolean }>) {
-    const enabled = event.detail.checked;
+  async function handleAutoStartToggle({ checked }: { checked: boolean }) {
     try {
-      if (enabled) {
-        await invoke('enable_auto_start');
-      } else {
-        await invoke('disable_auto_start');
-      }
-    } catch (error) {
-      console.error('Failed to update autostart state:', error);
+      await invoke(checked ? 'enable_auto_start' : 'disable_auto_start');
+      autoStart = checked;
+    } catch (err) {
+      console.error('Failed to update autostart state:', err);
     }
   }
 </script>
 
 <main class="w-full min-h-full px-6 py-6 text-white">
   <div class="w-full">
-    <h1 class="text-2xl font-semibold mb-6">Settings</h1>
+    <h1 class="text-2xl font-dm-sans mb-6">Settings</h1>
 
     {#if isLoading}
       <p>Loading startup settings...</p>
     {:else}
-      <Switch
+      <Setting
         label="Launch application on startup"
+        name="autostart"
         checked={autoStart}
-        on:change={handleAutoStartToggle}
+        onChange={handleAutoStartToggle}
       />
     {/if}
   </div>
