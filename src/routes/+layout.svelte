@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '../app.css';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import SplashScreen from '$components/SplashScreen.svelte';

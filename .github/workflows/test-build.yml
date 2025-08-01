@@ -1,30 +1,31 @@
-name: "Build installers"
+name: "Test Build"
 
-# This workflow builds G Hauler desktop installers for Windows (and eventually macOS)
+# This workflow builds G Hauler desktop installers for Windows 
 # and uploads them as downloadable artifacts. This allows team members and 
 # contributors to test pre-release builds without needing to compile locally.
 #
 # The workflow runs:
-# - On pull requests targeting the main branch
-# - On every push to the main branch
+# - On pull requests to any branch
+# - On every push to the main or develop branches  
 # - On manual trigger via GitHub Actions UI (workflow_dispatch)
 #
-# Currently configured for:
-# - Windows: Builds a NSIS (.exe) installer
-# - macOS: Build steps included but commented out for future use
+# Build outputs:
+# - Windows NSIS installer (.exe) - ready-to-distribute installer package
+# - Windows raw executable (.exe) - standalone executable without installer
+# - macOS builds: Build steps included but commented out for future use
 #
-# Artifacts are retained for 30 days and can be downloaded from the 
-# Actions run summary page.
+# All build artifacts are retained for 90 days and can be downloaded from the 
+# Actions run summary page. This enables testing of pre-release versions
+# across different environments before official releases.
 
 on:
   pull_request:
-    branches: ["main"]
   push:
-    branches: ["main"]
+    branches: ["main", "develop"]
   workflow_dispatch:
 
 jobs:
-  build-installers:
+  test-build:
     strategy:
       fail-fast: false
       matrix:
@@ -66,15 +67,25 @@ jobs:
         with:
           args: ${{ matrix.args }}
       
-      - name: upload artifacts (Windows)
+      # Upload the NSIS installer
+      - name: upload artifacts (Windows NSIS installer)
         if: matrix.platform == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installers
+          name: windows-nsis-installer
           path: |
             src-tauri/target/release/bundle/nsis/*.exe
-          # src-tauri/target/release/bundle/msi/*.msi
-          retention-days: 30
+          retention-days: 90
+      
+      # Upload the raw Windows executable
+      - name: upload artifacts (Windows executable)
+        if: matrix.platform == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-executable
+          path: |
+            src-tauri/target/release/*.exe
+          retention-days: 90
       
       # - name: upload artifacts (macOS)
       #   if: matrix.platform == 'macos-latest'
@@ -84,4 +95,4 @@ jobs:
       #     path: |
       #       src-tauri/target/*/release/bundle/dmg/*.dmg
       #       src-tauri/target/*/release/bundle/macos/*.app
-      #     retention-days: 30
+      #     retention-days: 90
