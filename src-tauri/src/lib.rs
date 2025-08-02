@@ -3,10 +3,6 @@ mod g_hauler;
 mod constants;
 mod models;
 
-mod autostart {
-    pub use crate::g_hauler::auto_start::*;
-}
-
 use std::sync::Mutex;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -42,6 +38,11 @@ pub fn run() {
             if let Err(e) = crate::g_hub::applications_json::initialize_applications_on_startup(&handle) {
                 eprintln!("Failed to initialize applications: {}", e);
             }
+
+            if let Err(e) = crate::g_hauler::auto_start::init_auto_start(&handle) {
+                eprintln!("Failed to sync autostart setting: {}", e);
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -55,9 +56,9 @@ pub fn run() {
             crate::g_hub::applications_json::save_applications_to_disk,
             crate::g_hub::settings_db::load_applications_from_sqlite,
             crate::g_hub::settings_db::save_applications_to_sqlite,
-            crate::autostart::enable_auto_start,
-            crate::autostart::disable_auto_start,
-            crate::autostart::is_auto_start_enabled,
+            crate::g_hauler::auto_start::enable_auto_start,
+            crate::g_hauler::auto_start::disable_auto_start,
+            crate::g_hauler::auto_start::is_auto_start_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
