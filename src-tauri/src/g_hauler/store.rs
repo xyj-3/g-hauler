@@ -1,4 +1,4 @@
-use crate::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_DATA_PATH};
+use crate::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_DATA_PATH, STORE_KEY_AUTOSTART};
 use serde_json::Value;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
@@ -14,6 +14,11 @@ pub async fn initialize_store(
     // Initialize default data path if not set
     if store.get(STORE_KEY_DATA_PATH).is_none() {
         store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DEFAULT_DATA_PATH));
+        changed = true;
+    }
+
+    if store.get(STORE_KEY_AUTOSTART).is_none() {
+        store.set(STORE_KEY_AUTOSTART, json!(false));
         changed = true;
     }
 
