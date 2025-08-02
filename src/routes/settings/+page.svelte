@@ -6,18 +6,25 @@
   let isLoading = $state(true);
 
   $effect(() => {
-    invoke<boolean>('is_auto_start_enabled')
-      .then(enabled => autoStart = enabled)
-      .catch(err => console.error('Failed to fetch autostart state:', err))
+    invoke<boolean>('store_get_key', { key: 'autostart' })
+      .then(enabled => autoStart = enabled ?? false)
+      .catch(err => console.error('Failed to load autostart from store:', err))
       .finally(() => isLoading = false);
   });
 
   async function handleAutoStartToggle({ checked }: { checked: boolean }) {
     try {
+      await invoke('store_set_key', {
+        key: 'autostart',
+        value: checked
+      });
+
       await invoke(checked ? 'enable_auto_start' : 'disable_auto_start');
+
       autoStart = checked;
+
     } catch (err) {
-      console.error('Failed to update autostart state:', err);
+      console.error('Failed to update autostart setting:', err);
     }
   }
 </script>
