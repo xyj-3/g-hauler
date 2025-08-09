@@ -1,8 +1,9 @@
 <script lang="ts">
-  let { checked = false, name = '', onChange = () => {} } = $props();
+  let { name = '', checked = false, disabled = false, onChange = () => {} } = $props();
   const id = `${name}-setting`;
 
   function toggle() {
+    if (disabled) return;
     onChange({ checked: !checked });
   }
 </script>
@@ -12,6 +13,7 @@
   name={name}
   role="switch"
   aria-checked={checked}
+  aria-disabled={disabled}
   aria-labelledby={id}
   onclick={toggle}
   class="w-11 h-6 rounded-full border-none flex items-center p-1 transition-colors duration-300 focus:outline-none shrink-0"
