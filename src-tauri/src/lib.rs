@@ -18,6 +18,7 @@ pub fn run() {
             applications: Mutex::new(Vec::new()),
             settings_db_data: Mutex::new(None),
         })
+        .manage(g_hauler::websocket_commands::init_websocket_state())
         .setup(|app| {
             let handle = app.handle();
 
@@ -56,6 +57,10 @@ pub fn run() {
             crate::g_hub::applications_json::save_applications_to_disk,
             crate::g_hub::settings_db::load_applications_from_sqlite,
             crate::g_hub::settings_db::save_applications_to_sqlite,
+            crate::g_hauler::websocket_commands::websocket_connect,
+            crate::g_hauler::websocket_commands::websocket_send_message,
+            crate::g_hauler::websocket_commands::websocket_disconnect,
+            crate::g_hauler::websocket_commands::websocket_list_connections,
             crate::g_hauler::auto_start::enable_auto_start,
             crate::g_hauler::auto_start::disable_auto_start,
             crate::g_hauler::auto_start::is_auto_start_enabled,
