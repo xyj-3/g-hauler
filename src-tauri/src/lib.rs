@@ -1,7 +1,7 @@
-mod g_hub;
-mod g_hauler;
-mod constants;
-mod models;
+mod websocket;
+mod settings;
+mod shared;
+mod applications;
 
 use std::sync::Mutex;
 
@@ -14,56 +14,52 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .manage(models::AppState {
+        .manage(shared::state::AppState {
             applications: Mutex::new(Vec::new()),
             settings_db_data: Mutex::new(None),
         })
-        .manage(g_hauler::websocket_commands::init_websocket_state())
+        .manage(websocket::init_websocket_state())
         .setup(|app| {
             let handle = app.handle();
 
             // Create backup of SQLite database on startup
-            if let Err(e) = crate::g_hub::settings_db::backup_sqlite_on_startup() {
+            if let Err(e) = crate::applications::settings_db::backup_sqlite_on_startup() {
                 eprintln!("Failed to backup SQLite database: {}", e);
             }
 
             // Load SQLite data into app state
-            if let Err(e) = crate::g_hub::settings_db::load_and_store_sqlite_data(&handle) {
+            if let Err(e) = crate::applications::settings_db::load_and_store_sqlite_data(&handle) {
                 eprintln!("Failed to load SQLite data: {}", e);
             }
 
-            if let Err(e) = tauri::async_runtime::block_on(crate::g_hauler::store::initialize_store(&handle))
+            if let Err(e) = tauri::async_runtime::block_on(crate::shared::store::initialize_store(&handle))
             {
                 eprintln!("Failed to initialize store: {}", e);
             }
-            if let Err(e) = crate::g_hub::applications_json::initialize_applications_on_startup(&handle) {
+            if let Err(e) = crate::applications::applications_json::initialize_applications_on_startup(&handle) {
                 eprintln!("Failed to initialize applications: {}", e);
             }
 
-            if let Err(e) = crate::g_hauler::auto_start::init_auto_start(&handle) {
+            if let Err(e) = crate::settings::auto_start::init_auto_start(&handle) {
                 eprintln!("Failed to sync autostart setting: {}", e);
             }
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crate::g_hauler::store::store_get_key,
-            crate::g_hauler::store::store_set_key,
-            crate::g_hub::util::get_pipeline_path,
-            crate::g_hauler::validation::validate_paths,
-            crate::g_hub::applications_json::get_applications,
-            crate::g_hub::applications_json::update_application,
-            crate::g_hub::applications_json::get_application_by_id,
-            crate::g_hub::applications_json::save_applications_to_disk,
-            crate::g_hub::settings_db::load_applications_from_sqlite,
-            crate::g_hub::settings_db::save_applications_to_sqlite,
-            crate::g_hauler::websocket_commands::websocket_connect,
-            crate::g_hauler::websocket_commands::websocket_send_message,
-            crate::g_hauler::websocket_commands::websocket_disconnect,
-            crate::g_hauler::websocket_commands::websocket_list_connections,
-            crate::g_hauler::auto_start::enable_auto_start,
-            crate::g_hauler::auto_start::disable_auto_start,
-            crate::g_hauler::auto_start::is_auto_start_enabled,
+            crate::shared::store::store_get_key,
+            crate::shared::store::store_set_key,
+            crate::applications::paths::get_pipeline_path,
+            crate::applications::validation::validate_paths,
+            crate::applications::applications_json::get_applications,
+            crate::applications::applications_json::update_application,
+            crate::applications::applications_json::get_application_by_id,
+            crate::applications::applications_json::save_applications_to_disk,
+            crate::applications::settings_db::load_applications_from_sqlite,
+            crate::applications::settings_db::save_applications_to_sqlite,
+            crate::settings::auto_start::enable_auto_start,
+            crate::settings::auto_start::disable_auto_start,
+            crate::settings::auto_start::is_auto_start_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

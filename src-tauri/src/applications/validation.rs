@@ -1,6 +1,5 @@
-use crate::constants::STORE_KEY_DATA_PATH;
-use crate::models::PathValidationResult;
-use crate::g_hub::util::{
+use crate::shared::constants::{STORE_KEY_DATA_PATH, STORE_FILENAME};
+use crate::applications::paths::{
     get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path,
 };
 use serde_json::Value;
@@ -8,9 +7,19 @@ use std::fs;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
+#[derive(serde::Serialize)]
+pub struct PathValidationResult {
+    pub data_path_exists: bool,
+    pub applications_json_exists: bool,
+    pub current_json_exists: bool,
+    pub version_json_exists: bool,
+    pub build_id: Option<String>,
+    pub images_dir_exists: bool,
+}
+
 #[tauri::command]
 pub async fn validate_paths(app_handle: AppHandle) -> PathValidationResult {
-    let store = match app_handle.store(crate::constants::STORE_FILENAME) {
+    let store = match app_handle.store(STORE_FILENAME) {
         Ok(store) => store,
         Err(_) => {
             return PathValidationResult {

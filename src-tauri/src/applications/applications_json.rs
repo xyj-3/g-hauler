@@ -1,20 +1,10 @@
-use crate::models::{AppState, ApplicationsData, GHUBApp};
-use crate::g_hub::util::{get_applications_json_path, get_build_id};
+use crate::applications::paths::{get_applications_json_path, get_build_id};
+use crate::shared::state::{
+    AppState, store_applications_in_manager, get_stored_applications
+};
+use crate::applications::models::{ApplicationsData, GHUBApp};
 use std::fs;
 use tauri::{AppHandle, Manager, State};
-
-fn store_applications_in_manager(
-    app_handle: &AppHandle,
-    applications: &[GHUBApp],
-) -> Result<(), String> {
-    let state: State<AppState> = app_handle.state();
-    let mut apps = state
-        .applications
-        .lock()
-        .map_err(|e| format!("Failed to acquire lock on applications: {}", e))?;
-    *apps = applications.to_vec();
-    Ok(())
-}
 
 pub fn load_and_store_applications(
     app_handle: &AppHandle,
@@ -80,15 +70,6 @@ pub fn load_and_store_applications(
     store_applications_in_manager(app_handle, &valid_applications)?;
 
     Ok(valid_applications)
-}
-
-pub fn get_stored_applications(app_handle: &AppHandle) -> Result<Vec<GHUBApp>, String> {
-    let state: State<AppState> = app_handle.state();
-    let apps = state
-        .applications
-        .lock()
-        .map_err(|e| format!("Failed to acquire lock on applications: {}", e))?;
-    Ok(apps.clone())
 }
 
 pub fn initialize_applications_on_startup(app_handle: &AppHandle) -> Result<(), String> {

@@ -4,7 +4,7 @@ use tokio::sync::Mutex;
 use tauri::{AppHandle, State};
 use serde_json::Value;
 
-use super::websocket::{WebSocketClient, WebSocketMessage};
+use super::client::{WebSocketClient, WebSocketMessage};
 
 type WebSocketClients = Arc<Mutex<HashMap<String, Arc<WebSocketClient>>>>;
 
