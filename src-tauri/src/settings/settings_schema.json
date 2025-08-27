@@ -1,0 +1,10 @@
+[
+  {
+    "key": "autostart",
+    "label": "Launch on Startup",
+    "type": "switch",
+    "default": false,
+    "system_managed": true,
+    "description": "Start the app when you sign in"
+  }
+]
