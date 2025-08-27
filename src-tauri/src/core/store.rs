@@ -1,4 +1,4 @@
-use crate::shared::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_DATA_PATH, STORE_KEY_AUTOSTART};
+use crate::core::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_DATA_PATH, STORE_KEY_AUTOSTART};
 use serde_json::Value;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;

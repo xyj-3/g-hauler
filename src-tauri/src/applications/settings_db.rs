@@ -1,5 +1,5 @@
-use crate::shared::constants::LGHUB_SETTINGS_DB_PATH;
-use crate::shared::state::AppState;
+use crate::core::constants::LGHUB_SETTINGS_DB_PATH;
+use crate::core::state::AppState;
 use crate::applications::models::{ApplicationsData, GHUBApp};
 use chrono::Utc;
 use rusqlite::Connection;

@@ -1,5 +1,5 @@
-use crate::shared::constants::STORE_KEY_DATA_PATH;
-use crate::shared::store::get_store_key;
+use crate::core::constants::STORE_KEY_DATA_PATH;
+use crate::core::store::get_store_key;
 use std::fs;
 use std::path::PathBuf;
 use tauri::AppHandle;

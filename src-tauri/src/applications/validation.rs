@@ -1,4 +1,4 @@
-use crate::shared::constants::{STORE_KEY_DATA_PATH, STORE_FILENAME};
+use crate::core::constants::{STORE_KEY_DATA_PATH, STORE_FILENAME};
 use crate::applications::paths::{
     get_applications_json_path, get_current_json_path, get_images_dir_path, get_version_json_path,
 };

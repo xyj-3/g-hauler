@@ -1,9 +1,9 @@
 use tauri::{AppHandle};
 use tauri_plugin_autostart::ManagerExt;
-use crate::shared::store;
+use crate::core::store;
 use serde_json::{json, Value};
 
-use crate::shared::constants::{STORE_KEY_AUTOSTART};
+use crate::core::constants::{STORE_KEY_AUTOSTART};
 
 #[tauri::command]
 pub fn enable_auto_start(app: tauri::AppHandle) -> Result<(), String> {
