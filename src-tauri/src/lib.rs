@@ -40,7 +40,7 @@ pub fn run() {
                 eprintln!("Failed to initialize applications: {}", e);
             }
 
-            if let Err(e) = crate::settings::auto_start::init_auto_start(&handle) {
+            if let Err(e) = crate::settings::autostart::init_auto_start(&handle) {
                 eprintln!("Failed to sync autostart setting: {}", e);
             }
 
@@ -57,9 +57,9 @@ pub fn run() {
             crate::applications::applications_json::save_applications_to_disk,
             crate::applications::settings_db::load_applications_from_sqlite,
             crate::applications::settings_db::save_applications_to_sqlite,
-            crate::settings::auto_start::enable_auto_start,
-            crate::settings::auto_start::disable_auto_start,
-            crate::settings::auto_start::is_auto_start_enabled,
+            crate::settings::autostart::enable_auto_start,
+            crate::settings::autostart::disable_auto_start,
+            crate::settings::autostart::is_auto_start_enabled,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

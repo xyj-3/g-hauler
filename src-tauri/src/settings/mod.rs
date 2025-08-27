@@ -1,1 +1,2 @@
-pub mod auto_start;
+pub mod autostart;
+pub mod schema;
