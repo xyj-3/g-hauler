@@ -1,5 +1,5 @@
 use crate::applications::paths::{get_applications_json_path, get_build_id};
-use crate::shared::state::{
+use crate::core::state::{
     AppState, store_applications_in_manager, get_stored_applications
 };
 use crate::applications::models::{ApplicationsData, GHUBApp};

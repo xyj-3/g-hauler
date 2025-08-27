@@ -1,6 +1,6 @@
 mod websocket;
 mod settings;
-mod shared;
+mod core;
 mod applications;
 
 use std::sync::Mutex;
@@ -14,7 +14,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .manage(shared::state::AppState {
+        .manage(core::state::AppState {
             applications: Mutex::new(Vec::new()),
             settings_db_data: Mutex::new(None),
         })
@@ -32,7 +32,7 @@ pub fn run() {
                 eprintln!("Failed to load SQLite data: {}", e);
             }
 
-            if let Err(e) = tauri::async_runtime::block_on(crate::shared::store::initialize_store(&handle))
+            if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle))
             {
                 eprintln!("Failed to initialize store: {}", e);
             }
@@ -47,8 +47,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            crate::shared::store::store_get_key,
-            crate::shared::store::store_set_key,
+            crate::core::store::store_get_key,
+            crate::core::store::store_set_key,
             crate::applications::paths::get_pipeline_path,
             crate::applications::validation::validate_paths,
             crate::applications::applications_json::get_applications,
