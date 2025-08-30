@@ -2,42 +2,99 @@
   import { invoke } from '@tauri-apps/api/core';
   import Switch from './ui/Switch.svelte';
 
-  let { label = '', key = '', onCommand = '', offCommand = '' } = $props();
+  // Types (keep in sync with your backend payloads)
+  type SelectOption = { value: string; label: string; description?: string };
+  type SettingType =
+    | { type: 'toggle' }
+    | { type: 'text'; placeholder?: string; validation?: { pattern?: string; min_length?: number; max_length?: number } }
+    | { type: 'number'; min?: number; max?: number; step?: number; unit?: string }
+    | { type: 'select'; options: SelectOption[] }
+    | { type: 'path'; directory: boolean; extensions?: string[] }
+    | { type: 'color' }
+    | { type: 'keybind' };
 
-  let checked = $state(false);
-  let loading = $state(true);
-  let saving  = $state(false);
+  type Setting = {
+    key: string;
+    label: string;
+    description?: string;
+    category: string;
+    default_value: any;
+    setting_type: SettingType;
+    requires_restart: boolean;
+    system_managed: boolean;
+  };
 
-  const id = `${key}-setting`;
+  type SettingItemState = {
+    key: string;
+    user_value: any;
+    effective_value: any;
+    in_sync: boolean;
+    capable: boolean;
+    error?: string | null;
+  };
 
-  $effect(() => {
-    invoke<boolean>('store_get_key', { key })
-      .then(v => { checked = v ?? false; })
-      .catch(e => { console.error(`Failed to load setting "${key}":`, e); })
-      .finally(() => { loading = false; });
-  });
+  let {
+    item,
+    itemState,
+    onStatePatched = (_: SettingItemState[]) => {}
+  } = $props<{
+    item: Setting;
+    itemState: SettingItemState | undefined;
+    onStatePatched?: (items: SettingItemState[]) => void;
+  }>();
 
-  async function handleToggle({ checked: next }: { checked: boolean }) {
+  let saving = $state(false);
+
+  function currentToggle(): boolean {
+    // Backend guarantees booleans for toggle user_value/default_value
+    const v = itemState?.user_value ?? item.default_value;
+    return !!v;
+  }
+
+  async function applyValue(value: any) {
     if (saving) return;
     saving = true;
     try {
-      await invoke('store_set_key', { key, value: next });
-      const cmd = next ? onCommand : offCommand;
-      if (cmd) await invoke(cmd);
-      checked = next;
+      const next = await invoke<SettingItemState[]>('settings_set_and_apply', {
+        key: item.key,
+        value
+      });
+      onStatePatched(next); // replace full state in parent
     } catch (e) {
-      console.error(`Failed to apply "${key}" setting:`, e);
+      console.error(`Failed to set "${item.key}"`, e);
     } finally {
       saving = false;
     }
   }
 </script>
 
-{#if loading}
-  <p>Loading {label}...</p>
-{:else}
-  <div class="w-full flex items-center justify-between">
-    <label for={id} class="text-white font-dm-sans text-base truncate">{label}</label>
-    <Switch name={key} checked={checked} disabled={saving} onChange={handleToggle} />
+<div class="w-full">
+  <div class="flex items-center justify-between gap-4">
+    <div class="min-w-0">
+      <label for={`${item.key}-setting`} class="text-white font-dm-sans text-base truncate">
+        {item.label}
+      </label>
+      {#if item.description}
+        <div class="text-xs text-gray-300 mt-1 truncate">{item.description}</div>
+      {/if}
+      {#if itemState && !itemState.in_sync}
+        <div class="text-[10px] text-yellow-400 mt-1">Not in sync with system</div>
+      {/if}
+      {#if itemState && itemState.error}
+        <div class="text-[10px] text-red-400 mt-1">{itemState.error}</div>
+      {/if}
+    </div>
+
+    {#if item.setting_type.type === 'toggle'}
+      <Switch
+        name={item.key}
+        checked={currentToggle()}
+        disabled={saving || (itemState && !itemState.capable)}
+        onChange={({ checked }) => applyValue(checked)}
+      />
+    {:else}
+      <div class="text-sm text-gray-400">Unsupported type: {item.setting_type.type}</div>
+    {/if}
   </div>
-{/if}
+  <div class="h-4"></div>
+</div>
