@@ -72,7 +72,6 @@ pub struct SettingItemState {
     pub error: Option<String>,
 }
 
-/// Keep SettingsState under AppState (as requested).
 #[derive(Debug, Default)]
 pub struct SettingsState {
     pub items: Vec<SettingItemState>,
