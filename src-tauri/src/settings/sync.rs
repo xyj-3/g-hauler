@@ -1,10 +1,20 @@
 use serde_json::Value;
 use tauri::AppHandle;
 
-use crate::core::store;
-use super::{adapters, registry};
+use crate::core::{state as app_state, store};
+use crate::settings::{adapters, registry, validation};
 
-/// Fill missing keys from registry defaults (no overwrite).
+/// Initializes and synchronizes SettingState for application
+pub fn init(app: &AppHandle) -> Result<(), String> {
+
+    ensure_defaults(app)?;
+    sync_system_settings(app)?;
+    app_state::refresh_settings_state(app)?;
+
+    Ok(())
+}
+
+/// Ensure each registry key exists in store with a valid value; if missing, write default.
 pub fn ensure_defaults(app: &AppHandle) -> Result<(), String> {
     for s in registry::all() {
         if store::get_store_key(app, &s.key).is_none() {
@@ -28,4 +38,3 @@ pub fn sync_system_settings(app: &AppHandle) -> Result<(), String> {
     }
     Ok(())
 }
-

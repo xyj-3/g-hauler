@@ -41,16 +41,14 @@ pub fn run() {
                 eprintln!("Failed to initialize applications: {}", e);
             }
 
-            if let Err(e) = crate::settings::sync::ensure_defaults(&handle) {
-                eprintln!("Settings defaults error: {}", e);
+            if let Err(e) = crate::settings::validation::validate_registry(crate::settings::registry::all()) {
+                eprintln!("settings registry validation error: {e}");
             }
-            if let Err(e) = crate::settings::sync::sync_system_settings(&handle) {
+
+            if let Err(e) = crate::settings::sync::init(&handle) {
                 eprintln!("Settings system sync error: {}", e);
             }
 
-            if let Err(e) = crate::core::state::refresh_settings_state(&handle) {
-                eprintln!("Failed to build settings state: {}", e);
-            }
 
             Ok(())
         })

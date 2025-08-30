@@ -1,8 +1,9 @@
 use serde_json::Value;
 use tauri::AppHandle;
 
-use crate::core::store;
-use super::{models::Setting, registry, state, validation};
+use crate::core::{state as app_state, store};
+use crate::settings::{adapters, registry, validation};
+use crate::settings::models::Setting;
 
 #[tauri::command]
 pub async fn settings_get_registry() -> Result<serde_json::Value, String> {
@@ -11,8 +12,9 @@ pub async fn settings_get_registry() -> Result<serde_json::Value, String> {
 
 #[tauri::command]
 pub async fn settings_get_state(app: AppHandle) -> Result<serde_json::Value, String> {
-    let items = state::build_state(&app);
-    Ok(serde_json::to_value(items).unwrap())
+    // Serve the cached state kept in AppState
+    let ss = app_state::get_settings_state(&app)?;
+    Ok(serde_json::to_value(ss.items).unwrap())
 }
 
 #[tauri::command]
@@ -21,16 +23,12 @@ pub async fn settings_set_and_apply(app: AppHandle, key: String, value: Value) -
 
     validation::validate_runtime_value(setting, &value)?;
 
-    // Save old value for rollback
     let prev = store::get_store_key(&app, &key);
 
-    // 1) write user preference
     store::set_store_key(&app, &key, value.clone())?;
 
-    // 2) apply system side-effect if needed
     if setting.system_managed {
-        let adapters = super::adapters::registry();
-        if let Some(adapter) = adapters.get(key.as_str()) {
+        if let Some(adapter) = adapters::registry().get(key.as_str()) {
             if let Err(e) = adapter.apply(&app, &value) {
                 if let Some(p) = prev {
                     let _ = store::set_store_key(&app, &key, p);
@@ -40,7 +38,7 @@ pub async fn settings_set_and_apply(app: AppHandle, key: String, value: Value) -
         }
     }
 
-    // 3) return fresh state
-    let items = state::build_state(&app);
-    Ok(serde_json::to_value(items).unwrap())
+    app_state::refresh_settings_state(&app)?;
+    let ss = app_state::get_settings_state(&app)?;
+    Ok(serde_json::to_value(ss.items).unwrap())
 }

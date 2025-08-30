@@ -7,6 +7,7 @@ use super::{adapters, models::*, registry};
 pub fn build_state(app: &AppHandle) -> Vec<SettingItemState> {
     let reg = adapters::registry();
 
+    println!("build_state");
     registry::all()
         .iter()
         .map(|s| {
