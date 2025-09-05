@@ -1,6 +1,4 @@
-mod client;
-mod commands;
+pub mod client;
+pub mod commands;
 
-pub use commands::{
-    init_websocket_state,
-};
+pub use client::WebSocketClient;

@@ -3,7 +3,8 @@ mod settings;
 mod core;
 mod applications;
 
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
+use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -18,9 +19,12 @@ pub fn run() {
             applications: Mutex::new(Vec::new()),
             settings_state: Mutex::new(Default::default()),
         })
-        .manage(websocket::init_websocket_state())
         .setup(|app| {
-            let handle = app.handle();
+            let handle = app.handle().clone();
+            
+            // Initialize singleton WebSocket client
+            let ws_client = Arc::new(websocket::WebSocketClient::new(handle.clone()));
+            app.manage(ws_client);
 
             if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
                 eprintln!("Failed to initialize store: {}", e);
@@ -53,6 +57,11 @@ pub fn run() {
             crate::settings::commands::settings_get_registry,
             crate::settings::commands::settings_get_state,
             crate::settings::commands::settings_set_and_apply,
+            crate::websocket::commands::ws_connect,
+            crate::websocket::commands::ws_send_message,
+            crate::websocket::commands::ws_disconnect,
+            crate::websocket::commands::ws_is_connected,
+            crate::websocket::commands::ws_is_reconnecting,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
