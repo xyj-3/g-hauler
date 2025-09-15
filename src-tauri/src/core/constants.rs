@@ -7,4 +7,3 @@ pub const STORE_KEY_AUTOSTART: &str = "autostart";
 
 // File paths
 pub const LGHUB_DEFAULT_DATA_PATH: &str = r"C:\ProgramData\LGHUB";
-pub const LGHUB_SETTINGS_DB_PATH: &str = r"%LOCALAPPDATA%\LGHUB\settings.db";

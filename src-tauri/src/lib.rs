@@ -16,22 +16,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(core::state::AppState {
             applications: Mutex::new(Vec::new()),
-            settings_db_data: Mutex::new(None),
             settings_state: Mutex::new(Default::default()),
         })
         .manage(websocket::init_websocket_state())
         .setup(|app| {
             let handle = app.handle();
-
-            // Create backup of SQLite database on startup
-            if let Err(e) = crate::applications::settings_db::backup_sqlite_on_startup() {
-                eprintln!("Failed to backup SQLite database: {}", e);
-            }
-
-            // Load SQLite data into app state
-            if let Err(e) = crate::applications::settings_db::load_and_store_sqlite_data(&handle) {
-                eprintln!("Failed to load SQLite data: {}", e);
-            }
 
             if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
                 eprintln!("Failed to initialize store: {}", e);
@@ -61,8 +50,6 @@ pub fn run() {
             crate::applications::applications_json::update_application,
             crate::applications::applications_json::get_application_by_id,
             crate::applications::applications_json::save_applications_to_disk,
-            crate::applications::settings_db::load_applications_from_sqlite,
-            crate::applications::settings_db::save_applications_to_sqlite,
             crate::settings::commands::settings_get_registry,
             crate::settings::commands::settings_get_state,
             crate::settings::commands::settings_set_and_apply,

@@ -1,13 +1,12 @@
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
 
-use crate::applications::models::{ApplicationsData, GHUBApp};
+use crate::applications::models::GHUBApp;
 use crate::settings::models::{SettingsState};
 use crate::settings::state as settings_state;
 
 pub struct AppState {
     pub applications: Mutex<Vec<GHUBApp>>,
-    pub settings_db_data: Mutex<Option<ApplicationsData>>,
     pub settings_state: Mutex<SettingsState>,
 }
 
