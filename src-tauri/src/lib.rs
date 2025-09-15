@@ -17,6 +17,7 @@ pub fn run() {
         .manage(core::state::AppState {
             applications: Mutex::new(Vec::new()),
             settings_db_data: Mutex::new(None),
+            settings_state: Mutex::new(Default::default()),
         })
         .manage(websocket::init_websocket_state())
         .setup(|app| {
@@ -32,17 +33,22 @@ pub fn run() {
                 eprintln!("Failed to load SQLite data: {}", e);
             }
 
-            if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle))
-            {
+            if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
                 eprintln!("Failed to initialize store: {}", e);
             }
+
             if let Err(e) = crate::applications::applications_json::initialize_applications_on_startup(&handle) {
                 eprintln!("Failed to initialize applications: {}", e);
             }
 
-            if let Err(e) = crate::settings::auto_start::init_auto_start(&handle) {
-                eprintln!("Failed to sync autostart setting: {}", e);
+            if let Err(e) = crate::settings::validation::validate_registry(crate::settings::registry::all()) {
+                eprintln!("settings registry validation error: {e}");
             }
+
+            if let Err(e) = crate::settings::sync::init(&handle) {
+                eprintln!("Settings system sync error: {}", e);
+            }
+
 
             Ok(())
         })
@@ -57,9 +63,9 @@ pub fn run() {
             crate::applications::applications_json::save_applications_to_disk,
             crate::applications::settings_db::load_applications_from_sqlite,
             crate::applications::settings_db::save_applications_to_sqlite,
-            crate::settings::auto_start::enable_auto_start,
-            crate::settings::auto_start::disable_auto_start,
-            crate::settings::auto_start::is_auto_start_enabled,
+            crate::settings::commands::settings_get_registry,
+            crate::settings::commands::settings_get_state,
+            crate::settings::commands::settings_set_and_apply,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
