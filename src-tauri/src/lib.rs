@@ -10,7 +10,19 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
-        .plugin(tauri_plugin_log::Builder::new().build())
+        .plugin(tauri_plugin_log::Builder::new()
+            .targets([
+                tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::LogDir { 
+                    file_name: Some("app".to_string()) 
+                }),
+            ])
+            .filter(|metadata| {
+                // Filter out all tungstenite-related logs (including tokio_tungstenite)
+                !metadata.target().starts_with("tungstenite") && 
+                !metadata.target().starts_with("tokio_tungstenite")
+            })
+            .build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
