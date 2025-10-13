@@ -61,7 +61,6 @@ pub fn run() {
             crate::websocket::commands::ws_send_message,
             crate::websocket::commands::ws_disconnect,
             crate::websocket::commands::ws_is_connected,
-            crate::websocket::commands::ws_is_reconnecting,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -2,7 +2,7 @@ use serde_json::Value;
 use tauri::AppHandle;
 
 use crate::core::{state as app_state, store};
-use crate::settings::{adapters, registry, validation};
+use crate::settings::{adapters, registry};
 
 /// Initializes and synchronizes SettingState for application
 pub fn init(app: &AppHandle) -> Result<(), String> {

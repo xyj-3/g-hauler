@@ -7,6 +7,7 @@
   import Sidebar from '$components/layout/Sidebar.svelte';
   import BottomBar from '$components/layout/BottomBar.svelte';
   import { invoke } from '@tauri-apps/api/core';
+  import { ws } from '$lib/services/websocket';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -55,6 +56,8 @@
       }
       hideSplashIfReady();
     });
+
+    ws.autoConnect();
   });
 </script>
 

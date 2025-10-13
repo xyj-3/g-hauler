@@ -68,3 +68,32 @@ export interface HumbleApp {
 export interface RiotGames {
   appName: string;
 }
+
+// WebSocket payload interfaces
+
+export interface ApplicationPayload {
+  databaseId?: string;
+  name: string;
+  bundleId?: string;
+  version?: number;
+  installTime?: string;
+  lastRunTime?: string;
+  applicationPath: string;
+  applicationFolder?: string;
+  poster?: string;
+  background?: string;
+  themeMusic?: string;
+  processId?: number;
+  sessionId?: number;
+  commandLine?: string;
+  applicationId?: string;
+  commands?: Command[];
+  categoryColors?: CategoryColor[];
+  isCustom?: boolean;
+  posterUrl?: string;
+  posterTitlePosition?: string;
+  isDisabled?: boolean;
+  isInstalled?: boolean;
+  userPaths?: string[];
+  posterPath?: string;
+}

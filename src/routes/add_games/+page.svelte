@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { open as openDialog } from '@tauri-apps/plugin-dialog';
+	import { ws } from '$lib/services/websocket';
 
 	interface AddGameOptions {
 		name?: string;
@@ -11,6 +12,8 @@
 	let gameName = $state(name);
 	let gameInstalled = $state(installed);
 	let filePath = $state('');
+	let isSubmitting = $state(false);
+	let submitMessage = $state('');
 
 	async function handleBrowseFile() {
 		const selected = await openDialog({
@@ -23,17 +26,45 @@
 		}
 	}
 
-	function handleSubmit(event: SubmitEvent) {
+	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		console.log({
-			name: gameName,
-			installed: gameInstalled,
-			filePath: filePath
-		});
+
+		if (!gameName.trim() || !filePath.trim()) {
+			submitMessage = 'Please fill in all required fields';
+			return;
+		}
+
+		isSubmitting = true;
+		submitMessage = '';
+
+		try {
+			// Check if WebSocket is connected
+			if (!(await ws.isConnected())) {
+				throw new Error('WebSocket not connected. Please connect first.');
+			}
+
+			// Send the WebSocket message
+			await ws.setApplication(filePath, gameName, { isInstalled: gameInstalled });
+
+			submitMessage = 'Game added successfully!';
+			
+			// Reset form
+			gameName = '';
+			filePath = '';
+			gameInstalled = true;
+			
+		} catch (error) {
+			console.error('Failed to add game:', error);
+			submitMessage = error instanceof Error ? error.message : 'Failed to add game';
+		} finally {
+			isSubmitting = false;
+		}
 	}
 </script>
 
 <h1>Add Games</h1>
+
+<!-- Note: For a truly reactive status indicator, you'd need a separate component that polls the connection status -->
 
 <form onsubmit={handleSubmit} class="max-w-md mx-auto mt-8 space-y-6">
 	<div class="space-y-2">
@@ -85,12 +116,20 @@
 		</div>
 	</div>
 
+	<!-- Submit Message -->
+	{#if submitMessage}
+		<div class="p-3 rounded-md {submitMessage.includes('success') ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}">
+			<p class="text-sm">{submitMessage}</p>
+		</div>
+	{/if}
+
 	<div class="flex justify-center">
 		<button
 			type="submit"
-			class="bg-blue-600 text-white text-sm py-2 px-6 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+			disabled={isSubmitting}
+			class="bg-blue-600 text-white text-sm py-2 px-6 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 		>
-			Add Game
+			{isSubmitting ? 'Adding Game...' : 'Add Game'}
 		</button>
 	</div>
 </form>

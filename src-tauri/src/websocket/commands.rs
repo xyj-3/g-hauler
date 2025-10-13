@@ -25,19 +25,28 @@ pub async fn ws_connect(
 #[tauri::command]
 pub async fn ws_send_message(
     ws_client: State<'_, Arc<WebSocketClient>>,
-    msg_id: String,
     verb: String,
     path: String,
     payload: Value,
 ) -> Result<(), String> {
+    eprintln!("[WebSocket] Sending message: verb={}, path={}", verb, path);
+
     let message = WebSocketMessage {
-        msg_id,
-        verb,
-        path,
+        verb: verb.clone(),
+        path: path.clone(),
         payload,
     };
-    
-    ws_client.send_message(message).await.map_err(|e| e.to_string())
+
+    match ws_client.send_message(message).await {
+        Ok(_) => {
+            eprintln!("[WebSocket] Message sent successfully: verb={}", verb);
+            Ok(())
+        }
+        Err(e) => {
+            eprintln!("[WebSocket] Failed to send message: verb={}, error={}", verb, e);
+            Err(e.to_string())
+        }
+    }
 }
 
 #[tauri::command]
@@ -51,12 +60,6 @@ pub async fn ws_disconnect(
 pub async fn ws_is_connected(
     ws_client: State<'_, Arc<WebSocketClient>>,
 ) -> Result<bool, String> {
-    Ok(ws_client.is_connected().await)
+    Ok(ws_client.is_connected())
 }
 
-#[tauri::command]
-pub async fn ws_is_reconnecting(
-    ws_client: State<'_, Arc<WebSocketClient>>,
-) -> Result<bool, String> {
-    Ok(ws_client.is_reconnecting().await)
-}

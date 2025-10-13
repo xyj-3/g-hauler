@@ -1,216 +1,182 @@
 use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::{Mutex, RwLock};
-use tokio::time::sleep;
-use tokio_tungstenite::{connect_async, WebSocketStream, MaybeTlsStream};
-use tokio_tungstenite::tungstenite::Message;
-use futures_util::{SinkExt, StreamExt};
+use std::sync::atomic::{AtomicBool, Ordering};
+use tokio::sync::Mutex;
+use tokio::net::TcpStream;
+use tokio_tungstenite::{client_async, WebSocketStream};
+use tokio_tungstenite::tungstenite::{Message, handshake::client::generate_key};
+use tokio_tungstenite::tungstenite::http::Request;
+use futures_util::{SinkExt, StreamExt, stream::{SplitSink, SplitStream}};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{json, Value};
 use tauri::{AppHandle, Emitter};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebSocketMessage {
-    pub msg_id: String,
     pub verb: String,
     pub path: String,
     pub payload: Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WebSocketResponse {
-    pub msg_id: String,
-    pub status: String,
-    pub payload: Value,
-}
-
-#[derive(Debug, Clone)]
-pub struct ReconnectionConfig {
-    pub max_retries: u32,
-    pub initial_delay: Duration,
-    pub max_delay: Duration,
-    pub backoff_multiplier: f64,
-}
-
-impl Default for ReconnectionConfig {
-    fn default() -> Self {
-        Self {
-            max_retries: 10,
-            initial_delay: Duration::from_millis(1000),
-            max_delay: Duration::from_secs(30),
-            backoff_multiplier: 1.5,
-        }
-    }
-}
-
 pub struct WebSocketClient {
-    pub ws_stream: Arc<Mutex<Option<WebSocketStream<MaybeTlsStream<tokio::net::TcpStream>>>>>,
+    pub write_stream: Arc<Mutex<Option<SplitSink<WebSocketStream<TcpStream>, Message>>>>,
+    pub read_stream: Arc<Mutex<Option<SplitStream<WebSocketStream<TcpStream>>>>>,
     pub app_handle: AppHandle,
-    pub uri: Arc<RwLock<Option<String>>>,
-    pub reconnection_config: ReconnectionConfig,
-    pub reconnecting: Arc<Mutex<bool>>,
+    pub is_connected: Arc<AtomicBool>,
 }
 
 impl WebSocketClient {
     pub fn new(app_handle: AppHandle) -> Self {
         Self {
-            ws_stream: Arc::new(Mutex::new(None)),
+            write_stream: Arc::new(Mutex::new(None)),
+            read_stream: Arc::new(Mutex::new(None)),
             app_handle,
-            uri: Arc::new(RwLock::new(None)),
-            reconnection_config: ReconnectionConfig::default(),
-            reconnecting: Arc::new(Mutex::new(false)),
+            is_connected: Arc::new(AtomicBool::new(false)),
         }
-    }
-
-    pub fn with_reconnection_config(mut self, config: ReconnectionConfig) -> Self {
-        self.reconnection_config = config;
-        self
     }
 
     pub async fn connect(&self, uri: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Store URI for reconnection
-        {
-            let mut uri_guard = self.uri.write().await;
-            *uri_guard = Some(uri.to_string());
-        }
+        // Parse the WebSocket URI to extract host and port
+        let uri_parsed = uri.parse::<tokio_tungstenite::tungstenite::http::Uri>()?;
+        let host = uri_parsed.host().ok_or("Invalid URI: missing host")?;
+        let port = uri_parsed.port_u16().unwrap_or(9010);
+        let addr = format!("{}:{}", host, port);
 
-        self.connect_internal(uri).await
-    }
+        // Establish TCP connection
+        let stream = TcpStream::connect(&addr).await?;
 
-    async fn connect_internal(&self, uri: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let request = tokio_tungstenite::tungstenite::handshake::client::Request::builder()
+        // Build the WebSocket handshake request
+        let request = Request::builder()
             .uri(uri)
+            .header("Host", &addr)
+            .header("Connection", "Upgrade")
+            .header("Upgrade", "websocket")
+            .header("Sec-WebSocket-Key", generate_key())
+            .header("Sec-WebSocket-Version", "13")
             .header("Sec-WebSocket-Protocol", "json")
             .body(())?;
 
-        let (ws_stream, _) = connect_async(request).await?;
+        // Perform WebSocket handshake
+        let (ws_stream, _) = client_async(request, stream).await?;
         
-        let mut stream_guard = self.ws_stream.lock().await;
-        *stream_guard = Some(ws_stream);
-        
+        // Split the stream into read and write halves
+        let (write, read) = ws_stream.split();
+
+        // Store the split streams
+        {
+            let mut write_guard = self.write_stream.lock().await;
+            *write_guard = Some(write);
+        }
+        {
+            let mut read_guard = self.read_stream.lock().await;
+            *read_guard = Some(read);
+        }
+
+        self.is_connected.store(true, Ordering::SeqCst);
         let _ = self.app_handle.emit("websocket-connected", "Connected");
         Ok(())
     }
 
     pub async fn send_message(&self, message: WebSocketMessage) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let mut stream_guard = self.ws_stream.lock().await;
-        
-        if let Some(ref mut stream) = *stream_guard {
-            let json_message = serde_json::to_string(&message)?;
-            stream.send(Message::Text(json_message)).await?;
+        let mut write_guard = self.write_stream.lock().await;
+
+        if let Some(ref mut write_stream) = *write_guard {
+            let json_message = json!({
+                "verb": message.verb.to_uppercase(),
+                "path": message.path,
+                "payload": message.payload
+            });
+            let message_str = json_message.to_string();
+            eprintln!("[WebSocket Client] Sending JSON: {}", message_str);
+            write_stream.send(Message::Text(message_str)).await?;
+            eprintln!("[WebSocket Client] Message sent to server");
         } else {
+            eprintln!("[WebSocket Client] Cannot send message: not connected");
             return Err("WebSocket not connected".into());
         }
-        
+
         Ok(())
     }
 
     pub async fn listen_for_messages(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         loop {
-            let message = {
-                let mut stream_guard = self.ws_stream.lock().await;
-                if let Some(ref mut stream) = *stream_guard {
-                    match stream.next().await {
-                        Some(msg) => msg?,
-                        None => break,
-                    }
+            // Acquire the read lock, get the next message, and immediately release the lock
+            let message_result = {
+                let mut read_guard = self.read_stream.lock().await;
+                if let Some(ref mut read_stream) = *read_guard {
+                    read_stream.next().await
                 } else {
                     return Err("WebSocket not connected".into());
                 }
-            };
+            }; // Lock is released here
 
-            match message {
-                Message::Text(text) => {
-                    // Emit the message to the frontend
-                    let _ = self.app_handle.emit("websocket-message", text);
-                }
-                Message::Close(_) => {
-                    let _ = self.app_handle.emit("websocket-closed", "Connection closed");
-                    break;
-                }
-                _ => {}
-            }
-        }
-        
-        // Connection ended - try to reconnect if we have a URI
-        let _ = self.app_handle.emit("websocket-disconnected", "Connection lost");
-        self.start_reconnection().await;
-        
-        Ok(())
-    }
-
-    async fn start_reconnection(&self) {
-        let mut reconnecting_guard = self.reconnecting.lock().await;
-        if *reconnecting_guard {
-            return; // Already reconnecting
-        }
-        *reconnecting_guard = true;
-        drop(reconnecting_guard);
-
-        let uri = {
-            let uri_guard = self.uri.read().await;
-            uri_guard.clone()
-        };
-
-        if let Some(uri_str) = uri {
-            let mut delay = self.reconnection_config.initial_delay;
-            
-            for attempt in 1..=self.reconnection_config.max_retries {
-                eprintln!("Reconnection attempt {} of {}", attempt, self.reconnection_config.max_retries);
-                let _ = self.app_handle.emit("websocket-reconnecting", format!("Attempt {}", attempt));
-
-                match self.connect_internal(&uri_str).await {
-                    Ok(()) => {
-                        eprintln!("Reconnected successfully");
-                        let _ = self.app_handle.emit("websocket-reconnected", "Reconnected");
-                        let mut reconnecting_guard = self.reconnecting.lock().await;
-                        *reconnecting_guard = false;
-                        return;
-                    }
-                    Err(e) => {
-                        eprintln!("Reconnection attempt {} failed: {}", attempt, e);
-                        if attempt < self.reconnection_config.max_retries {
-                            sleep(delay).await;
-                            delay = Duration::from_millis(
-                                (delay.as_millis() as f64 * self.reconnection_config.backoff_multiplier) as u64
-                            ).min(self.reconnection_config.max_delay);
+            // Process the message outside the lock
+            match message_result {
+                Some(Ok(message)) => {
+                    match message {
+                        Message::Text(text) => {
+                            eprintln!("[WebSocket Client] Received message: {}", text);
+                            // Emit the message to the frontend
+                            let _ = self.app_handle.emit("websocket-message", text);
+                        }
+                        Message::Close(_) => {
+                            eprintln!("[WebSocket Client] Connection closed by server");
+                            self.is_connected.store(false, Ordering::SeqCst);
+                            let _ = self.app_handle.emit("websocket-closed", "Connection closed");
+                            break;
+                        }
+                        Message::Ping(data) => {
+                            eprintln!("[WebSocket Client] Received ping");
+                            // Send pong response using write stream
+                            let mut write_guard = self.write_stream.lock().await;
+                            if let Some(ref mut write_stream) = *write_guard {
+                                let _ = write_stream.send(Message::Pong(data)).await;
+                            }
+                        }
+                        Message::Pong(_) => {
+                            eprintln!("[WebSocket Client] Received pong");
+                        }
+                        _ => {
+                            eprintln!("[WebSocket Client] Received other message type: {:?}", message);
                         }
                     }
                 }
+                Some(Err(e)) => {
+                    self.is_connected.store(false, Ordering::SeqCst);
+                    return Err(e.into());
+                },
+                None => {
+                    self.is_connected.store(false, Ordering::SeqCst);
+                    break;
+                }
             }
-
-            eprintln!("All reconnection attempts failed");
-            let _ = self.app_handle.emit("websocket-reconnection-failed", "All attempts failed");
         }
 
-        let mut reconnecting_guard = self.reconnecting.lock().await;
-        *reconnecting_guard = false;
+        let _ = self.app_handle.emit("websocket-disconnected", "Connection lost");
+        Ok(())
     }
 
     pub async fn disconnect(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        // Clear stored URI to prevent reconnection
+        // Send close message via write stream
         {
-            let mut uri_guard = self.uri.write().await;
-            *uri_guard = None;
+            let mut write_guard = self.write_stream.lock().await;
+            if let Some(ref mut write_stream) = *write_guard {
+                let _ = write_stream.send(Message::Close(None)).await;
+            }
+            *write_guard = None;
+        }
+        
+        // Clear read stream
+        {
+            let mut read_guard = self.read_stream.lock().await;
+            *read_guard = None;
         }
 
-        let mut stream_guard = self.ws_stream.lock().await;
-        if let Some(ref mut stream) = *stream_guard {
-            stream.send(Message::Close(None)).await?;
-        }
-        *stream_guard = None;
-        
+        self.is_connected.store(false, Ordering::SeqCst);
         let _ = self.app_handle.emit("websocket-disconnected", "Manually disconnected");
         Ok(())
     }
 
-    pub async fn is_connected(&self) -> bool {
-        let stream_guard = self.ws_stream.lock().await;
-        stream_guard.is_some()
-    }
-
-    pub async fn is_reconnecting(&self) -> bool {
-        let reconnecting_guard = self.reconnecting.lock().await;
-        *reconnecting_guard
+    pub fn is_connected(&self) -> bool {
+        self.is_connected.load(Ordering::SeqCst)
     }
 }
