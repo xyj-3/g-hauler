@@ -1,4 +1,4 @@
-use crate::core::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_DATA_PATH, STORE_KEY_AUTOSTART};
+use crate::core::constants::{LGHUB_DEFAULT_DATA_PATH, STORE_FILENAME, STORE_KEY_AUTOSTART, STORE_KEY_DATA_PATH, STORE_KEY_LAST_GHUB_VERSION};
 use serde_json::Value;
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
@@ -9,11 +9,27 @@ pub async fn initialize_store(
     app_handle: &tauri::AppHandle,
 ) -> Result<(), tauri_plugin_store::Error> {
     let store = app_handle.store(STORE_FILENAME)?;
+    
+    let changed = set_store_defaults(&store);
+
+    if changed {
+        store.save()?;
+        println!("Store initialized with default values");
+    }
+
+    Ok(())
+}
+
+fn set_store_defaults(store: &tauri_plugin_store::Store<tauri::Wry>) -> bool {
     let mut changed = false;
 
-    // Initialize default data path if not set
     if store.get(STORE_KEY_DATA_PATH).is_none() {
         store.set(STORE_KEY_DATA_PATH, json!(LGHUB_DEFAULT_DATA_PATH));
+        changed = true;
+    }
+
+    if store.get(STORE_KEY_LAST_GHUB_VERSION).is_none() {
+        store.set(STORE_KEY_LAST_GHUB_VERSION, json!(""));
         changed = true;
     }
 
@@ -22,12 +38,7 @@ pub async fn initialize_store(
         changed = true;
     }
 
-    if changed {
-        store.save()?;
-        println!("Store initialized with default values");
-    }
-
-    Ok(())
+    changed
 }
 
 // Internal synchronous function for use within Rust code
