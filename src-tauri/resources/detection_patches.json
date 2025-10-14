@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "patches": [
+    {
+      "applicationId": "14bb5db3-19ba-444d-80d8-0d049a7003ec",
+      "gameName": "Grand Theft Auto V",
+      "detections": [
+        {
+          "winRegistry": {
+            "executable": "GTA5.exe",
+            "registryKey": "InstallFolderEpic",
+            "registryPath": "HKEY_LOCAL_MACHINE/SOFTWARE/WOW6432Node/Rockstar Games/Grand Theft Auto V"
+          }
+        }
+      ]
+    }
+  ]
+}

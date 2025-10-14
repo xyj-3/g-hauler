@@ -5,6 +5,7 @@ pub const STORE_KEY_AUTOSTART: &str = "autostart";
 
 // Store constants
 pub const STORE_FILENAME: &str = "settings.json";
+pub const APPLIED_PATCHES_FILENAME: &str = "applied_patches.json";
 
 // File paths
 pub const LGHUB_DEFAULT_DATA_PATH: &str = r"C:\ProgramData\LGHUB";
