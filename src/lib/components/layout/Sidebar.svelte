@@ -22,14 +22,14 @@
     },
     {
       path: '/detection',
-      label: 'Game Detection Patching',
+      label: 'Fix Game Detection',
       icon: Wrench,
       iconSize: 'w-6.5 h-6.5',
       iconStroke: 'stroke-[1.5]',
       labelWidth: 'w-44'
     },
     {
-      path: '/add_games',
+      path: '/add-games',
       label: 'Add Games to G HUB',
       icon: Truck,
       iconSize: 'w-6.5 h-6.5',

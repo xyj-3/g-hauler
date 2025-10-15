@@ -1,3 +1,3 @@
 <main>
-    <h1>Game Detection</h1>
+    <h1>Fix Game Detection</h1>
 </main>
