@@ -1,5 +1,5 @@
 use crate::core::constants::APPLIED_PATCHES_FILENAME;
-use crate::detection_patches::models::AppliedPatchesData;
+use crate::ghub_game_patches::models::AppliedPatchesData;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 

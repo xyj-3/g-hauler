@@ -1,4 +1,4 @@
-use crate::detection_patches::models::{DetectionPatchesData, GameDetectionPatches};
+use crate::ghub_game_patches::models::{DetectionPatchesData, GameDetectionPatches};
 use tauri::{AppHandle, Manager};
 
 /// Load the bundled detection patches from the resources directory
@@ -9,15 +9,15 @@ pub fn load_detection_patches(app_handle: &AppHandle) -> Result<DetectionPatches
         .resource_dir()
         .map_err(|e| format!("Failed to get resource directory: {}", e))?;
 
-    let patches_path = resource_path.join("detection_patches.json");
+    let patches_path = resource_path.join("ghub_game_patches.json");
 
     // Read the file
     let file_content = std::fs::read_to_string(&patches_path)
-        .map_err(|e| format!("Failed to read detection_patches.json from {:?}: {}", patches_path, e))?;
+        .map_err(|e| format!("Failed to read ghub_game_patches.json from {:?}: {}", patches_path, e))?;
 
     // Parse JSON
     let patches_data: DetectionPatchesData = serde_json::from_str(&file_content)
-        .map_err(|e| format!("Failed to parse detection_patches.json: {}", e))?;
+        .map_err(|e| format!("Failed to parse ghub_game_patches.json: {}", e))?;
 
     Ok(patches_data)
 }

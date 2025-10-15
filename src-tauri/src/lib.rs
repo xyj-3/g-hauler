@@ -2,7 +2,7 @@ mod websocket;
 mod settings;
 mod core;
 mod applications;
-mod detection_patches;
+mod ghub_game_patches;
 
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
@@ -68,7 +68,7 @@ pub fn run() {
                     Ok(true) => {
                         println!("G HUB version has changed - reapplying detection patches");
 
-                        if let Err(e) = crate::detection_patches::applier::reapply_saved_patches(
+                        if let Err(e) = crate::ghub_game_patches::applier::reapply_saved_patches(
                             &handle_clone,
                             &ws_client_clone,
                         ).await {
@@ -107,12 +107,12 @@ pub fn run() {
             crate::websocket::commands::ws_send_message,
             crate::websocket::commands::ws_disconnect,
             crate::websocket::commands::ws_is_connected,
-            crate::detection_patches::commands::get_available_patches_for_game,
-            crate::detection_patches::commands::patch_apply_single,
-            crate::detection_patches::commands::patch_apply_for_game,
-            crate::detection_patches::commands::patch_apply_all,
-            crate::detection_patches::commands::patch_get_applied,
-            crate::detection_patches::commands::patch_reapply_saved,
+            crate::ghub_game_patches::commands::get_available_patches_for_game,
+            crate::ghub_game_patches::commands::patch_apply_single,
+            crate::ghub_game_patches::commands::patch_apply_for_game,
+            crate::ghub_game_patches::commands::patch_apply_all,
+            crate::ghub_game_patches::commands::patch_get_applied,
+            crate::ghub_game_patches::commands::patch_reapply_saved,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

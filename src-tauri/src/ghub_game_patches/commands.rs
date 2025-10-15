@@ -1,12 +1,12 @@
 use crate::applications::models::Detection;
 use crate::core::state::AppState;
-use crate::detection_patches::applier::{
+use crate::ghub_game_patches::applier::{
     apply_all_patches, apply_patch_to_game, apply_patches_for_game, get_missing_detections,
     reapply_saved_patches,
 };
-use crate::detection_patches::loader::{get_patches_for_game, load_detection_patches};
-use crate::detection_patches::models::AppliedPatchesData;
-use crate::detection_patches::persistence::load_applied_patches;
+use crate::ghub_game_patches::loader::{get_patches_for_game, load_detection_patches};
+use crate::ghub_game_patches::models::AppliedPatchesData;
+use crate::ghub_game_patches::persistence::load_applied_patches;
 use crate::websocket::client::WebSocketClient;
 use std::sync::Arc;
 use tauri::{AppHandle, Manager, State};
