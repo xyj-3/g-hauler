@@ -1330,6 +1330,7 @@ dependencies = [
  "chrono",
  "futures-util",
  "once_cell",
+ "plist",
  "regex",
  "serde",
  "serde_json",
@@ -1343,6 +1344,7 @@ dependencies = [
  "tauri-plugin-store",
  "tokio",
  "tokio-tungstenite",
+ "winreg 0.55.0",
 ]
 
 [[package]]
