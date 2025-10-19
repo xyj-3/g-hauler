@@ -54,19 +54,6 @@
     selectedGames = selectedGames; // Trigger reactivity
   }
 
-  function getPlatformName(game: DetectedGame): string {
-    const platform = game.platform;
-    if ('steam' in platform) return 'Steam';
-    if ('epicGames' in platform) return 'Epic Games';
-    if ('winRegistry' in platform) return 'Windows Registry';
-    if ('uplay' in platform) return 'Ubisoft Connect';
-    if ('gogGalaxy' in platform) return 'GOG Galaxy';
-    if ('humbleApp' in platform) return 'Humble App';
-    if ('riotGames' in platform) return 'Riot Games';
-    if ('osxBundle' in platform) return 'macOS App';
-    return 'Unknown';
-  }
-
   function getPlatformIdentifier(game: DetectedGame): string {
     const platform = game.platform;
     if ('steam' in platform) return `App ID: ${platform.steam.appId}`;
@@ -99,21 +86,37 @@
     console.log('Importing games:', Array.from(selectedGames));
   }
 
+  // Define platform order
+  const platformOrder = [
+    'Steam',
+    'Epic Games',
+    'GOG Galaxy',
+    'Ubisoft Connect',
+    'Riot Games',
+    'Windows Registry',
+    'macOS Apps',
+    'Humble App'
+  ];
+
   // Get platforms that have games
   let platformsWithGames = $derived(() => {
     if (!scanResults) return [];
-    return Object.entries(scanResults.gamesByPlatform)
-      .filter(([_, games]) => games.length > 0)
-      .map(([platform]) => platform);
+    const results = scanResults;
+    return platformOrder.filter(platform =>
+      results.gamesByPlatform[platform]?.length > 0
+    );
   });
 
   // Get filtered games based on selected tab
   let filteredGames = $derived((): [string, DetectedGame[]][] => {
     if (!scanResults) return [];
+    const results = scanResults;
     if (selectedPlatformTab === 'all') {
-      return Object.entries(scanResults.gamesByPlatform) as [string, DetectedGame[]][];
+      return platformOrder
+        .filter(platform => results.gamesByPlatform[platform]?.length > 0)
+        .map(platform => [platform, results.gamesByPlatform[platform]]) as [string, DetectedGame[]][];
     }
-    return [[selectedPlatformTab, scanResults.gamesByPlatform[selectedPlatformTab] || []]];
+    return [[selectedPlatformTab, results.gamesByPlatform[selectedPlatformTab] || []]];
   });
 </script>
 
@@ -154,19 +157,19 @@
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
             <input
               type="checkbox"
-              bind:checked={scanOptions.scanUplay}
+              bind:checked={scanOptions.scanGogGalaxy}
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
             />
-            <span class="text-sm">Ubisoft Connect</span>
+            <span class="text-sm">GOG Galaxy</span>
           </label>
 
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
             <input
               type="checkbox"
-              bind:checked={scanOptions.scanGogGalaxy}
+              bind:checked={scanOptions.scanUplay}
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
             />
-            <span class="text-sm">GOG Galaxy</span>
+            <span class="text-sm">Ubisoft Connect</span>
           </label>
 
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
@@ -189,15 +192,6 @@
             </label>
           {/if}
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanHumbleApp}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Humble App</span>
-          </label>
-
           {#if isMacOS}
             <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
               <input
@@ -208,6 +202,15 @@
               <span class="text-sm">macOS Apps</span>
             </label>
           {/if}
+
+          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              bind:checked={scanOptions.scanHumbleApp}
+              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
+            />
+            <span class="text-sm">Humble App</span>
+          </label>
         </div>
       </div>
 
@@ -333,7 +336,7 @@
             {:else}
               <!-- Single platform view - grouped by platform -->
               <div class="divide-y divide-gray-700">
-                {#each filteredGames() as [platformName, games]: [string, DetectedGame[]]}
+                {#each filteredGames() as [_, games]: [string, DetectedGame[]]}
                   {#if games.length > 0}
                     <div class="p-4">
                       <div class="space-y-1.5">
