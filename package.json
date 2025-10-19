@@ -37,6 +37,7 @@
     "@tauri-apps/plugin-fs": "~2",
     "@tauri-apps/plugin-log": "~2",
     "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-os": "^2.3.1",
     "@tauri-apps/plugin-store": "~2",
     "lucide-svelte": "^0.525.0",
     "simple-icons": "^15.5.0"

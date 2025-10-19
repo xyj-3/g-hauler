@@ -1,6 +1,12 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/core';
+  import { type as osType } from '@tauri-apps/plugin-os';
   import type { GameScanResult, ScanOptions, DetectedGame } from '$lib/types';
+
+  // Detect the current OS
+  const currentOS = osType();
+  const isWindows = currentOS === 'windows';
+  const isMacOS = currentOS === 'macos';
 
   let scanOptions = $state<ScanOptions>({
     scanSteam: true,
@@ -8,9 +14,9 @@
     scanUplay: true,
     scanGogGalaxy: true,
     scanRiotGames: true,
-    scanWinRegistry: true,
+    scanWinRegistry: isWindows,
     scanHumbleApp: true,
-    scanOsxBundle: true
+    scanOsxBundle: isMacOS
   });
 
   // State for scanning and results
@@ -172,14 +178,16 @@
             <span class="text-sm">Riot Games</span>
           </label>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanWinRegistry}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Windows Registry</span>
-          </label>
+          {#if isWindows}
+            <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
+              <input
+                type="checkbox"
+                bind:checked={scanOptions.scanWinRegistry}
+                class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
+              />
+              <span class="text-sm">Windows Registry</span>
+            </label>
+          {/if}
 
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
             <input
@@ -190,14 +198,16 @@
             <span class="text-sm">Humble App</span>
           </label>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanOsxBundle}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">macOS Apps</span>
-          </label>
+          {#if isMacOS}
+            <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
+              <input
+                type="checkbox"
+                bind:checked={scanOptions.scanOsxBundle}
+                class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
+              />
+              <span class="text-sm">macOS Apps</span>
+            </label>
+          {/if}
         </div>
       </div>
 
