@@ -2,16 +2,15 @@
   import { invoke } from '@tauri-apps/api/core';
   import type { GameScanResult, ScanOptions, DetectedGame } from '$lib/types';
 
-  // State for scan options (all start unchecked for testing)
   let scanOptions = $state<ScanOptions>({
-    scanSteam: false,
-    scanEpicGames: false,
-    scanUplay: false,
-    scanGogGalaxy: false,
-    scanRiotGames: false,
-    scanWinRegistry: false,
-    scanHumbleApp: false,
-    scanOsxBundle: false
+    scanSteam: true,
+    scanEpicGames: true,
+    scanUplay: true,
+    scanGogGalaxy: true,
+    scanRiotGames: true,
+    scanWinRegistry: true,
+    scanHumbleApp: true,
+    scanOsxBundle: true
   });
 
   // State for scanning and results
