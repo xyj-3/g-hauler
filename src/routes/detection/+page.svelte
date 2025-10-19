@@ -108,10 +108,10 @@
   });
 
   // Get filtered games based on selected tab
-  let filteredGames = $derived(() => {
+  let filteredGames = $derived((): [string, DetectedGame[]][] => {
     if (!scanResults) return [];
     if (selectedPlatformTab === 'all') {
-      return Object.entries(scanResults.gamesByPlatform);
+      return Object.entries(scanResults.gamesByPlatform) as [string, DetectedGame[]][];
     }
     return [[selectedPlatformTab, scanResults.gamesByPlatform[selectedPlatformTab] || []]];
   });
@@ -301,8 +301,8 @@
             {#if selectedPlatformTab === 'all'}
               <!-- All platforms view - flat list with platform badges -->
               <div class="p-4 space-y-1.5">
-                {#each filteredGames() as [platformName, games]}
-                  {#each games as game}
+                {#each filteredGames() as [platformName, games]: [string, DetectedGame[]]}
+                  {#each games as game: DetectedGame}
                     <label
                       class="flex items-start space-x-2.5 p-2 rounded hover:bg-gray-700/30 transition-colors cursor-pointer group"
                     >
@@ -333,11 +333,11 @@
             {:else}
               <!-- Single platform view - grouped by platform -->
               <div class="divide-y divide-gray-700">
-                {#each filteredGames() as [platformName, games]}
+                {#each filteredGames() as [platformName, games]: [string, DetectedGame[]]}
                   {#if games.length > 0}
                     <div class="p-4">
                       <div class="space-y-1.5">
-                        {#each games as game}
+                        {#each games as game: DetectedGame}
                           <label
                             class="flex items-start space-x-2.5 p-2 rounded hover:bg-gray-700/30 transition-colors cursor-pointer group"
                           >
