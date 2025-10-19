@@ -4,6 +4,7 @@ mod core;
 mod applications;
 mod ghub_game_patches;
 mod game_detection;
+mod tray;
 
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
@@ -55,6 +56,31 @@ pub fn run() {
 
             if let Err(e) = crate::settings::sync::init(&handle) {
                 eprintln!("Settings system sync error: {}", e);
+            }
+
+            // Initialize system tray
+            if let Err(e) = crate::tray::create_tray(&handle) {
+                eprintln!("Failed to create system tray: {}", e);
+            }
+
+            // Set up window event handler for minimize to tray
+            if let Some(window) = handle.get_webview_window("main") {
+                let app_handle = handle.clone();
+                window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                        // Check if minimize_to_tray is enabled
+                        let should_minimize = crate::core::store::get_store_key(&app_handle, crate::core::constants::STORE_KEY_MINIMIZE_TO_TRAY)
+                            .and_then(|v| v.as_bool())
+                            .unwrap_or(false);
+
+                        if should_minimize {
+                            api.prevent_close();
+                            if let Some(window) = app_handle.get_webview_window("main") {
+                                let _ = window.hide();
+                            }
+                        }
+                    }
+                });
             }
 
             // Check if G HUB version has changed and reapply patches if needed

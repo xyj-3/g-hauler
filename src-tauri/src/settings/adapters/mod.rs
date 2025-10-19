@@ -8,12 +8,16 @@ pub trait SystemSetting {
 }
 
 pub mod autostart;
+pub mod tray;
 
 use std::collections::HashMap;
 use autostart::AutostartAdapter;
+use tray::TrayAdapter;
+use crate::core::constants::{STORE_KEY_AUTOSTART, STORE_KEY_MINIMIZE_TO_TRAY};
 
 pub fn registry() -> HashMap<&'static str, Box<dyn SystemSetting + Send + Sync>> {
     let mut map: HashMap<&'static str, Box<dyn SystemSetting + Send + Sync>> = HashMap::new();
-    map.insert("autostart", Box::new(AutostartAdapter));
+    map.insert(STORE_KEY_AUTOSTART, Box::new(AutostartAdapter));
+    map.insert(STORE_KEY_MINIMIZE_TO_TRAY, Box::new(TrayAdapter));
     map
 }

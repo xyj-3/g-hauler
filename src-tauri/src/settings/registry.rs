@@ -2,11 +2,12 @@ use once_cell::sync::Lazy;
 use serde_json::json;
 
 use super::models::*;
+use crate::core::constants::{STORE_KEY_AUTOSTART, STORE_KEY_MINIMIZE_TO_TRAY};
 
 pub static SETTINGS_REGISTRY: Lazy<Vec<Setting>> = Lazy::new(|| {
     vec![
         Setting {
-            key: "autostart".into(),
+            key: STORE_KEY_AUTOSTART.into(),
             label: "Launch on Startup".into(),
             description: Some("Start the app automatically when you sign in".into()),
             category: SettingCategory::General,
@@ -15,7 +16,16 @@ pub static SETTINGS_REGISTRY: Lazy<Vec<Setting>> = Lazy::new(|| {
             requires_restart: false,
             system_managed: true,
         },
-        // Add more settings here (Text, Number, Select, Path, …)
+        Setting {
+            key: STORE_KEY_MINIMIZE_TO_TRAY.into(),
+            label: "Minimize to Tray".into(),
+            description: Some("Hide the app to system tray when minimized instead of taskbar".into()),
+            category: SettingCategory::General,
+            default_value: json!(false),
+            setting_type: SettingType::Toggle,
+            requires_restart: false,
+            system_managed: true,
+        },
     ]
 });
 
