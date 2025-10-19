@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use crate::game_detection::utils::normalize_path_separators;
 use std::path::PathBuf;
 
 #[derive(Default)]
@@ -94,11 +95,11 @@ impl HumbleDetector {
         let install_path = metadata_json["installPath"]
             .as_str()
             .or_else(|| metadata_json["install_path"].as_str())
-            .map(PathBuf::from);
+            .map(|s| normalize_path_separators(s));
 
         let executable = metadata_json["executable"]
             .as_str()
-            .map(PathBuf::from);
+            .map(|s| normalize_path_separators(s));
 
         let platform = GamePlatform::HumbleApp {
             game_id: game_id.clone(),

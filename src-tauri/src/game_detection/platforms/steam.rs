@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use crate::game_detection::utils::normalize_path_separators;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
@@ -91,7 +92,7 @@ impl SteamDetector {
         for line in content.lines() {
             if line.contains("\"path\"") {
                 if let Some(path_str) = self.extract_vdf_value(line) {
-                    let path = PathBuf::from(path_str);
+                    let path = normalize_path_separators(&path_str);
                     if path.exists() {
                         folders_set.insert(path);
                     }
@@ -155,7 +156,8 @@ impl SteamDetector {
         let install_path = manifest_path
             .parent()
             .and_then(|p| Some(p.join("common").join(&install_dir)))
-            .filter(|p| p.exists());
+            .filter(|p| p.exists())
+            .map(|p| normalize_path_separators(p));
 
         // Try to find the executable
         let executable_path = if let Some(ref path) = install_path {

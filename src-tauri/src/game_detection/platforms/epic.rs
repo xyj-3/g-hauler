@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use crate::game_detection::utils::normalize_path_separators;
 use serde::Deserialize;
 use std::path::PathBuf;
 
@@ -78,11 +79,11 @@ impl EpicDetector {
         let manifest: EpicManifest = serde_json::from_str(&content)
             .map_err(|e| format!("Failed to parse manifest: {}", e))?;
 
-        let install_path = Some(PathBuf::from(&manifest.install_location));
+        let install_path = Some(normalize_path_separators(&manifest.install_location));
         let executable_path = if !manifest.launch_executable.is_empty() {
-            Some(
+            Some(normalize_path_separators(
                 PathBuf::from(&manifest.install_location).join(&manifest.launch_executable),
-            )
+            ))
         } else {
             None
         };

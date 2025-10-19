@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use crate::game_detection::utils::normalize_path_separators;
 use serde::Deserialize;
 use std::path::PathBuf;
 
@@ -80,13 +81,15 @@ impl RiotDetector {
             }
 
             let install_path = if !client.install_location.is_empty() {
-                Some(PathBuf::from(&client.install_location))
+                Some(normalize_path_separators(&client.install_location))
             } else {
                 None
             };
 
             let executable = if let Some(ref path) = install_path {
-                self.find_riot_game_executable(path, &client.name).await
+                self.find_riot_game_executable(path, &client.name)
+                    .await
+                    .map(|p| normalize_path_separators(p))
             } else {
                 None
             };

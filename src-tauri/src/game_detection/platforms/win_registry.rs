@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use crate::game_detection::utils::normalize_path_separators;
 use std::path::PathBuf;
 
 #[cfg(target_os = "windows")]
@@ -73,14 +74,14 @@ impl RegistryDetector {
         let install_location: Option<PathBuf> = key
             .get_value::<String, _>("InstallLocation")
             .ok()
-            .map(PathBuf::from);
+            .map(|s| normalize_path_separators(&s));
 
         let executable: Option<PathBuf> = key
             .get_value::<String, _>("DisplayIcon")
             .ok()
             .or_else(|| key.get_value::<String, _>("UninstallString").ok())
             .and_then(|s| self.extract_executable_from_path(&s))
-            .map(PathBuf::from);
+            .map(|s| normalize_path_separators(&s));
 
         let publisher: Option<String> = key.get_value("Publisher").ok();
         let version: Option<String> = key.get_value("DisplayVersion").ok();

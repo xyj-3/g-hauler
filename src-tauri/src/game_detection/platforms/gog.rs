@@ -1,5 +1,5 @@
 use crate::game_detection::models::*;
-use std::path::PathBuf;
+use crate::game_detection::utils::normalize_path_separators;
 
 #[cfg(target_os = "windows")]
 use winreg::enums::*;
@@ -53,10 +53,11 @@ impl GogDetector {
     #[cfg(target_os = "windows")]
     fn parse_gog_registry_entry(&self, key: &RegKey, product_id: &str) -> Option<DetectedGame> {
         let game_name: String = key.get_value("gameName").ok()?;
-        let path: PathBuf = key.get_value::<String, _>("path").ok()?.into();
+        let path_str: String = key.get_value("path").ok()?;
+        let path = normalize_path_separators(&path_str);
         let exe: Option<String> = key.get_value("exe").ok();
 
-        let executable_path = exe.as_ref().map(|e| path.join(e));
+        let executable_path = exe.as_ref().map(|e| normalize_path_separators(path.join(e)));
 
         let platform = GamePlatform::GogGalaxy {
             product_id: product_id.to_string(),

@@ -1,5 +1,5 @@
 use crate::game_detection::models::*;
-use std::path::PathBuf;
+use crate::game_detection::utils::normalize_path_separators;
 
 #[cfg(target_os = "windows")]
 use winreg::enums::*;
@@ -52,7 +52,8 @@ impl UplayDetector {
 
     #[cfg(target_os = "windows")]
     fn parse_uplay_registry_entry(&self, key: &RegKey, app_id: &str) -> Option<DetectedGame> {
-        let install_dir: PathBuf = key.get_value::<String, _>("InstallDir").ok()?.into();
+        let install_dir_str: String = key.get_value("InstallDir").ok()?;
+        let install_dir = normalize_path_separators(&install_dir_str);
 
         let game_name = key
             .get_value::<String, _>("DisplayName")
