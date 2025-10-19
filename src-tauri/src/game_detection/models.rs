@@ -6,13 +6,21 @@ use std::path::PathBuf;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub enum GamePlatform {
+    #[serde(rename_all = "camelCase")]
     Steam { app_id: String },
+    #[serde(rename_all = "camelCase")]
     EpicGames { app_name: String },
+    #[serde(rename_all = "camelCase")]
     WinRegistry { registry_key: String },
+    #[serde(rename_all = "camelCase")]
     Uplay { app_id: String },
+    #[serde(rename_all = "camelCase")]
     GogGalaxy { product_id: String },
+    #[serde(rename_all = "camelCase")]
     HumbleApp { game_id: String },
+    #[serde(rename_all = "camelCase")]
     RiotGames { app_name: String },
+    #[serde(rename_all = "camelCase")]
     OsxBundle { bundle_id: String },
 }
 
