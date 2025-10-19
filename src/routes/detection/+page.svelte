@@ -25,6 +25,7 @@
   let selectedGames = $state<Set<string>>(new Set());
   let errorMessage = $state<string | null>(null);
   let selectedPlatformTab = $state<string>('all');
+  let searchQuery = $state<string>('');
 
   async function handleScanForGames() {
     isScanning = true;
@@ -118,18 +119,26 @@
     return getPlatformsWithGames(scanResults);
   });
 
-  // Get filtered games based on selected tab
+  // Filter games by search query
+  function filterGamesBySearch(games: DetectedGame[]): DetectedGame[] {
+    if (!searchQuery.trim()) return games;
+    const query = searchQuery.toLowerCase();
+    return games.filter(game => game.name.toLowerCase().includes(query));
+  }
+
+  // Get filtered games based on selected tab and search query
   let filteredGames = $derived((): [string, DetectedGame[]][] => {
     if (!scanResults) return [];
     const results = scanResults;
 
     if (selectedPlatformTab === 'all') {
       return getPlatformsWithGames(results)
-        .map(platform => [platform, sortGamesByName(results.gamesByPlatform[platform])]) as [string, DetectedGame[]][];
+        .map(platform => [platform, filterGamesBySearch(sortGamesByName(results.gamesByPlatform[platform]))])
+        .filter(([_, games]) => games.length > 0) as [string, DetectedGame[]][];
     }
 
     const games = results.gamesByPlatform[selectedPlatformTab] || [];
-    return [[selectedPlatformTab, sortGamesByName(games)]];
+    return [[selectedPlatformTab, filterGamesBySearch(sortGamesByName(games))]];
   });
 </script>
 
@@ -314,6 +323,32 @@
               <p class="text-sm">Try selecting different scan options or check your game installations.</p>
             </div>
           {:else}
+            <!-- Search Bar -->
+            <div class="px-6 py-3 border-b border-gray-700 bg-gray-800/30">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  bind:value={searchQuery}
+                  placeholder="Search games..."
+                  class="w-full pl-10 pr-10 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                />
+                {#if searchQuery}
+                  <button
+                    onclick={() => searchQuery = ''}
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                {/if}
+              </div>
+            </div>
+
             {#if selectedPlatformTab === 'all'}
               <!-- All platforms view - flat list with platform badges -->
               <div class="p-4 space-y-1.5">
