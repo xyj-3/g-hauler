@@ -97,3 +97,45 @@ export interface ApplicationPayload {
   userPaths?: string[];
   posterPath?: string;
 }
+
+// Game Detection Types
+
+export type GamePlatform =
+  | { steam: { appId: string } }
+  | { epicGames: { appName: string } }
+  | { winRegistry: { registryKey: string } }
+  | { uplay: { appId: string } }
+  | { gogGalaxy: { productId: string } }
+  | { humbleApp: { gameId: string } }
+  | { riotGames: { appName: string } }
+  | { osxBundle: { bundleId: string } };
+
+export interface DetectedGame {
+  id: string;
+  name: string;
+  executablePath?: string;
+  installPath?: string;
+  platform: GamePlatform;
+  platformData: Record<string, string>;
+}
+
+export interface GameScanResult {
+  games: DetectedGame[];
+  gamesByPlatform: Record<string, DetectedGame[]>;
+  totalCount: number;
+  scanDurationMs: number;
+  scannedPlatforms: string[];
+  failedPlatforms: string[];
+  errors: string[];
+}
+
+export interface ScanOptions {
+  scanSteam: boolean;
+  scanEpicGames: boolean;
+  scanUplay: boolean;
+  scanGogGalaxy: boolean;
+  scanRiotGames: boolean;
+  scanWinRegistry: boolean;
+  scanHumbleApp: boolean;
+  scanOsxBundle: boolean;
+}
