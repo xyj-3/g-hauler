@@ -32,9 +32,16 @@ impl GogDetector {
         let mut games = Vec::new();
 
         let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
-        let gog_key = hklm
-            .open_subkey(r"SOFTWARE\WOW6432Node\GOG.com\Games")
-            .map_err(|_| "GOG Galaxy registry key not found".to_string())?;
+
+        // Check for installed games registry key
+        // This key only exists when GOG games are installed
+        let gog_key = match hklm.open_subkey(r"SOFTWARE\WOW6432Node\GOG.com\Games") {
+            Ok(key) => key,
+            Err(_) => {
+                // GOG Galaxy not installed or no games are installed
+                return Ok(Vec::new());
+            }
+        };
 
         // Collect all product IDs first to avoid holding the iterator across await
         let product_ids: Vec<String> = gog_key.enum_keys().filter_map(Result::ok).collect();
