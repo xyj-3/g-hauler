@@ -98,25 +98,38 @@
     'Humble App'
   ];
 
-  // Get platforms that have games
-  let platformsWithGames = $derived(() => {
-    if (!scanResults) return [];
-    const results = scanResults;
+  // Helper function to get platforms that have games in order
+  function getPlatformsWithGames(results: GameScanResult): string[] {
     return platformOrder.filter(platform =>
       results.gamesByPlatform[platform]?.length > 0
     );
+  }
+
+  // Helper function to sort games alphabetically by name
+  function sortGamesByName(games: DetectedGame[]): DetectedGame[] {
+    return [...games].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+    );
+  }
+
+  // Get platforms that have games
+  let platformsWithGames = $derived(() => {
+    if (!scanResults) return [];
+    return getPlatformsWithGames(scanResults);
   });
 
   // Get filtered games based on selected tab
   let filteredGames = $derived((): [string, DetectedGame[]][] => {
     if (!scanResults) return [];
     const results = scanResults;
+
     if (selectedPlatformTab === 'all') {
-      return platformOrder
-        .filter(platform => results.gamesByPlatform[platform]?.length > 0)
-        .map(platform => [platform, results.gamesByPlatform[platform]]) as [string, DetectedGame[]][];
+      return getPlatformsWithGames(results)
+        .map(platform => [platform, sortGamesByName(results.gamesByPlatform[platform])]) as [string, DetectedGame[]][];
     }
-    return [[selectedPlatformTab, results.gamesByPlatform[selectedPlatformTab] || []]];
+
+    const games = results.gamesByPlatform[selectedPlatformTab] || [];
+    return [[selectedPlatformTab, sortGamesByName(games)]];
   });
 </script>
 
