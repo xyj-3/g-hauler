@@ -1,4 +1,5 @@
 use crate::game_detection::models::*;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 #[cfg(target_os = "windows")]
@@ -71,30 +72,34 @@ impl SteamDetector {
     }
 
     fn parse_library_folders(&self, steam_path: &Path) -> Result<Vec<PathBuf>, String> {
-        let mut folders = vec![steam_path.to_path_buf()];
+        let mut folders_set: HashSet<PathBuf> = HashSet::new();
+
+        // Add the main Steam path
+        folders_set.insert(steam_path.to_path_buf());
 
         let library_vdf = steam_path.join("steamapps/libraryfolders.vdf");
 
         if !library_vdf.exists() {
-            return Ok(folders);
+            return Ok(folders_set.into_iter().collect());
         }
 
         let content = std::fs::read_to_string(&library_vdf)
             .map_err(|e| format!("Failed to read library folders: {}", e))?;
 
         // Parse VDF format to find additional library paths
+        // Note: libraryfolders.vdf often includes the main Steam path, so we use a HashSet to deduplicate
         for line in content.lines() {
             if line.contains("\"path\"") {
                 if let Some(path_str) = self.extract_vdf_value(line) {
                     let path = PathBuf::from(path_str);
                     if path.exists() {
-                        folders.push(path);
+                        folders_set.insert(path);
                     }
                 }
             }
         }
 
-        Ok(folders)
+        Ok(folders_set.into_iter().collect())
     }
 
     async fn scan_steam_library(&self, library_path: &Path) -> Result<Vec<DetectedGame>, String> {
