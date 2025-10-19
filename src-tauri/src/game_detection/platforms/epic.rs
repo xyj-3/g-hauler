@@ -12,7 +12,11 @@ struct EpicManifest {
     #[serde(default)]
     launch_executable: String,
     #[serde(default)]
+    catalog_item_id: String,
+    #[serde(default)]
     main_game_catalog_item_id: String,
+    #[serde(default)]
+    app_categories: Vec<String>,
 }
 
 #[derive(Default)]
@@ -71,6 +75,24 @@ impl EpicDetector {
         Ok(PathBuf::from(home).join(".config/Epic/EpicGamesLauncher/Data/Manifests"))
     }
 
+    /// Check if a manifest represents DLC rather than a base game
+    fn is_dlc(manifest: &EpicManifest) -> bool {
+        // DLC items have a MainGameCatalogItemId that differs from their own CatalogItemId
+        // Base games have MainGameCatalogItemId == CatalogItemId (self-referencing)
+        if !manifest.main_game_catalog_item_id.is_empty()
+            && !manifest.catalog_item_id.is_empty()
+            && manifest.main_game_catalog_item_id != manifest.catalog_item_id
+        {
+            return true;
+        }
+
+        // Additionally check AppCategories for "addons" or "dlc"
+        manifest.app_categories.iter().any(|cat| {
+            let cat_lower = cat.to_lowercase();
+            cat_lower.contains("addon") || cat_lower.contains("dlc")
+        })
+    }
+
     async fn parse_epic_manifest(&self, manifest_path: &PathBuf) -> Result<DetectedGame, String> {
         let content = tokio::fs::read_to_string(manifest_path)
             .await
@@ -78,6 +100,11 @@ impl EpicDetector {
 
         let manifest: EpicManifest = serde_json::from_str(&content)
             .map_err(|e| format!("Failed to parse manifest: {}", e))?;
+
+        // Skip DLC items
+        if Self::is_dlc(&manifest) {
+            return Err("Skipping DLC item".to_string());
+        }
 
         let install_path = Some(normalize_path_separators(&manifest.install_location));
         let executable_path = if !manifest.launch_executable.is_empty() {
@@ -99,13 +126,6 @@ impl EpicDetector {
             install_path,
             platform,
         );
-
-        // Use builder pattern for platform_data if available
-        let game = if !manifest.main_game_catalog_item_id.is_empty() {
-            game.with_platform_data("catalog_item_id".to_string(), manifest.main_game_catalog_item_id)
-        } else {
-            game
-        };
 
         Ok(game)
     }
