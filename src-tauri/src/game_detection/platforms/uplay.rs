@@ -55,10 +55,9 @@ impl UplayDetector {
         let install_dir_str: String = key.get_value("InstallDir").ok()?;
         let install_dir = normalize_path_separators(&install_dir_str);
 
-        let game_name = key
-            .get_value::<String, _>("DisplayName")
-            .ok()
-            .or_else(|| key.get_value::<String, _>("GameName").ok())
+        // Get display name from the Windows Uninstall registry
+        let game_name = self
+            .get_display_name_from_uninstall_registry(app_id)
             .unwrap_or_else(|| format!("Uplay Game {}", app_id));
 
         let platform = GamePlatform::Uplay {
@@ -72,5 +71,20 @@ impl UplayDetector {
             Some(install_dir),
             platform,
         ))
+    }
+
+    #[cfg(target_os = "windows")]
+    fn get_display_name_from_uninstall_registry(&self, app_id: &str) -> Option<String> {
+        let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+        let uninstall_path = format!(
+            r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Uplay Install {}",
+            app_id
+        );
+
+        if let Ok(uninstall_key) = hklm.open_subkey(&uninstall_path) {
+            uninstall_key.get_value::<String, _>("DisplayName").ok()
+        } else {
+            None
+        }
     }
 }
