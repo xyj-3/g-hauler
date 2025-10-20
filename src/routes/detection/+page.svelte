@@ -55,6 +55,19 @@
     selectedGames = selectedGames; // Trigger reactivity
   }
 
+  function getPlatformName(game: DetectedGame): string {
+    const platform = game.platform;
+    if ('steam' in platform) return 'Steam';
+    if ('epicGames' in platform) return 'Epic Games';
+    if ('winRegistry' in platform) return 'Windows Registry';
+    if ('uplay' in platform) return 'Ubisoft Connect';
+    if ('gogGalaxy' in platform) return 'GOG Galaxy';
+    if ('riotGames' in platform) return 'Riot Games';
+    if ('osxBundle' in platform) return 'macOS App';
+    if ('eaApp' in platform) return 'EA App';
+    return '';
+  }
+
   function getPlatformIdentifier(game: DetectedGame): string {
     const platform = game.platform;
     if ('steam' in platform) return `App ID: ${platform.steam.appId}`;
@@ -132,9 +145,11 @@
     const results = scanResults;
 
     if (selectedPlatformTab === 'all') {
-      return getPlatformsWithGames(results)
-        .map(platform => [platform, filterGamesBySearch(sortGamesByName(results.gamesByPlatform[platform]))])
-        .filter(([_, games]) => games.length > 0) as [string, DetectedGame[]][];
+      // Use the games list from backend, which already contains all games
+      const sortedAndFiltered = filterGamesBySearch(sortGamesByName(results.games));
+
+      // Return as a single group
+      return sortedAndFiltered.length > 0 ? [['all', sortedAndFiltered]] : [];
     }
 
     const games = results.gamesByPlatform[selectedPlatformTab] || [];
@@ -352,8 +367,9 @@
             {#if selectedPlatformTab === 'all'}
               <!-- All platforms view - flat list with platform badges -->
               <div class="p-4 space-y-1.5">
-                {#each filteredGames() as [platformName, games]: [string, DetectedGame[]]}
+                {#each filteredGames() as [_, games]: [string, DetectedGame[]]}
                   {#each games as game: DetectedGame}
+                    {@const gamePlatform = getPlatformName(game)}
                     <label
                       class="flex items-start space-x-2.5 p-2 rounded hover:bg-gray-700/30 transition-colors cursor-pointer group"
                     >
@@ -366,8 +382,8 @@
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                           <p class="text-sm font-medium group-hover:text-white transition-colors">{game.name}</p>
-                          <span class="px-2 py-0.5 {getPlatformColor(platformName)} rounded text-xs font-medium whitespace-nowrap">
-                            {platformName}
+                          <span class="px-2 py-0.5 {getPlatformColor(gamePlatform)} rounded text-xs font-medium whitespace-nowrap">
+                            {gamePlatform}
                           </span>
                         </div>
                         <p class="text-xs text-gray-400 mt-0.5">{getPlatformIdentifier(game)}</p>
