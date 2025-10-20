@@ -53,10 +53,6 @@ impl GameScanner {
             scan_platform!(result, RegistryDetector::new(), GamePlatform::WIN_REGISTRY_NAME);
         }
 
-        if self.options.scan_humble_app {
-            scan_platform!(result, HumbleDetector::new(), GamePlatform::HUMBLE_APP_NAME);
-        }
-
         if self.options.scan_osx_bundle {
             scan_platform!(result, OsxDetector::new(), GamePlatform::OSX_BUNDLE_NAME);
         }

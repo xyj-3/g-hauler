@@ -22,14 +22,13 @@ export interface Command {
   name: string;
 }
 
-export type Detection = 
+export type Detection =
   | { steam: SteamApp }
   | { winRegistry: WinRegistry }
   | { epicGames: EpicGames }
   | { osxBundle: OsxBundle }
   | { uplay: Uplay }
   | { gogGalaxy: GogGalaxy }
-  | { humbleApp: HumbleApp }
   | { riotGames: RiotGames }
   | { glob: string }
   | any;
@@ -59,10 +58,6 @@ export interface Uplay {
 
 export interface GogGalaxy {
   productId: string;
-}
-
-export interface HumbleApp {
-  gameName: string;
 }
 
 export interface RiotGames {
@@ -106,7 +101,6 @@ export type GamePlatform =
   | { winRegistry: { registryKey: string } }
   | { uplay: { appId: string } }
   | { gogGalaxy: { productId: string } }
-  | { humbleApp: { gameId: string } }
   | { riotGames: { appName: string } }
   | { osxBundle: { bundleId: string } };
 
@@ -136,6 +130,5 @@ export interface ScanOptions {
   scanGogGalaxy: boolean;
   scanRiotGames: boolean;
   scanWinRegistry: boolean;
-  scanHumbleApp: boolean;
   scanOsxBundle: boolean;
 }

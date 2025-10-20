@@ -4,7 +4,6 @@ pub mod win_registry;
 pub mod uplay;
 pub mod gog;
 pub mod riot;
-pub mod humble;
 pub mod osx;
 
 pub use steam::SteamDetector;
@@ -13,5 +12,4 @@ pub use win_registry::RegistryDetector;
 pub use uplay::UplayDetector;
 pub use gog::GogDetector;
 pub use riot::RiotDetector;
-pub use humble::HumbleDetector;
 pub use osx::OsxDetector;

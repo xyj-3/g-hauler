@@ -39,7 +39,6 @@ fn detection_types_match(a: &Detection, b: &Detection) -> bool {
         (Detection::OsxBundle { .. }, Detection::OsxBundle { .. }) => true,
         (Detection::Uplay { .. }, Detection::Uplay { .. }) => true,
         (Detection::GogGalaxy { .. }, Detection::GogGalaxy { .. }) => true,
-        (Detection::HumbleApp { .. }, Detection::HumbleApp { .. }) => true,
         (Detection::RiotGames { .. }, Detection::RiotGames { .. }) => true,
         (Detection::Glob { .. }, Detection::Glob { .. }) => true,
         _ => false,

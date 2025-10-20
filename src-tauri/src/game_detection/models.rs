@@ -17,8 +17,6 @@ pub enum GamePlatform {
     #[serde(rename_all = "camelCase")]
     GogGalaxy { product_id: String },
     #[serde(rename_all = "camelCase")]
-    HumbleApp { game_id: String },
-    #[serde(rename_all = "camelCase")]
     RiotGames { app_name: String },
     #[serde(rename_all = "camelCase")]
     OsxBundle { bundle_id: String },
@@ -31,7 +29,6 @@ impl GamePlatform {
     pub const WIN_REGISTRY_NAME: &'static str = "Windows Registry";
     pub const UPLAY_NAME: &'static str = "Ubisoft Connect";
     pub const GOG_GALAXY_NAME: &'static str = "GOG Galaxy";
-    pub const HUMBLE_APP_NAME: &'static str = "Humble App";
     pub const RIOT_GAMES_NAME: &'static str = "Riot Games";
     pub const OSX_BUNDLE_NAME: &'static str = "macOS App";
 
@@ -43,7 +40,6 @@ impl GamePlatform {
             GamePlatform::WinRegistry { .. } => Self::WIN_REGISTRY_NAME,
             GamePlatform::Uplay { .. } => Self::UPLAY_NAME,
             GamePlatform::GogGalaxy { .. } => Self::GOG_GALAXY_NAME,
-            GamePlatform::HumbleApp { .. } => Self::HUMBLE_APP_NAME,
             GamePlatform::RiotGames { .. } => Self::RIOT_GAMES_NAME,
             GamePlatform::OsxBundle { .. } => Self::OSX_BUNDLE_NAME,
         }
@@ -57,7 +53,6 @@ impl GamePlatform {
             GamePlatform::WinRegistry { registry_key } => registry_key,
             GamePlatform::Uplay { app_id } => app_id,
             GamePlatform::GogGalaxy { product_id } => product_id,
-            GamePlatform::HumbleApp { game_id } => game_id,
             GamePlatform::RiotGames { app_name } => app_name,
             GamePlatform::OsxBundle { bundle_id } => bundle_id,
         }
@@ -185,8 +180,6 @@ pub struct ScanOptions {
     pub scan_riot_games: bool,
     /// Whether to scan Windows Registry for games
     pub scan_win_registry: bool,
-    /// Whether to scan Humble App
-    pub scan_humble_app: bool,
     /// Whether to scan macOS app bundles
     pub scan_osx_bundle: bool,
 }
@@ -201,7 +194,6 @@ impl ScanOptions {
             scan_gog_galaxy: true,
             scan_riot_games: true,
             scan_win_registry: true,
-            scan_humble_app: true,
             scan_osx_bundle: true,
         }
     }
@@ -215,7 +207,6 @@ impl ScanOptions {
             scan_gog_galaxy: true,
             scan_riot_games: true,
             scan_win_registry: false,
-            scan_humble_app: false,
             scan_osx_bundle: cfg!(target_os = "macos"),
         }
     }

@@ -63,10 +63,6 @@ pub enum Detection {
         #[serde(rename = "gogGalaxy")]
         gog_galaxy: GogGalaxy,
     },
-    HumbleApp {
-        #[serde(rename = "humbleApp")]
-        humble_app: HumbleApp,
-    },
     RiotGames {
         #[serde(rename = "riotGames")]
         riot_games: RiotGames,
@@ -115,12 +111,6 @@ pub struct Uplay {
 #[serde(rename_all = "camelCase")]
 pub struct GogGalaxy {
     pub product_id: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct HumbleApp {
-    pub game_name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

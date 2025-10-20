@@ -129,7 +129,7 @@ impl OsxDetector {
         // Expanded list of game-related indicators
         let game_indicators = [
             "steam", "epic", "blizzard", "ubisoft", "ea", "game", "unity", "unreal",
-            "riot", "gog", "humble", "itch", "origin", "bethesda", "rockstar",
+            "riot", "gog", "itch", "origin", "bethesda", "rockstar",
         ];
 
         let name_lower = game.name.to_lowercase();

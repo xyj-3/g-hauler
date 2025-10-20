@@ -15,7 +15,6 @@
     scanGogGalaxy: true,
     scanRiotGames: true,
     scanWinRegistry: isWindows,
-    scanHumbleApp: true,
     scanOsxBundle: isMacOS
   });
 
@@ -62,7 +61,6 @@
     if ('winRegistry' in platform) return `Key: ${platform.winRegistry.registryKey}`;
     if ('uplay' in platform) return `App ID: ${platform.uplay.appId}`;
     if ('gogGalaxy' in platform) return `Product ID: ${platform.gogGalaxy.productId}`;
-    if ('humbleApp' in platform) return `Game ID: ${platform.humbleApp.gameId}`;
     if ('riotGames' in platform) return `App: ${platform.riotGames.appName}`;
     if ('osxBundle' in platform) return `Bundle ID: ${platform.osxBundle.bundleId}`;
     return '';
@@ -76,7 +74,6 @@
       'GOG Galaxy': 'bg-purple-600/20 text-purple-400',
       'Riot Games': 'bg-red-600/20 text-red-400',
       'Windows Registry': 'bg-cyan-600/20 text-cyan-400',
-      'Humble App': 'bg-orange-600/20 text-orange-400',
       'macOS App': 'bg-slate-600/20 text-slate-300'
     };
     return colors[platformName] || 'bg-gray-600/20 text-gray-400';
@@ -95,8 +92,7 @@
     'Ubisoft Connect',
     'Riot Games',
     'Windows Registry',
-    'macOS Apps',
-    'Humble App'
+    'macOS Apps'
   ];
 
   // Helper function to get platforms that have games in order
@@ -224,15 +220,6 @@
               <span class="text-sm">macOS Apps</span>
             </label>
           {/if}
-
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanHumbleApp}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Humble App</span>
-          </label>
         </div>
       </div>
 
