@@ -291,10 +291,10 @@
 
         <!-- Platform Tabs -->
         {#if scanResults.totalCount > 0}
-          <div class="border-b border-gray-700 flex-shrink-0 px-6">
-            <div class="flex gap-1 overflow-x-auto">
+          <div class="border-b border-gray-700 flex-shrink-0 px-6 bg-gray-800/30">
+            <div class="flex gap-2 overflow-x-auto pb-1">
               <button
-                class="px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === 'all' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+                class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === 'all' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
                 onclick={() => selectedPlatformTab = 'all'}
               >
                 All ({scanResults.totalCount})
@@ -302,7 +302,7 @@
               {#each platformsWithGames() as platform}
                 {@const count = scanResults.gamesByPlatform[platform]?.length || 0}
                 <button
-                  class="px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === platform ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+                  class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === platform ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
                   onclick={() => selectedPlatformTab = platform}
                 >
                   {platform} ({count})
@@ -324,7 +324,7 @@
             </div>
           {:else}
             <!-- Search Bar -->
-            <div class="px-6 py-3 border-b border-gray-700 bg-gray-800/30">
+            <div class="px-6 py-3.5 border-b border-gray-700/50 bg-gray-800/20">
               <div class="relative">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -333,7 +333,7 @@
                   type="text"
                   bind:value={searchQuery}
                   placeholder="Search games..."
-                  class="w-full pl-10 pr-10 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  class="w-full pl-10 pr-10 py-2 bg-gray-700/40 border border-gray-600/50 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/70 focus:bg-gray-700/60 focus:ring-1 focus:ring-blue-500/50 transition-colors"
                 />
                 {#if searchQuery}
                   <button
