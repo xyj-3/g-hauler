@@ -57,11 +57,6 @@ impl RiotDetector {
         Ok(PathBuf::from(home).join("Library/Application Support/Riot Games"))
     }
 
-    #[cfg(target_os = "linux")]
-    fn find_riot_client_path(&self) -> Result<PathBuf, String> {
-        Err("Riot Games detection not implemented for Linux".to_string())
-    }
-
     async fn parse_riot_client_installs(
         &self,
         config_path: &PathBuf,

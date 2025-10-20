@@ -69,12 +69,6 @@ impl EpicDetector {
             .join("Library/Application Support/Epic/EpicGamesLauncher/Data/Manifests"))
     }
 
-    #[cfg(target_os = "linux")]
-    fn find_epic_manifests_path(&self) -> Result<PathBuf, String> {
-        let home = std::env::var("HOME").map_err(|_| "HOME not set")?;
-        Ok(PathBuf::from(home).join(".config/Epic/EpicGamesLauncher/Data/Manifests"))
-    }
-
     /// Check if a manifest represents DLC rather than a base game
     fn is_dlc(manifest: &EpicManifest) -> bool {
         // DLC items have a MainGameCatalogItemId that differs from their own CatalogItemId

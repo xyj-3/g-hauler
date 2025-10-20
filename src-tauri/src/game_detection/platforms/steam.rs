@@ -60,18 +60,6 @@ impl SteamDetector {
         }
     }
 
-    #[cfg(target_os = "linux")]
-    fn find_steam_path(&self) -> Result<PathBuf, String> {
-        let home = std::env::var("HOME").map_err(|_| "HOME not set")?;
-        let steam_path = PathBuf::from(home).join(".steam/steam");
-
-        if steam_path.exists() {
-            Ok(steam_path)
-        } else {
-            Err("Steam installation not found".to_string())
-        }
-    }
-
     fn parse_library_folders(&self, steam_path: &Path) -> Result<Vec<PathBuf>, String> {
         let mut folders_set: HashSet<PathBuf> = HashSet::new();
 
@@ -215,33 +203,14 @@ impl SteamDetector {
             }
         }
 
-        // For macOS/Linux, look for executables differently
-        #[cfg(not(target_os = "windows"))]
+        // For macOS, look for .app bundles
+        #[cfg(target_os = "macos")]
         {
-            // Look for .app bundles on macOS
-            #[cfg(target_os = "macos")]
-            {
-                if let Ok(mut entries) = tokio::fs::read_dir(game_path).await {
-                    while let Ok(Some(entry)) = entries.next_entry().await {
-                        let path = entry.path();
-                        if path.extension().and_then(|e| e.to_str()) == Some("app") {
-                            return Some(path);
-                        }
-                    }
-                }
-            }
-
-            // Look for executable files on Linux
-            #[cfg(target_os = "linux")]
-            {
-                if let Ok(mut entries) = tokio::fs::read_dir(game_path).await {
-                    while let Ok(Some(entry)) = entries.next_entry().await {
-                        let path = entry.path();
-                        if let Ok(metadata) = entry.metadata().await {
-                            if metadata.is_file() && metadata.permissions().mode() & 0o111 != 0 {
-                                candidates.push(path);
-                            }
-                        }
+            if let Ok(mut entries) = tokio::fs::read_dir(game_path).await {
+                while let Ok(Some(entry)) = entries.next_entry().await {
+                    let path = entry.path();
+                    if path.extension().and_then(|e| e.to_str()) == Some("app") {
+                        return Some(path);
                     }
                 }
             }

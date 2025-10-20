@@ -40,12 +40,6 @@ impl HumbleDetector {
         Ok(PathBuf::from(home).join("Library/Application Support/Humble App"))
     }
 
-    #[cfg(target_os = "linux")]
-    fn find_humble_app_path(&self) -> Result<PathBuf, String> {
-        let home = std::env::var("HOME").map_err(|_| "HOME not set")?;
-        Ok(PathBuf::from(home).join(".config/Humble App"))
-    }
-
     async fn scan_humble_games_dir(&self, games_dir: &PathBuf) -> Result<Vec<DetectedGame>, String> {
         let mut games = Vec::new();
 

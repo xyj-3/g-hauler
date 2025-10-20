@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 /// Normalizes path separators based on the target platform.
 ///
 /// On Windows, converts forward slashes to backslashes and removes duplicate backslashes.
-/// On Unix-like systems (macOS, Linux), converts backslashes to forward slashes.
+/// On macOS, converts backslashes to forward slashes.
 ///
 /// # Arguments
 /// * `path` - The path string to normalize
@@ -25,9 +25,9 @@ pub fn normalize_path_separators<P: AsRef<Path>>(path: P) -> PathBuf {
         PathBuf::from(normalized)
     }
 
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
     {
-        // On Unix-like systems, convert backslashes to forward slashes
+        // On macOS, convert backslashes to forward slashes
         let normalized = path_str.replace('\\', "/");
         PathBuf::from(normalized)
     }
@@ -66,8 +66,8 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(target_os = "windows"))]
-    fn test_normalize_unix_paths() {
+    #[cfg(target_os = "macos")]
+    fn test_normalize_macos_paths() {
         // Test backslashes to forward slashes
         assert_eq!(
             normalize_path_separators("/Users\\username\\Games"),
