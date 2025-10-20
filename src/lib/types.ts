@@ -30,6 +30,7 @@ export type Detection =
   | { uplay: Uplay }
   | { gogGalaxy: GogGalaxy }
   | { riotGames: RiotGames }
+  | { eaApp: EaApp }
   | { glob: string }
   | any;
 
@@ -62,6 +63,10 @@ export interface GogGalaxy {
 
 export interface RiotGames {
   appName: string;
+}
+
+export interface EaApp {
+  gameId: string;
 }
 
 // WebSocket payload interfaces
@@ -102,7 +107,8 @@ export type GamePlatform =
   | { uplay: { appId: string } }
   | { gogGalaxy: { productId: string } }
   | { riotGames: { appName: string } }
-  | { osxBundle: { bundleId: string } };
+  | { osxBundle: { bundleId: string } }
+  | { eaApp: { gameId: string } };
 
 export interface DetectedGame {
   id: string;
@@ -131,4 +137,5 @@ export interface ScanOptions {
   scanRiotGames: boolean;
   scanWinRegistry: boolean;
   scanOsxBundle: boolean;
+  scanEaApp: boolean;
 }

@@ -5,6 +5,7 @@ pub mod uplay;
 pub mod gog;
 pub mod riot;
 pub mod osx;
+pub mod ea_app;
 
 pub use steam::SteamDetector;
 pub use epic::EpicDetector;
@@ -13,3 +14,4 @@ pub use uplay::UplayDetector;
 pub use gog::GogDetector;
 pub use riot::RiotDetector;
 pub use osx::OsxDetector;
+pub use ea_app::EaAppDetector;

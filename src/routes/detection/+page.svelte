@@ -15,7 +15,8 @@
     scanGogGalaxy: true,
     scanRiotGames: true,
     scanWinRegistry: isWindows,
-    scanOsxBundle: isMacOS
+    scanOsxBundle: isMacOS,
+    scanEaApp: true
   });
 
   // State for scanning and results
@@ -63,6 +64,7 @@
     if ('gogGalaxy' in platform) return `Product ID: ${platform.gogGalaxy.productId}`;
     if ('riotGames' in platform) return `App: ${platform.riotGames.appName}`;
     if ('osxBundle' in platform) return `Bundle ID: ${platform.osxBundle.bundleId}`;
+    if ('eaApp' in platform) return `Game ID: ${platform.eaApp.gameId}`;
     return '';
   }
 
@@ -74,7 +76,8 @@
       'GOG Galaxy': 'bg-purple-600/20 text-purple-400',
       'Riot Games': 'bg-red-600/20 text-red-400',
       'Windows Registry': 'bg-cyan-600/20 text-cyan-400',
-      'macOS App': 'bg-slate-600/20 text-slate-300'
+      'macOS App': 'bg-slate-600/20 text-slate-300',
+      'EA App': 'bg-orange-600/20 text-orange-400'
     };
     return colors[platformName] || 'bg-gray-600/20 text-gray-400';
   }
@@ -89,6 +92,7 @@
     'Steam',
     'Epic Games',
     'GOG Galaxy',
+    'EA App',
     'Ubisoft Connect',
     'Riot Games',
     'Windows Registry',
@@ -197,6 +201,15 @@
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
             />
             <span class="text-sm">Riot Games</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              bind:checked={scanOptions.scanEaApp}
+              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
+            />
+            <span class="text-sm">EA App</span>
           </label>
 
           {#if isWindows}

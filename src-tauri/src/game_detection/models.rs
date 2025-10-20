@@ -20,6 +20,8 @@ pub enum GamePlatform {
     RiotGames { app_name: String },
     #[serde(rename_all = "camelCase")]
     OsxBundle { bundle_id: String },
+    #[serde(rename_all = "camelCase")]
+    EaApp { game_id: String },
 }
 
 impl GamePlatform {
@@ -31,6 +33,7 @@ impl GamePlatform {
     pub const GOG_GALAXY_NAME: &'static str = "GOG Galaxy";
     pub const RIOT_GAMES_NAME: &'static str = "Riot Games";
     pub const OSX_BUNDLE_NAME: &'static str = "macOS App";
+    pub const EA_APP_NAME: &'static str = "EA App";
 
     /// Get the platform name as a string from an instance
     pub fn name(&self) -> &str {
@@ -42,6 +45,7 @@ impl GamePlatform {
             GamePlatform::GogGalaxy { .. } => Self::GOG_GALAXY_NAME,
             GamePlatform::RiotGames { .. } => Self::RIOT_GAMES_NAME,
             GamePlatform::OsxBundle { .. } => Self::OSX_BUNDLE_NAME,
+            GamePlatform::EaApp { .. } => Self::EA_APP_NAME,
         }
     }
 
@@ -55,6 +59,7 @@ impl GamePlatform {
             GamePlatform::GogGalaxy { product_id } => product_id,
             GamePlatform::RiotGames { app_name } => app_name,
             GamePlatform::OsxBundle { bundle_id } => bundle_id,
+            GamePlatform::EaApp { game_id } => game_id,
         }
     }
 }
@@ -182,6 +187,8 @@ pub struct ScanOptions {
     pub scan_win_registry: bool,
     /// Whether to scan macOS app bundles
     pub scan_osx_bundle: bool,
+    /// Whether to scan EA App (formerly Origin)
+    pub scan_ea_app: bool,
 }
 
 impl ScanOptions {
@@ -195,6 +202,7 @@ impl ScanOptions {
             scan_riot_games: true,
             scan_win_registry: true,
             scan_osx_bundle: true,
+            scan_ea_app: true,
         }
     }
 
@@ -208,6 +216,7 @@ impl ScanOptions {
             scan_riot_games: true,
             scan_win_registry: false,
             scan_osx_bundle: cfg!(target_os = "macos"),
+            scan_ea_app: true,
         }
     }
 }

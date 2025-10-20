@@ -57,6 +57,10 @@ impl GameScanner {
             scan_platform!(result, OsxDetector::new(), GamePlatform::OSX_BUNDLE_NAME);
         }
 
+        if self.options.scan_ea_app {
+            scan_platform!(result, EaAppDetector::new(), GamePlatform::EA_APP_NAME);
+        }
+
         let scan_duration_ms = start_time.elapsed().as_millis() as u64;
 
         Ok(result.finalize(scan_duration_ms))
