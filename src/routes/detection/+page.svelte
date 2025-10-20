@@ -14,8 +14,8 @@
     scanUplay: true,
     scanGogGalaxy: true,
     scanRiotGames: true,
-    scanWinRegistry: isWindows,
-    scanOsxBundle: isMacOS,
+    scanWinRegistry: false,
+    scanOsxBundle: false,
     scanEaApp: true
   });
 
