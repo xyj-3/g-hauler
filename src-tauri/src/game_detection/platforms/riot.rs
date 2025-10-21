@@ -6,17 +6,9 @@ use std::path::PathBuf;
 #[derive(Debug, Deserialize)]
 struct RiotClientInstalls {
     #[serde(default)]
-    associated_client: Vec<AssociatedClient>,
-}
-
-#[derive(Debug, Deserialize)]
-struct AssociatedClient {
+    associated_client: std::collections::HashMap<String, String>,
     #[serde(default)]
-    name: String,
-    #[serde(default)]
-    id: String,
-    #[serde(default)]
-    install_location: String,
+    patchlines: std::collections::HashMap<String, String>,
 }
 
 #[derive(Default)]
@@ -70,41 +62,40 @@ impl RiotDetector {
         let installs: RiotClientInstalls = serde_json::from_str(&content)
             .map_err(|e| format!("Failed to parse Riot config: {}", e))?;
 
-        for client in installs.associated_client {
-            if client.name.is_empty() {
+        // Parse associated_client entries
+        // Format: {"C:/Riot Games/VALORANT/live/": "C:/Riot Games/Riot Client/RiotClientServices.exe"}
+        for (install_path_str, _riot_client_exe) in installs.associated_client {
+            let install_path = PathBuf::from(&install_path_str);
+
+            // Extract game name from path
+            let game_name = self.extract_game_name_from_path(&install_path);
+
+            if game_name.is_empty() {
                 continue;
             }
 
-            let install_path = if !client.install_location.is_empty() {
-                Some(normalize_path_separators(&client.install_location))
-            } else {
-                None
-            };
-
-            let executable = if let Some(ref path) = install_path {
-                self.find_riot_game_executable(path, &client.name)
-                    .await
-                    .map(|p| normalize_path_separators(p))
-            } else {
-                None
-            };
+            // Find the actual game executable
+            let executable = self.find_riot_game_executable(&install_path, &game_name)
+                .await
+                .map(|p| normalize_path_separators(p));
 
             let platform = GamePlatform::RiotGames {
-                app_name: client.name.clone(),
+                app_name: game_name.clone(),
             };
 
+            // Generate a game ID from the path
+            let game_id = format!("riot_{}", game_name.to_lowercase().replace(" ", "_"));
+
             let mut game = DetectedGame::new(
-                client.id.clone(),
-                client.name.clone(),
+                game_id.clone(),
+                game_name.clone(),
                 executable,
-                install_path,
+                Some(normalize_path_separators(&install_path_str)),
                 platform,
             );
 
-            if !client.id.is_empty() {
-                game.platform_data
-                    .insert("app_id".to_string(), client.id);
-            }
+            game.platform_data
+                .insert("app_id".to_string(), game_id);
 
             games.push(game);
         }
@@ -112,27 +103,52 @@ impl RiotDetector {
         Ok(games)
     }
 
+    /// Extract game name from install path
+    /// Example: "C:/Riot Games/VALORANT/live/" -> "VALORANT"
+    fn extract_game_name_from_path(&self, path: &PathBuf) -> String {
+        let path_str = path.to_string_lossy();
+
+        // Pattern: "C:/Riot Games/VALORANT/live/" or "C:/Riot Games/League of Legends/"
+        if let Some(after_riot_games) = path_str.split("Riot Games/").nth(1) {
+            // Get the game directory name (first component after "Riot Games/")
+            let game_component = after_riot_games
+                .split('/')
+                .next()
+                .unwrap_or("")
+                .trim();
+
+            if !game_component.is_empty() {
+                return game_component.to_string();
+            }
+        }
+
+        String::new()
+    }
+
     async fn find_riot_game_executable(
         &self,
         install_path: &PathBuf,
         game_name: &str,
     ) -> Option<PathBuf> {
-        let possible_exes = match game_name.to_lowercase().as_str() {
-            name if name.contains("league") => vec!["LeagueClient.exe", "League of Legends.exe"],
-            name if name.contains("valorant") => vec!["VALORANT.exe", "Valorant.exe"],
-            name if name.contains("legends of runeterra") => vec!["LoR.exe"],
-            name if name.contains("teamfight tactics") => vec!["TeamfightTactics.exe"],
-            _ => vec![],
+        // Canonical executable names for Riot Games titles
+        let (exe_names, subdirs): (Vec<&str>, Vec<&str>) = match game_name {
+            "VALORANT" => (vec!["VALORANT.exe"], vec!["", "live"]),
+            "League of Legends" => (vec!["LeagueClient.exe", "League of Legends.exe"], vec!["", "Game"]),
+            "Legends of Runeterra" => (vec!["LoR.exe"], vec![""]),
+            "Teamfight Tactics" => (vec!["TeamfightTactics.exe"], vec![""]),
+            _ => (vec![], vec![""]),
         };
 
-        for exe_name in possible_exes {
-            let exe_path = install_path.join(exe_name);
-            if exe_path.exists() {
-                return Some(exe_path);
-            }
+        // Check each possible location
+        for subdir in &subdirs {
+            let search_dir = if subdir.is_empty() {
+                install_path.clone()
+            } else {
+                install_path.join(subdir)
+            };
 
-            for subdir in &["Game", "live"] {
-                let exe_path = install_path.join(subdir).join(exe_name);
+            for exe_name in &exe_names {
+                let exe_path = search_dir.join(exe_name);
                 if exe_path.exists() {
                     return Some(exe_path);
                 }
