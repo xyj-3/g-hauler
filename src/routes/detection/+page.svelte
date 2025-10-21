@@ -174,7 +174,7 @@
   });
 </script>
 
-<main class="w-full min-h-full px-6 py-6 text-white">
+<main class="w-full h-full flex flex-col px-6 py-6 text-white overflow-hidden">
   <h1 class="text-2xl font-dm-sans mb-2">Fix Game Detection</h1>
 
   <p class="text-sm text-gray-400 mb-4">
@@ -182,7 +182,7 @@
   </p>
 
   <!-- Top Action Bar -->
-  <div class="mb-4 space-y-3">
+  <div class="mb-4 space-y-3 flex-shrink-0">
     <!-- Scan Button -->
     <div class="inline-flex gap-2">
       <button
@@ -297,7 +297,7 @@
 
   <!-- Error Message -->
   {#if errorMessage}
-    <div class="border border-red-500/50 rounded-lg p-4 bg-red-900/20 mb-4">
+    <div class="border border-red-500/50 rounded-lg p-4 bg-red-900/20 mb-4 flex-shrink-0">
       <p class="text-red-400 text-sm">
         <strong>Error:</strong> {errorMessage}
       </p>
@@ -305,7 +305,7 @@
   {/if}
 
   <!-- Results Panel -->
-  <div class="border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden flex flex-col h-[calc(100vh-260px)]">
+  <div class="border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden flex flex-col flex-1 min-h-0">
       {#if showLoadingUI}
         <!-- Loading State -->
         <div class="flex-1 flex flex-col items-center justify-center space-y-4">
