@@ -102,7 +102,7 @@
     const colors: Record<string, string> = {
       'Steam': 'bg-blue-600/20 text-blue-400',
       'Epic Games': 'bg-yellow-600/20 text-yellow-400',
-      'Ubisoft Connect': 'bg-indigo-600/20 text-indigo-400',
+      'Ubisoft Connect': 'bg-green-600/20 text-green-400',
       'GOG Galaxy': 'bg-purple-600/20 text-purple-400',
       'Riot Games': 'bg-red-600/20 text-red-400',
       'Windows Registry': 'bg-cyan-600/20 text-cyan-400',
