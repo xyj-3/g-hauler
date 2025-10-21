@@ -117,6 +117,28 @@
     console.log('Importing games:', Array.from(selectedGames));
   }
 
+  function handleSelectAll() {
+    if (!scanResults) return;
+
+    const gamesToSelect = selectedPlatformTab === 'all'
+      ? scanResults.games
+      : scanResults.gamesByPlatform[selectedPlatformTab] || [];
+
+    gamesToSelect.forEach(game => selectedGames.add(game.id));
+    selectedGames = new Set(selectedGames); // Trigger reactivity
+  }
+
+  function handleDeselectAll() {
+    if (!scanResults) return;
+
+    const gamesToDeselect = selectedPlatformTab === 'all'
+      ? scanResults.games
+      : scanResults.gamesByPlatform[selectedPlatformTab] || [];
+
+    gamesToDeselect.forEach(game => selectedGames.delete(game.id));
+    selectedGames = new Set(selectedGames); // Trigger reactivity
+  }
+
   // Define platform order
   const platformOrder = [
     'Steam',
@@ -314,8 +336,8 @@
         </div>
       {:else if scanResults}
         <!-- Results Header -->
-        <div class="px-6 py-4 border-b border-gray-700 flex-shrink-0">
-          <div class="flex items-center justify-between">
+        <div class="px-6 border-b border-gray-700 flex-shrink-0">
+          <div class="flex items-center justify-between h-14">
             <div>
               <h2 class="text-base font-medium">
                 Scan Results
@@ -327,14 +349,16 @@
                 </span>
               </h2>
             </div>
-            {#if selectedGames.size > 0}
-              <button
-                class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-xl"
-                onclick={handleImportGames}
-              >
-                Import {selectedGames.size} Selected
-              </button>
-            {/if}
+            <div class="h-14 flex items-center justify-end">
+              {#if selectedGames.size > 0}
+                <button
+                  class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-xl"
+                  onclick={handleImportGames}
+                >
+                  Import {selectedGames.size} Selected
+                </button>
+              {/if}
+            </div>
           </div>
         </div>
 
@@ -359,22 +383,11 @@
               {/each}
             </div>
           </div>
-        {/if}
 
-        <!-- Results Content -->
-        <div class="flex-1 overflow-y-auto">
-          {#if scanResults.totalCount === 0}
-            <div class="p-8 text-center text-gray-400">
-              <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p class="text-lg mb-2">No games found</p>
-              <p class="text-sm">Try selecting different scan options or check your game installations.</p>
-            </div>
-          {:else}
-            <!-- Search Bar -->
-            <div class="px-6 py-3.5 border-b border-gray-700/50 bg-gray-800/20">
-              <div class="relative">
+          <!-- Search Bar -->
+          <div class="px-6 py-2.5 border-b border-gray-700/50 bg-gray-800/20 flex-shrink-0">
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -382,7 +395,7 @@
                   type="text"
                   bind:value={searchQuery}
                   placeholder="Search games..."
-                  class="w-full pl-10 pr-10 py-2 bg-gray-700/40 border border-gray-600/50 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/70 focus:bg-gray-700/60 focus:ring-1 focus:ring-blue-500/50 transition-colors"
+                  class="w-full pl-10 pr-10 py-1.5 bg-gray-700/40 border border-gray-600/50 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/70 focus:bg-gray-700/60 focus:ring-1 focus:ring-blue-500/50 transition-colors"
                 />
                 {#if searchQuery}
                   <button
@@ -396,7 +409,33 @@
                   </button>
                 {/if}
               </div>
+              <button
+                class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                onclick={handleSelectAll}
+              >
+                Select All
+              </button>
+              <button
+                class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                onclick={handleDeselectAll}
+              >
+                Deselect All
+              </button>
             </div>
+          </div>
+        {/if}
+
+        <!-- Results Content -->
+        <div class="flex-1 overflow-y-auto">
+          {#if scanResults.totalCount === 0}
+            <div class="p-8 text-center text-gray-400">
+              <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-lg mb-2">No games found</p>
+              <p class="text-sm">Try selecting different scan options or check your game installations.</p>
+            </div>
+          {:else}
 
             {#if selectedPlatformTab === 'all'}
               <!-- All platforms view - flat list with platform badges -->

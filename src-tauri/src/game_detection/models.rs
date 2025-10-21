@@ -159,6 +159,14 @@ impl GameScanResult {
     /// Finalize the result with scan duration
     pub fn finalize(mut self, duration_ms: u64) -> Self {
         self.scan_duration_ms = duration_ms;
+
+        // // Deduplicate games by ID, keeping the first occurrence
+        // let mut seen_ids = std::collections::HashSet::new();
+        // self.games.retain(|game| seen_ids.insert(game.id.clone()));
+
+        // // Update total count to reflect deduplicated games
+        // self.total_count = self.games.len();
+
         self
     }
 }
