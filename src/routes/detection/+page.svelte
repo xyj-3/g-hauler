@@ -21,6 +21,7 @@
 
   // State for scanning and results
   let isScanning = $state(false);
+  let showLoadingUI = $state(false);
   let scanResults = $state<GameScanResult | null>(null);
   let selectedGames = $state<Set<string>>(new Set());
   let errorMessage = $state<string | null>(null);
@@ -31,8 +32,16 @@
   async function handleScanForGames() {
     isScanning = true;
     errorMessage = null;
-    scanResults = null;
     selectedGames = new Set();
+
+    // Only show loading UI if scan takes longer than 300ms
+    const loadingTimeout = setTimeout(() => {
+      if (isScanning) {
+        showLoadingUI = true;
+        // Clear results only when showing loading UI
+        scanResults = null;
+      }
+    }, 300);
 
     try {
       const result = await invoke<GameScanResult>('scan_installed_games', {
@@ -42,8 +51,11 @@
     } catch (error) {
       errorMessage = error instanceof Error ? error.message : String(error);
       console.error('Scan failed:', error);
+      scanResults = null;
     } finally {
+      clearTimeout(loadingTimeout);
       isScanning = false;
+      showLoadingUI = false;
     }
   }
 
@@ -174,21 +186,21 @@
     <!-- Scan Button -->
     <div class="inline-flex gap-2">
       <button
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2"
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2 min-w-[180px] justify-center active:scale-[0.98]"
         onclick={handleScanForGames}
-        disabled={isScanning}
+        disabled={showLoadingUI}
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
-        {isScanning ? 'Scanning...' : 'Scan For Games'}
+        {showLoadingUI ? 'Scanning...' : 'Scan For Games'}
       </button>
 
       <!-- Gear Toggle -->
       <button
-        class="px-3 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''}"
+        class="px-3 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''} active:scale-[0.98]"
         onclick={toggleCustomScan}
-        disabled={isScanning}
+        disabled={showLoadingUI}
         aria-label="Custom scan options"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,7 +306,7 @@
 
   <!-- Results Panel -->
   <div class="border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden flex flex-col h-[calc(100vh-260px)]">
-      {#if isScanning}
+      {#if showLoadingUI}
         <!-- Loading State -->
         <div class="flex-1 flex flex-col items-center justify-center space-y-4">
           <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
