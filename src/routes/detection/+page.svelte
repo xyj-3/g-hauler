@@ -26,6 +26,7 @@
   let errorMessage = $state<string | null>(null);
   let selectedPlatformTab = $state<string>('all');
   let searchQuery = $state<string>('');
+  let showCustomScan = $state(false);
 
   async function handleScanForGames() {
     isScanning = true;
@@ -44,6 +45,10 @@
     } finally {
       isScanning = false;
     }
+  }
+
+  function toggleCustomScan() {
+    showCustomScan = !showCustomScan;
   }
 
   function toggleGameSelection(gameId: string) {
@@ -164,15 +169,40 @@
     Scan your system to find locally installed games that G HUB is not detecting and add profiles for them.
   </p>
 
-  <!-- Split View Layout -->
-  <div class="flex gap-6 h-[calc(100vh-170px)]">
-    <!-- Left Panel: Settings -->
-    <div class="w-64 flex-shrink-0 flex flex-col gap-4">
-      <!-- Platform Selection -->
-      <div class="border border-gray-700 rounded-lg bg-gray-800/50 p-4">
-        <h2 class="text-base font-medium mb-3">Platforms</h2>
+  <!-- Top Action Bar -->
+  <div class="mb-4 space-y-3">
+    <!-- Scan Button -->
+    <div class="inline-flex gap-2">
+      <button
+        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2"
+        onclick={handleScanForGames}
+        disabled={isScanning}
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        {isScanning ? 'Scanning...' : 'Scan For Games'}
+      </button>
 
-        <div class="space-y-1">
+      <!-- Gear Toggle -->
+      <button
+        class="px-3 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''}"
+        onclick={toggleCustomScan}
+        disabled={isScanning}
+        aria-label="Custom scan options"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Custom Scan Configuration -->
+    {#if showCustomScan}
+      <div class="border border-gray-700 rounded-lg bg-gray-800/50 p-4">
+        <h3 class="text-sm font-medium mb-3">Select Platforms:</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
             <input
               type="checkbox"
@@ -203,6 +233,15 @@
           <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
             <input
               type="checkbox"
+              bind:checked={scanOptions.scanEaApp}
+              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
+            />
+            <span class="text-sm">EA App</span>
+          </label>
+
+          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
+            <input
+              type="checkbox"
               bind:checked={scanOptions.scanUplay}
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
             />
@@ -216,15 +255,6 @@
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
             />
             <span class="text-sm">Riot Games</span>
-          </label>
-
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanEaApp}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">EA App</span>
           </label>
 
           {#if isWindows}
@@ -250,28 +280,20 @@
           {/if}
         </div>
       </div>
+    {/if}
+  </div>
 
-      <!-- Scan Button -->
-      <button
-        class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
-        onclick={handleScanForGames}
-        disabled={isScanning}
-      >
-        {isScanning ? 'Scanning...' : 'Scan for Games'}
-      </button>
-
-      <!-- Error Message -->
-      {#if errorMessage}
-        <div class="border border-red-500/50 rounded-lg p-4 bg-red-900/20">
-          <p class="text-red-400 text-sm">
-            <strong>Error:</strong> {errorMessage}
-          </p>
-        </div>
-      {/if}
+  <!-- Error Message -->
+  {#if errorMessage}
+    <div class="border border-red-500/50 rounded-lg p-4 bg-red-900/20 mb-4">
+      <p class="text-red-400 text-sm">
+        <strong>Error:</strong> {errorMessage}
+      </p>
     </div>
+  {/if}
 
-    <!-- Right Panel: Results -->
-    <div class="flex-1 border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden flex flex-col">
+  <!-- Results Panel -->
+  <div class="border border-gray-700 rounded-lg bg-gray-800/50 overflow-hidden flex flex-col h-[calc(100vh-260px)]">
       {#if isScanning}
         <!-- Loading State -->
         <div class="flex-1 flex flex-col items-center justify-center space-y-4">
@@ -451,9 +473,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <p class="text-lg mb-2">No scan results yet</p>
-          <p class="text-sm text-center">Select platforms and click "Scan for Games" to get started.</p>
+          <p class="text-sm text-center">Click "Scan All Platforms" or choose a custom scan to get started.</p>
         </div>
       {/if}
     </div>
-  </div>
 </main>
