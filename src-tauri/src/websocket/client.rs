@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::collections::HashMap;
 use tokio::sync::Mutex;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{client_async, WebSocketStream};
@@ -15,6 +16,36 @@ pub struct WebSocketMessage {
     pub verb: String,
     pub path: String,
     pub payload: Value,
+}
+
+/// Remove duplicate entries from categoryColors arrays based on tag name
+fn deduplicate_category_colors(message_value: &mut Value) {
+    // Check if this is a response with applications payload
+    if let Some(payload) = message_value.get_mut("payload") {
+        if let Some(applications) = payload.get_mut("applications") {
+            if let Some(apps_array) = applications.as_array_mut() {
+                for app in apps_array.iter_mut() {
+                    if let Some(category_colors) = app.get_mut("categoryColors") {
+                        if let Some(colors_array) = category_colors.as_array_mut() {
+                            let mut seen_tags: HashMap<String, Value> = HashMap::new();
+
+                            // Collect unique entries by tag
+                            for color_entry in colors_array.iter() {
+                                if let Some(tag) = color_entry.get("tag").and_then(|t| t.as_str()) {
+                                    seen_tags
+                                        .entry(tag.to_string())
+                                        .or_insert_with(|| color_entry.clone());
+                                }
+                            }
+
+                            // Replace with deduplicated list
+                            *category_colors = Value::Array(seen_tags.into_values().collect());
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 pub struct WebSocketClient {
@@ -115,8 +146,35 @@ impl WebSocketClient {
                     match message {
                         Message::Text(text) => {
                             eprintln!("[WebSocket Client] Received message: {}", text);
-                            // Emit the message to the frontend
-                            let _ = self.app_handle.emit("websocket-message", text);
+
+                            // Parse, deduplicate, and re-serialize the message
+                            let processed_text = match serde_json::from_str::<Value>(&text) {
+                                Ok(mut message_value) => {
+                                    // Skip OPTIONS messages (don't deduplicate or emit)
+                                    if message_value.get("verb").and_then(|v| v.as_str()) == Some("OPTIONS") {
+                                        eprintln!("[WebSocket Client] Skipping OPTIONS message");
+                                        continue;
+                                    }
+
+                                    // Only deduplicate categoryColors for GET /applications responses
+                                    let is_get_applications = message_value.get("verb").and_then(|v| v.as_str()) == Some("GET")
+                                        && message_value.get("path").and_then(|p| p.as_str()) == Some("/applications");
+
+                                    if is_get_applications {
+                                        deduplicate_category_colors(&mut message_value);
+                                    }
+
+                                    // Serialize back to string
+                                    serde_json::to_string(&message_value).unwrap_or(text)
+                                }
+                                Err(_) => {
+                                    // If parsing fails, use original text
+                                    text
+                                }
+                            };
+
+                            // Emit the processed message to the frontend
+                            let _ = self.app_handle.emit("websocket-message", processed_text);
                         }
                         Message::Close(_) => {
                             eprintln!("[WebSocket Client] Connection closed by server");
