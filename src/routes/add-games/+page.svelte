@@ -127,7 +127,7 @@
 		<button
 			type="submit"
 			disabled={isSubmitting}
-			class="bg-blue-600 text-white text-sm py-2 px-6 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+			class="bg-btn text-white text-sm py-2 px-6 rounded-md hover:bg-btn-hover focus:outline-none focus:ring-2 focus:ring-btn-disabled focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 		>
 			{isSubmitting ? 'Adding Game...' : 'Add Game'}
 		</button>

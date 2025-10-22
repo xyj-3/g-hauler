@@ -210,7 +210,7 @@
     <!-- Scan Button -->
     <div class="inline-flex gap-2">
       <button
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2 min-w-[140px] justify-center active:scale-[0.98]"
+        class="px-4 py-2 bg-btn hover:bg-btn-hover disabled:bg-btn disabled:opacity-50 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2 min-w-[140px] justify-center active:scale-[0.98]"
         onclick={handleScanForGames}
         disabled={showLoadingUI}
       >
@@ -222,7 +222,7 @@
 
       <!-- Gear Toggle -->
       <button
-        class="px-2.5 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''} active:scale-[0.98]"
+        class="px-2.5 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-btn hover:bg-btn-hover' : ''} active:scale-[0.98]"
         onclick={toggleCustomScan}
         disabled={showLoadingUI}
         aria-label="Custom scan options"
@@ -242,7 +242,7 @@
           <button
             onclick={() => scanOptions.scanSteam = !scanOptions.scanSteam}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanSteam
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             Steam
@@ -251,7 +251,7 @@
           <button
             onclick={() => scanOptions.scanEpicGames = !scanOptions.scanEpicGames}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanEpicGames
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             Epic Games
@@ -260,7 +260,7 @@
           <button
             onclick={() => scanOptions.scanGogGalaxy = !scanOptions.scanGogGalaxy}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanGogGalaxy
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             GOG Galaxy
@@ -269,7 +269,7 @@
           <button
             onclick={() => scanOptions.scanEaApp = !scanOptions.scanEaApp}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanEaApp
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             EA App
@@ -278,7 +278,7 @@
           <button
             onclick={() => scanOptions.scanUplay = !scanOptions.scanUplay}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanUplay
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             Ubisoft Connect
@@ -287,7 +287,7 @@
           <button
             onclick={() => scanOptions.scanRiotGames = !scanOptions.scanRiotGames}
             class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanRiotGames
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
             Riot Games
@@ -297,7 +297,7 @@
             <button
               onclick={() => scanOptions.scanWinRegistry = !scanOptions.scanWinRegistry}
               class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanWinRegistry
-                ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+                ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
                 : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
             >
               Windows Registry
@@ -308,7 +308,7 @@
             <button
               onclick={() => scanOptions.scanOsxBundle = !scanOptions.scanOsxBundle}
               class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanOsxBundle
-                ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+                ? 'bg-btn hover:bg-btn-hover text-white border border-btn-disabled'
                 : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
             >
               macOS Apps

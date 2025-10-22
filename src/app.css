@@ -3,6 +3,9 @@
 @theme {
   --color-background: #111827;
   --color-teal: #2dd4bf;
+  --color-btn: #2563eb;
+  --color-btn-hover: #1d4ed8;
+  --color-btn-disabled: #3b82f6;
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-dm-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }

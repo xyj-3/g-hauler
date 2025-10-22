@@ -147,7 +147,7 @@
       <button
         onclick={handleSave}
         disabled={isSaving}
-        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-500 disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2"
+        class="px-4 py-2 bg-btn hover:bg-btn-hover disabled:bg-btn-disabled disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2"
       >
         {#if isSaving}
           <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>

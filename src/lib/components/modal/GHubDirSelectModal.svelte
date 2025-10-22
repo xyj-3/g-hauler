@@ -78,7 +78,7 @@
         placeholder="Enter or select G HUB path"
       />
       <button
-        class="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+        class="px-3 py-1 rounded bg-btn text-white hover:bg-btn-hover"
         type="button"
         onclick={handleBrowse}
       >Browse</button>

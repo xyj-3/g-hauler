@@ -44,7 +44,7 @@
         <p class="text-sm text-gray-400 mb-6">{error}</p>
         <button
           onclick={loadApplications}
-          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-medium shadow-lg hover:shadow-xl"
+          class="px-6 py-3 bg-btn hover:bg-btn-hover rounded-lg transition-colors font-medium shadow-lg hover:shadow-xl"
         >
           Retry
         </button>
