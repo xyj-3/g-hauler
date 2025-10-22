@@ -33,6 +33,7 @@
     isScanning = true;
     errorMessage = null;
     selectedGames = new Set();
+    showCustomScan = false; // Close custom scan panel when starting scan
 
     // Only show loading UI if scan takes longer than 300ms
     const loadingTimeout = setTimeout(() => {
@@ -235,83 +236,83 @@
 
     <!-- Custom Scan Configuration -->
     {#if showCustomScan}
-      <div class="border border-gray-700 rounded-lg bg-gray-800/50 p-4">
-        <h3 class="text-sm font-medium mb-3">Select Platforms:</h3>
-        <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanSteam}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Steam</span>
-          </label>
+      <div class="border border-gray-700/50 rounded-lg bg-gradient-to-br from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-3 shadow-lg">
+        <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2.5">Scan Platforms</h3>
+        <div class="flex flex-wrap gap-2">
+          <button
+            onclick={() => scanOptions.scanSteam = !scanOptions.scanSteam}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanSteam
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            Steam
+          </button>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanEpicGames}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Epic Games</span>
-          </label>
+          <button
+            onclick={() => scanOptions.scanEpicGames = !scanOptions.scanEpicGames}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanEpicGames
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            Epic Games
+          </button>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanGogGalaxy}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">GOG Galaxy</span>
-          </label>
+          <button
+            onclick={() => scanOptions.scanGogGalaxy = !scanOptions.scanGogGalaxy}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanGogGalaxy
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            GOG Galaxy
+          </button>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanEaApp}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">EA App</span>
-          </label>
+          <button
+            onclick={() => scanOptions.scanEaApp = !scanOptions.scanEaApp}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanEaApp
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            EA App
+          </button>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanUplay}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Ubisoft Connect</span>
-          </label>
+          <button
+            onclick={() => scanOptions.scanUplay = !scanOptions.scanUplay}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanUplay
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            Ubisoft Connect
+          </button>
 
-          <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-            <input
-              type="checkbox"
-              bind:checked={scanOptions.scanRiotGames}
-              class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-            />
-            <span class="text-sm">Riot Games</span>
-          </label>
+          <button
+            onclick={() => scanOptions.scanRiotGames = !scanOptions.scanRiotGames}
+            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanRiotGames
+              ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+              : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+          >
+            Riot Games
+          </button>
 
           {#if isWindows}
-            <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-              <input
-                type="checkbox"
-                bind:checked={scanOptions.scanWinRegistry}
-                class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span class="text-sm">Windows Registry</span>
-            </label>
+            <button
+              onclick={() => scanOptions.scanWinRegistry = !scanOptions.scanWinRegistry}
+              class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanWinRegistry
+                ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+                : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+            >
+              Windows Registry
+            </button>
           {/if}
 
           {#if isMacOS}
-            <label class="flex items-center space-x-2 p-1.5 rounded hover:bg-gray-700/30 transition-colors cursor-pointer">
-              <input
-                type="checkbox"
-                bind:checked={scanOptions.scanOsxBundle}
-                class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-0 cursor-pointer"
-              />
-              <span class="text-sm">macOS Apps</span>
-            </label>
+            <button
+              onclick={() => scanOptions.scanOsxBundle = !scanOptions.scanOsxBundle}
+              class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanOsxBundle
+                ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
+                : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
+            >
+              macOS Apps
+            </button>
           {/if}
         </div>
       </div>
