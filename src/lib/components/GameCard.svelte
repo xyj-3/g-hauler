@@ -13,7 +13,7 @@
 
   const { game, tabindex, ongameUpdated }: GameCardProps = $props();
   
-  let cardElement = $state<HTMLDivElement>();
+  let cardElement: HTMLButtonElement;
   let isVisible = $state(false);
   let imageLoaded = $state(false);
   let resolvedPosterUrl = $state<string | null>(null);
@@ -23,6 +23,10 @@
   const handleCardClick = () => {
     console.log('Game selected:', game.name);
     showEditModal = true;
+    // Remove focus from the button to prevent persistent highlighting
+    if (cardElement) {
+      cardElement.blur();
+    }
   };
 
   const handleModalClose = () => {
@@ -136,14 +140,14 @@
 
 <button
   bind:this={cardElement}
-  class="cursor-pointer group transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg"
+  class="cursor-pointer group transition-all duration-200 focus:outline-none rounded-lg active:scale-[0.98]"
   onclick={handleCardClick}
   onkeydown={handleKeyDown}
   tabindex={tabindex}
   aria-label="Select {game.name}"
 >
   <!-- Minimal border highlight -->
-  <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 group-hover:border-blue-400/60 shadow-md group-hover:shadow-lg">
+  <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 hover:border-blue-400/60 shadow-md hover:shadow-lg">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
     {#if isVisible && resolvedPosterUrl}
       <img
@@ -157,11 +161,11 @@
       />
     {/if}
     <!-- Very subtle overlay -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
   </div>
 
   <div class="mt-2.5 px-1">
-    <h3 class="text-white font-semibold text-sm leading-tight truncate font-dm-sans group-hover:text-blue-300 transition-colors" title={game.name}>
+    <h3 class="text-white font-semibold text-sm leading-tight truncate font-dm-sans hover:text-blue-300 transition-colors" title={game.name}>
       {game.name}
     </h3>
   </div>
