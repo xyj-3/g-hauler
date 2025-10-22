@@ -134,17 +134,17 @@
   });
 </script>
 
-<div
+<button
   bind:this={cardElement}
-  class="cursor-pointer group w-40 transition-transform duration-200 hover:scale-108"
+  class="cursor-pointer group transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-lg"
   onclick={handleCardClick}
   onkeydown={handleKeyDown}
   tabindex={tabindex}
-  role="button"
   aria-label="Select {game.name}"
 >
-  <div class="relative aspect-[3/4] overflow-hidden rounded-sm">
-    <div class="absolute inset-0 bg-gray-700"></div>
+  <!-- Minimal border highlight -->
+  <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 group-hover:border-blue-400/60 shadow-md group-hover:shadow-lg">
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
     {#if isVisible && resolvedPosterUrl}
       <img
         src={resolvedPosterUrl}
@@ -156,13 +156,16 @@
         loading="lazy"
       />
     {/if}
+    <!-- Very subtle overlay -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
   </div>
-  <div class="mt-2">
-    <h3 class="text-white font-medium text-sm leading-tight truncate font-dm-sans" title={game.name}>
+
+  <div class="mt-2.5 px-1">
+    <h3 class="text-white font-semibold text-sm leading-tight truncate font-dm-sans group-hover:text-blue-300 transition-colors" title={game.name}>
       {game.name}
     </h3>
   </div>
-</div>
+</button>
 
 {#if showEditModal}
   <GameEditModal 
