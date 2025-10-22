@@ -198,23 +198,23 @@
   });
 </script>
 
-<main class="w-full h-full flex flex-col px-6 py-6 text-white overflow-hidden">
-  <h1 class="text-2xl font-dm-sans mb-2">Fix Game Detection</h1>
+<main class="w-full h-full flex flex-col px-6 py-4 text-white overflow-hidden">
+  <h1 class="text-xl font-dm-sans mb-1">Fix Game Detection</h1>
 
-  <p class="text-sm text-gray-400 mb-4">
+  <p class="text-xs text-gray-400 mb-3">
     Scan your system to find locally installed games that G HUB is not detecting and add profiles for them.
   </p>
 
   <!-- Top Action Bar -->
-  <div class="mb-4 space-y-3 flex-shrink-0">
+  <div class="mb-3 space-y-2 flex-shrink-0">
     <!-- Scan Button -->
     <div class="inline-flex gap-2">
       <button
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2 min-w-[180px] justify-center active:scale-[0.98]"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600 disabled:opacity-50 text-white rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl flex items-center gap-2 min-w-[140px] justify-center active:scale-[0.98]"
         onclick={handleScanForGames}
         disabled={showLoadingUI}
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
         {showLoadingUI ? 'Scanning...' : 'Scan For Games'}
@@ -222,12 +222,12 @@
 
       <!-- Gear Toggle -->
       <button
-        class="px-3 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''} active:scale-[0.98]"
+        class="px-2.5 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-700 disabled:opacity-50 text-white rounded-lg transition-colors shadow-lg hover:shadow-xl {showCustomScan ? 'bg-blue-600 hover:bg-blue-700' : ''} active:scale-[0.98]"
         onclick={toggleCustomScan}
         disabled={showLoadingUI}
         aria-label="Custom scan options"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -236,12 +236,12 @@
 
     <!-- Custom Scan Configuration -->
     {#if showCustomScan}
-      <div class="border border-gray-700/50 rounded-lg bg-gradient-to-br from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-3 shadow-lg">
-        <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wide mb-2.5">Scan Platforms</h3>
-        <div class="flex flex-wrap gap-2">
+      <div class="border border-gray-700/50 rounded-lg bg-gradient-to-br from-gray-800/60 to-gray-800/40 backdrop-blur-sm p-2.5 shadow-lg">
+        <h3 class="text-xs font-semibold text-gray-300 uppercase tracking-wide mb-1.5">Scan Platforms</h3>
+        <div class="flex flex-wrap gap-1.5">
           <button
             onclick={() => scanOptions.scanSteam = !scanOptions.scanSteam}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanSteam
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanSteam
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -250,7 +250,7 @@
 
           <button
             onclick={() => scanOptions.scanEpicGames = !scanOptions.scanEpicGames}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanEpicGames
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanEpicGames
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -259,7 +259,7 @@
 
           <button
             onclick={() => scanOptions.scanGogGalaxy = !scanOptions.scanGogGalaxy}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanGogGalaxy
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanGogGalaxy
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -268,7 +268,7 @@
 
           <button
             onclick={() => scanOptions.scanEaApp = !scanOptions.scanEaApp}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanEaApp
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanEaApp
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -277,7 +277,7 @@
 
           <button
             onclick={() => scanOptions.scanUplay = !scanOptions.scanUplay}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanUplay
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanUplay
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -286,7 +286,7 @@
 
           <button
             onclick={() => scanOptions.scanRiotGames = !scanOptions.scanRiotGames}
-            class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanRiotGames
+            class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanRiotGames
               ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
               : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
           >
@@ -296,7 +296,7 @@
           {#if isWindows}
             <button
               onclick={() => scanOptions.scanWinRegistry = !scanOptions.scanWinRegistry}
-              class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanWinRegistry
+              class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanWinRegistry
                 ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
                 : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
             >
@@ -307,7 +307,7 @@
           {#if isMacOS}
             <button
               onclick={() => scanOptions.scanOsxBundle = !scanOptions.scanOsxBundle}
-              class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors {scanOptions.scanOsxBundle
+              class="px-2.5 py-1 rounded-md text-xs font-medium transition-colors {scanOptions.scanOsxBundle
                 ? 'bg-blue-600 hover:bg-blue-700 text-white border border-blue-500'
                 : 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-300 hover:text-white border border-gray-600/40 hover:border-gray-600'}"
             >
@@ -321,7 +321,7 @@
 
   <!-- Error Message -->
   {#if errorMessage}
-    <div class="border border-red-500/50 rounded-lg p-4 bg-red-900/20 mb-4 flex-shrink-0">
+    <div class="border border-red-500/50 rounded-lg p-3 bg-red-900/20 mb-2 flex-shrink-0">
       <p class="text-red-400 text-sm">
         <strong>Error:</strong> {errorMessage}
       </p>
@@ -338,12 +338,12 @@
         </div>
       {:else if scanResults}
         <!-- Results Header -->
-        <div class="px-6 border-b border-gray-700 flex-shrink-0">
-          <div class="flex items-center justify-between h-14">
+        <div class="px-4 border-b border-gray-700 flex-shrink-0">
+          <div class="flex items-center justify-between h-12">
             <div>
-              <h2 class="text-base font-medium">
+              <h2 class="text-sm font-medium">
                 Scan Results
-                <span class="text-sm text-gray-400 font-normal ml-2">
+                <span class="text-xs text-gray-400 font-normal ml-2">
                   {scanResults.totalCount} {scanResults.totalCount === 1 ? 'game' : 'games'} · {scanResults.scanDurationMs}ms
                   {#if scanResults.errors.length > 0}
                     · <span class="text-yellow-400">{scanResults.errors.length} {scanResults.errors.length === 1 ? 'warning' : 'warnings'}</span>
@@ -351,7 +351,7 @@
                 </span>
               </h2>
             </div>
-            <div class="h-14 flex items-center justify-end">
+            <div class="h-12 flex items-center justify-end">
               {#if selectedGames.size > 0}
                 <button
                   class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-xl"
@@ -366,10 +366,10 @@
 
         <!-- Platform Tabs -->
         {#if scanResults.totalCount > 0}
-          <div class="border-b border-gray-700 flex-shrink-0 px-6 bg-gray-800/30">
-            <div class="flex gap-2 overflow-x-auto pb-1">
+          <div class="border-b border-gray-700 flex-shrink-0 px-4 bg-gray-800/30 pt-1">
+            <div class="flex gap-2 overflow-x-auto">
               <button
-                class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === 'all' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+                class="px-3 py-2 text-sm font-medium transition-colors border-b-3 whitespace-nowrap {selectedPlatformTab === 'all' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
                 onclick={() => selectedPlatformTab = 'all'}
               >
                 All ({scanResults.totalCount})
@@ -377,7 +377,7 @@
               {#each platformsWithGames() as platform}
                 {@const count = scanResults.gamesByPlatform[platform]?.length || 0}
                 <button
-                  class="px-4 py-2.5 text-sm font-medium transition-colors border-b-2 whitespace-nowrap {selectedPlatformTab === platform ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
+                  class="px-3 py-2 text-sm font-medium transition-colors border-b-[3px] whitespace-nowrap {selectedPlatformTab === platform ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
                   onclick={() => selectedPlatformTab = platform}
                 >
                   {platform} ({count})
@@ -387,7 +387,7 @@
           </div>
 
           <!-- Search Bar -->
-          <div class="px-6 py-2.5 border-b border-gray-700/50 bg-gray-800/20 flex-shrink-0">
+          <div class="px-4 py-2 border-b border-gray-700/50 bg-gray-800/20 flex-shrink-0">
             <div class="flex items-center gap-2">
               <div class="relative flex-1">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
