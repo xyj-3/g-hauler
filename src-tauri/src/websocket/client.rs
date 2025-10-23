@@ -145,8 +145,6 @@ impl WebSocketClient {
                 Some(Ok(message)) => {
                     match message {
                         Message::Text(text) => {
-                            eprintln!("[WebSocket Client] Received message: {}", text);
-
                             // Parse, deduplicate, and re-serialize the message
                             let processed_text = match serde_json::from_str::<Value>(&text) {
                                 Ok(mut message_value) => {
@@ -156,11 +154,12 @@ impl WebSocketClient {
                                         continue;
                                     }
 
-                                    // Only deduplicate categoryColors for GET /applications responses
-                                    let is_get_applications = message_value.get("verb").and_then(|v| v.as_str()) == Some("GET")
-                                        && message_value.get("path").and_then(|p| p.as_str()) == Some("/applications");
+                                    // Deduplicate categoryColors for /applications responses
+                                    // Check both request format (with verb) and response format (without verb)
+                                    let is_get_applications = message_value.get("path").and_then(|p| p.as_str()) == Some("/applications");
 
                                     if is_get_applications {
+                                        eprintln!("[WebSocket Client] Deduplicating categoryColors for /applications response");
                                         deduplicate_category_colors(&mut message_value);
                                     }
 

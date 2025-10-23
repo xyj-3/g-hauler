@@ -8,6 +8,7 @@
   import BottomBar from '$components/layout/BottomBar.svelte';
   import { invoke } from '@tauri-apps/api/core';
   import { ws } from '$lib/services/websocket';
+  import { homePageLoaded } from '$lib/stores/appState';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -32,20 +33,31 @@
   }
 
   onMount(() => {
-    let splashDone = false;
+    let minSplashTimeDone = false;
     let validationDone = false;
+    let homeLoadDone = false;
+    let maxTimeoutReached = false;
 
     const hideSplashIfReady = () => {
-      if (splashDone && validationDone) {
+      // Hide splash when all required tasks are done OR max timeout is reached
+      if ((minSplashTimeDone && validationDone && homeLoadDone) || maxTimeoutReached) {
         showSplash = false;
       }
     };
 
+    // Minimum splash screen time (1 second)
     setTimeout(() => {
-      splashDone = true;
+      minSplashTimeDone = true;
       hideSplashIfReady();
     }, 1000);
 
+    // Maximum splash screen time (3 seconds) - feels natural
+    setTimeout(() => {
+      maxTimeoutReached = true;
+      hideSplashIfReady();
+    }, 3000);
+
+    // Path validation
     invoke<PathValidationResult>('validate_paths').then((result) => {
       validationResult = result;
       validationDone = true;
@@ -57,7 +69,18 @@
       hideSplashIfReady();
     });
 
+    // Subscribe to home page loaded state
+    const unsubscribe = homePageLoaded.subscribe((loaded) => {
+      homeLoadDone = loaded;
+      hideSplashIfReady();
+    });
+
+    // Start WebSocket connection
     ws.autoConnect();
+
+    return () => {
+      unsubscribe();
+    };
   });
 </script>
 

@@ -79,12 +79,8 @@ class WebSocketService {
         });
 
         listen('websocket-message', (event) => {
-            console.log('[WebSocket] Raw message received:', event.payload);
-
             try {
                 const message = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload;
-                console.log('[WebSocket] Parsed JSON message:', message);
-                
                 // Just log the message - no processing needed
                 // Applications can listen to this event directly if they need the data
             } catch (error) {
@@ -105,6 +101,9 @@ class WebSocketService {
     }
 
     // Convenient action helpers - now fire-and-forget
+    getApplications = async () =>
+        this.send('GET', '/applications');
+
     getApplication = async (applicationId: string) =>
         this.send('GET', '/application', { id: applicationId });
 
@@ -120,7 +119,7 @@ class WebSocketService {
             ...options
         });
     }
-    
+
     deleteApplication = async (applicationId: string) =>
         this.send('DELETE', '/application', { id: applicationId });
 }

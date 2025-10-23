@@ -98,6 +98,27 @@ export interface ApplicationPayload {
   posterPath?: string;
 }
 
+// WebSocket Response interfaces
+
+export interface WebSocketMessage {
+  msgId: string;
+  origin: string;
+  path: string;
+  payload: any;
+}
+
+export interface ApplicationsResponse extends WebSocketMessage {
+  payload: {
+    applications: ApplicationPayload[];
+  };
+}
+
+export interface WebSocketCommand {
+  cardId?: string;
+  category: string;
+  name: string;
+}
+
 // Game Detection Types
 
 export type GamePlatform =

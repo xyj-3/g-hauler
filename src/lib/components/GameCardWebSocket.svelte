@@ -1,10 +1,8 @@
 <script lang="ts">
   import type { GHUBApp } from '$lib/types';
-  import { invoke } from '@tauri-apps/api/core';
-  import { readFile } from '@tauri-apps/plugin-fs';
   import { onMount } from 'svelte';
   import GameEditModal from '$components/modal/GameEditModal.svelte';
-  
+
   interface GameCardProps {
     game: GHUBApp;
     tabindex?: number;
@@ -12,11 +10,10 @@
   }
 
   const { game, tabindex, ongameUpdated }: GameCardProps = $props();
-  
+
   let cardElement: HTMLButtonElement;
   let isVisible = $state(false);
   let imageLoaded = $state(false);
-  let resolvedPosterUrl = $state<string | null>(null);
   let observer: IntersectionObserver;
   let showEditModal = $state(false);
 
@@ -32,20 +29,14 @@
   const handleModalClose = () => {
     showEditModal = false;
   };
-  
+
   const handleGameSave = async (updatedGame: GHUBApp) => {
     try {
-      // Update the application in the backend memory
-      await invoke('update_application', { updatedApp: updatedGame });
-      console.log('Application updated successfully in backend memory');
-      
-      // Save to disk
-      await invoke('save_applications_to_disk');
-      console.log('Applications saved to disk successfully');
-      
-      // Update the frontend state
+      // For WebSocket route, we might need different save logic
+      // For now, just update the frontend state
       ongameUpdated?.(updatedGame);
       showEditModal = false;
+      console.log('Game updated in WebSocket mode');
     } catch (error) {
       console.error('Failed to update application:', error);
       // Rethrow the error so the modal can handle it
@@ -68,59 +59,14 @@
     imageLoaded = false;
   };
 
-  const resolvePipelineUrl = async (url: string): Promise<string> => {
-    if (!url.startsWith('pipeline://')) {
-      return url;
-    }
-    
-    try {
-      const relativePath = url.replace('pipeline://', '');
-      const pipelinePath = await invoke<string | null>('get_pipeline_path');
-      if (!pipelinePath) {
-        throw new Error('Pipeline path not found');
-      }
-      const fullPath = `${pipelinePath}/${relativePath}`.replace(/\\/g, '/');
-
-      const fileData = await readFile(fullPath);
-      const blob = new Blob([fileData]);
-      const dataUrl = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      });
-      
-      return dataUrl;
-    } catch (error) {
-      console.error('Failed to resolve pipeline image:', error);
-    }
-    return url;
-  };
-
-  const loadContent = async () => {
-    if (game.posterUrl.startsWith('pipeline://')) {
-      try {
-        resolvedPosterUrl = await resolvePipelineUrl(game.posterUrl);
-        } catch (error) {
-          console.error('Error resolving pipeline URL:', error);
-          resolvedPosterUrl = null;
-      }
-    } else {
-      // For HTTP URLs from WebSocket payload, use them directly
-      resolvedPosterUrl = game.posterUrl;
-    }
-  };
-  
   onMount(() => {
     if (!cardElement) return;
-    
+
     observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          // console.log(entry.intersectionRatio.toFixed(2));
-          // console.log(entry.isIntersecting);
           if (entry.isIntersecting) {
             isVisible = true;
-            loadContent();
             observer.unobserve(entry.target);
           }
         });
@@ -130,9 +76,9 @@
         threshold: 0,
       }
     );
-    
+
     observer.observe(cardElement);
-    
+
     return () => {
       if (observer && cardElement) {
         observer.unobserve(cardElement);
@@ -152,9 +98,9 @@
   <!-- Minimal border highlight -->
   <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 hover:border-blue-400/60 shadow-md hover:shadow-lg">
     <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
-    {#if isVisible && resolvedPosterUrl}
+    {#if isVisible && game.posterUrl}
       <img
-        src={resolvedPosterUrl}
+        src={game.posterUrl}
         alt="{game.name} poster"
         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
         class:opacity-0={!imageLoaded}
@@ -175,9 +121,9 @@
 </button>
 
 {#if showEditModal}
-  <GameEditModal 
-    {game} 
-    isOpen={showEditModal} 
+  <GameEditModal
+    {game}
+    isOpen={showEditModal}
     onclose={handleModalClose}
     onsave={handleGameSave}
   />
