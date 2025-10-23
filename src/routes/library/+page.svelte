@@ -1,17 +1,14 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { listen, type UnlistenFn } from '@tauri-apps/api/event';
   import GameCardWebSocket from '$lib/components/GameCardWebSocket.svelte';
   import GameCardSkeleton from '$lib/components/GameCardSkeleton.svelte';
-  import type { GHUBApp, ApplicationsResponse } from '$lib/types';
+  import type { GHUBApp } from '$lib/types';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
+  import { applicationsAsGHUBApps, wsConnected } from '$lib/stores/websocket.svelte';
 
-  let applications = $state<GHUBApp[]>([]);
   let loading = $state(true);
   let error = $state<string | null>(null);
-  let unsubscribeMessage: UnlistenFn | null = null;
-  let unsubscribeConnected: UnlistenFn | null = null;
   let loadingTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   // Number of skeleton cards to show while loading
@@ -49,7 +46,7 @@
         }
       }, LOADING_TIMEOUT_MS);
 
-      // Send GET /applications message using helper method
+      // Send GET /applications message - response will be handled by the store
       await ws.getApplications();
       console.log('[library] GET /applications message sent');
     } catch (err) {
@@ -63,110 +60,45 @@
   };
 
   const handleGameUpdated = (updatedGame: GHUBApp) => {
-    const index = applications.findIndex(app => app.applicationId === updatedGame.applicationId);
-    if (index !== -1) {
-      applications[index] = updatedGame;
-      applications = [...applications]; // Trigger reactivity
-    }
+    // No need to manually update - the store will handle updates via WebSocket events
+    console.log('[library] Game updated:', updatedGame.name);
   };
 
-  onMount(async () => {
-    // Listen for WebSocket connected event
-    unsubscribeConnected = await listen('websocket-connected', () => {
-      console.log('[library] WebSocket connected event received, loading applications');
-      loadApplications();
-    });
+  // React to applications data arriving
+  $effect(() => {
+    const apps = $applicationsAsGHUBApps;
+    if (apps.length > 0 && loading) {
+      console.log('[library] Applications loaded from store:', apps.length);
+      loading = false;
+      homePageLoaded.set(true);
 
-    // Listen for WebSocket messages
-    unsubscribeMessage = await listen('websocket-message', (event) => {
-      try {
-        console.log('[library] WebSocket event received:', event);
-
-        const message: ApplicationsResponse = typeof event.payload === 'string'
-          ? JSON.parse(event.payload)
-          : event.payload;
-
-        console.log('[library] Parsed message:', message);
-        console.log('[library] Message path:', message.path);
-        console.log('[library] Payload type:', typeof message.payload);
-        console.log('[library] Has applications?:', !!message.payload?.applications);
-
-        // Check if this is a response to /applications
-        if (message.path === '/applications') {
-          console.log('[library] Path matches /applications');
-
-          if (message.payload?.applications) {
-            console.log('[library] Applications array found, length:', message.payload.applications.length);
-
-            // Map the WebSocket response to GHUBApp format
-            applications = message.payload.applications.map((app) => ({
-              applicationId: app.applicationId || app.databaseId || '',
-              categoryColors: app.categoryColors || [],
-              commands: (app.commands || []).map((cmd) => ({
-                category: cmd.category || '',
-                keystroke: [], // WebSocket response doesn't include keystroke data
-                name: cmd.name || ''
-              })),
-              detection: [], // WebSocket response doesn't include detection
-              name: app.name,
-              posterTitlePosition: app.posterTitlePosition || '0',
-              posterUrl: app.posterUrl || '',
-              version: app.version || 1
-            }));
-
-            loading = false;
-            homePageLoaded.set(true); // Signal that home page has loaded
-
-            // Clear the loading timeout since we successfully loaded
-            if (loadingTimeoutId) {
-              clearTimeout(loadingTimeoutId);
-              loadingTimeoutId = null;
-            }
-
-            console.log('[library] Successfully loaded', applications.length, 'applications');
-          } else {
-            console.warn('[library] Path matches but no applications in payload');
-            loading = false;
-            homePageLoaded.set(true); // Still signal loaded even if empty
-
-            // Clear the loading timeout
-            if (loadingTimeoutId) {
-              clearTimeout(loadingTimeoutId);
-              loadingTimeoutId = null;
-            }
-          }
-        } else {
-          console.log('[library] Path does not match /applications, ignoring');
-        }
-      } catch (err) {
-        console.error('[library] Failed to process WebSocket message:', err);
-        error = err instanceof Error ? err.message : 'Failed to process response';
-        loading = false;
-        homePageLoaded.set(true); // Signal loaded even on error
-
-        // Clear the loading timeout
-        if (loadingTimeoutId) {
-          clearTimeout(loadingTimeoutId);
-          loadingTimeoutId = null;
-        }
+      // Clear the loading timeout since we successfully loaded
+      if (loadingTimeoutId) {
+        clearTimeout(loadingTimeoutId);
+        loadingTimeoutId = null;
       }
-    });
+    }
+  });
 
+  // React to connection state changes
+  $effect(() => {
+    if ($wsConnected) {
+      console.log('[library] WebSocket connected, loading applications');
+      loadApplications();
+    }
+  });
+
+  onMount(() => {
     // Try to load applications immediately if already connected
     loadApplications();
   });
 
   onDestroy(() => {
-    if (unsubscribeMessage) {
-      unsubscribeMessage();
-    }
-    if (unsubscribeConnected) {
-      unsubscribeConnected();
-    }
     // Clear any pending timeout
     if (loadingTimeoutId) {
       clearTimeout(loadingTimeoutId);
     }
+
     // Reset the store when leaving the page
     homePageLoaded.set(false);
   });
@@ -175,7 +107,7 @@
 <main class="w-full text-white min-h-full px-6 py-6">
   <div class="max-w-[2000px] mx-auto">
     <!-- Debug info -->
-    {console.log('[library] Rendering - loading:', loading, 'error:', error, 'applications.length:', applications.length)}
+    {console.log('[library] Rendering - loading:', loading, 'error:', error, 'applications.length:', $applicationsAsGHUBApps.length)}
 
     {#if error}
       <div class="text-center text-red-400 h-screen flex flex-col items-center justify-center">
@@ -204,15 +136,15 @@
           <GameCardSkeleton />
         {/each}
       </div>
-    {:else if applications.length > 0}
+    {:else if $applicationsAsGHUBApps.length > 0}
       <div class="mb-6">
         <h1 class="text-2xl font-dm-sans font-bold mb-1">Game Library (WebSocket)</h1>
-        <p class="text-sm text-gray-400">{applications.length} {applications.length === 1 ? 'profile' : 'profiles'}</p>
+        <p class="text-sm text-gray-400">{$applicationsAsGHUBApps.length} {$applicationsAsGHUBApps.length === 1 ? 'profile' : 'profiles'}</p>
       </div>
 
       <!-- Responsive grid with improved spacing -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
-        {#each applications as game, index}
+        {#each $applicationsAsGHUBApps as game, index}
           <GameCardWebSocket {game} tabindex={index} ongameUpdated={handleGameUpdated} />
         {/each}
       </div>

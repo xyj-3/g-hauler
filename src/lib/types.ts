@@ -160,3 +160,25 @@ export interface ScanOptions {
   scanOsxBundle: boolean;
   scanEaApp: boolean;
 }
+
+// ============ Transformation Helpers ============
+
+/**
+ * Converts an ApplicationPayload (from WebSocket) to GHUBApp format
+ */
+export function applicationPayloadToGHUBApp(app: ApplicationPayload): GHUBApp {
+  return {
+    applicationId: app.applicationId || app.databaseId || '',
+    categoryColors: app.categoryColors || [],
+    commands: (app.commands || []).map((cmd) => ({
+      category: cmd.category || '',
+      keystroke: [], // WebSocket response doesn't include keystroke data
+      name: cmd.name || ''
+    })),
+    detection: [], // WebSocket response doesn't include detection
+    name: app.name,
+    posterTitlePosition: app.posterTitlePosition || '0',
+    posterUrl: app.posterUrl || '',
+    version: app.version || 1
+  };
+}

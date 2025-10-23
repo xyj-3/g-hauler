@@ -9,6 +9,7 @@
   import { invoke } from '@tauri-apps/api/core';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
+  import { initializeWebSocketStores } from '$lib/stores/websocket.svelte';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -74,6 +75,9 @@
       homeLoadDone = loaded;
       hideSplashIfReady();
     });
+
+    // Initialize WebSocket stores BEFORE connecting
+    initializeWebSocketStores();
 
     // Start WebSocket connection
     ws.autoConnect();

@@ -1,15 +1,12 @@
 import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
 import type { ApplicationPayload } from '../types';
 
 class WebSocketService {
-    private eventListenersSetup = false;
     private readonly DEFAULT_URI = 'ws://localhost:9010';
 
     async connect(uri: string): Promise<void> {
         try {
             await invoke('ws_connect', { uri });
-            this.setupEventListenersOnce();
         } catch (error) {
             console.error('WebSocket connection failed:', error);
             throw error;
@@ -25,7 +22,7 @@ class WebSocketService {
         }
     }
 
-    async send(verb: string, path: string, payload: Record<string, any> = {}): Promise<any> {
+    async send(verb: string, path: string, payload: Record<string, any> = {}): Promise<void> {
         console.log('[WebSocket] Sending message:', { verb, path, payload });
 
         try {
@@ -50,45 +47,6 @@ class WebSocketService {
         }
     }
 
-    private setupEventListenersOnce(): void {
-        if (this.eventListenersSetup) return;
-        this.eventListenersSetup = true;
-
-        listen('websocket-connected', () => {
-            console.log('WebSocket connected');
-        });
-
-        listen('websocket-disconnected', (event) => {
-            console.log('WebSocket disconnected:', event.payload);
-        });
-
-        listen('websocket-reconnecting', (event) => {
-            console.log('WebSocket reconnecting:', event.payload);
-        });
-
-        listen('websocket-reconnected', () => {
-            console.log('WebSocket reconnected');
-        });
-
-        listen('websocket-reconnection-failed', () => {
-            console.log('WebSocket reconnection failed');
-        });
-
-        listen('websocket-closed', (event) => {
-            console.log('WebSocket closed:', event.payload);
-        });
-
-        listen('websocket-message', (event) => {
-            try {
-                const message = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload;
-                // Just log the message - no processing needed
-                // Applications can listen to this event directly if they need the data
-            } catch (error) {
-                console.error('[WebSocket] Failed to parse message as JSON:', error, event.payload);
-            }
-        });
-    }
-
     async autoConnect(): Promise<void> {
         try {
             console.log('Attempting to connect to WebSocket at:', this.DEFAULT_URI);
@@ -100,18 +58,20 @@ class WebSocketService {
         }
     }
 
-    // Convenient action helpers - now fire-and-forget
-    getApplications = async () =>
-        this.send('GET', '/applications');
+    // Action helpers - fire-and-forget commands that trigger responses via WebSocket events
+    async getApplications(): Promise<void> {
+        return this.send('GET', '/applications');
+    }
 
-    getApplication = async (applicationId: string) =>
-        this.send('GET', '/application', { id: applicationId });
+    async getApplication(applicationId: string): Promise<void> {
+        return this.send('GET', '/application', { id: applicationId });
+    }
 
-    setApplication = async (
+    async setApplication(
         applicationPath: string,
         name: string,
         options?: Partial<Omit<ApplicationPayload, 'applicationPath' | 'name'>>
-    ) => {
+    ): Promise<void> {
         console.log('Setting application:', { applicationPath, name, ...options });
         return this.send('SET', '/application', {
             applicationPath,
@@ -120,8 +80,9 @@ class WebSocketService {
         });
     }
 
-    deleteApplication = async (applicationId: string) =>
-        this.send('DELETE', '/application', { id: applicationId });
+    async deleteApplication(applicationId: string): Promise<void> {
+        return this.send('DELETE', '/application', { id: applicationId });
+    }
 }
 
 // Export singleton instance
