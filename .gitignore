@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 /.windsurfrules
 /.github/instructions
 /.claude
+/CLAUDE.md
