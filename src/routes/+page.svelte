@@ -89,8 +89,8 @@
   });
 
   onMount(() => {
-    // Try to load applications immediately if already connected
-    loadApplications();
+    // No need to call loadApplications here - the $effect above will handle it
+    // when the WebSocket is connected
   });
 
   onDestroy(() => {
