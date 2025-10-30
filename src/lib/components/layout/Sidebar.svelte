@@ -21,14 +21,6 @@
       labelWidth: 'w-16'
     },
     {
-      path: '/library',
-      label: 'Library (WebSocket)',
-      icon: Gamepad2,
-      iconSize: 'w-7 h-7',
-      iconStroke: 'stroke-[1.45]',
-      labelWidth: 'w-40'
-    },
-    {
       path: '/detection',
       label: 'Fix Game Detection',
       icon: Wrench,
