@@ -62,11 +62,16 @@
 	}
 </script>
 
-<h1>Add Games</h1>
+<main class="w-full min-h-full px-6 py-4 text-white">
+	<h1 class="text-xl font-dm-sans mb-1">Add Games</h1>
 
-<!-- Note: For a truly reactive status indicator, you'd need a separate component that polls the connection status -->
+	<p class="text-xs text-gray-400 mb-3">
+		Add game profiles to G HUB. Use Fix Game Detection to automatically detect installed games.
+	</p>
 
-<form onsubmit={handleSubmit} class="max-w-md mx-auto mt-8 space-y-6">
+	<!-- Note: For a truly reactive status indicator, you'd need a separate component that polls the connection status -->
+
+	<form onsubmit={handleSubmit} class="max-w-md mx-auto mt-8 space-y-6">
 	<div class="space-y-2">
 		<label for="game-name" class="block text-sm font-medium text-white">
 			Game Name
@@ -132,4 +137,5 @@
 			{isSubmitting ? 'Adding Game...' : 'Add Game'}
 		</button>
 	</div>
-</form>
+	</form>
+</main>

@@ -104,7 +104,11 @@
   });
 </script>
 
-<main class="w-full text-white min-h-full px-6 py-6">
+<main class="w-full text-white min-h-full px-6 py-4">
+  <h1 class="text-xl font-dm-sans mb-1">Library</h1>
+
+  <div class="mb-3"></div>
+
   <div class="max-w-[2000px] mx-auto">
     <!-- Debug info -->
     {console.log('[library] Rendering - loading:', loading, 'error:', error, 'applications.length:', $applicationsAsGHUBApps.length)}
@@ -137,11 +141,6 @@
         {/each}
       </div>
     {:else if $applicationsAsGHUBApps.length > 0}
-      <div class="mb-6">
-        <h1 class="text-2xl font-dm-sans font-bold mb-1">Library</h1>
-        <p class="text-sm text-gray-400">{$applicationsAsGHUBApps.length} {$applicationsAsGHUBApps.length === 1 ? 'profile' : 'profiles'}</p>
-      </div>
-
       <!-- Responsive grid with improved spacing -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
         {#each $applicationsAsGHUBApps as game, index}
