@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import GameCardWebSocket from '$lib/components/GameCardWebSocket.svelte';
-  import GameCardSkeleton from '$lib/components/GameCardSkeleton.svelte';
   import type { GHUBApp } from '$lib/types';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
@@ -11,9 +10,7 @@
   let error = $state<string | null>(null);
   let loadingTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  // Number of skeleton cards to show while loading
-  const SKELETON_COUNT = 24;
-  // Maximum time to show skeleton before showing error (10 seconds)
+  // Maximum time to show loading before showing error (10 seconds)
   const LOADING_TIMEOUT_MS = 10000;
 
   const loadApplications = async () => {
@@ -89,8 +86,18 @@
   });
 
   onMount(() => {
-    // No need to call loadApplications here - the $effect above will handle it
-    // when the WebSocket is connected
+    // Check if WebSocket is already connected and we have no apps yet
+    // This handles the case where the component remounts (e.g., hot reload)
+    // but the WebSocket store persists with its connection state
+    if ($wsConnected && $applicationsAsGHUBApps.length === 0) {
+      console.log('[library] onMount: WebSocket already connected, loading applications');
+      loadApplications();
+    } else if ($applicationsAsGHUBApps.length > 0) {
+      // If we already have apps in the store (from hot reload), don't show loading
+      console.log('[library] onMount: Applications already in store, skipping load');
+      loading = false;
+      homePageLoaded.set(true);
+    }
   });
 
   onDestroy(() => {
@@ -127,25 +134,18 @@
           Retry
         </button>
       </div>
-    {:else if loading}
-      <!-- Skeleton loading state -->
-      <div class="mb-6">
-        <div class="h-8 bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
-        <div class="h-4 bg-gray-700 rounded w-32 animate-pulse"></div>
-      </div>
-
-      <!-- Skeleton grid -->
+    {:else if $applicationsAsGHUBApps.length > 0 || loading}
+      <!-- Responsive grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
-        {#each Array(SKELETON_COUNT) as _, index}
-          <GameCardSkeleton />
-        {/each}
-      </div>
-    {:else if $applicationsAsGHUBApps.length > 0}
-      <!-- Responsive grid with improved spacing -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
-        {#each $applicationsAsGHUBApps as game, index}
-          <GameCardWebSocket {game} tabindex={index} ongameUpdated={handleGameUpdated} />
-        {/each}
+        {#if loading}
+          {#each Array(24) as _, index}
+            <GameCardWebSocket loading={true} tabindex={index} />
+          {/each}
+        {:else}
+          {#each $applicationsAsGHUBApps as game, index}
+            <GameCardWebSocket {game} tabindex={index} ongameUpdated={handleGameUpdated} />
+          {/each}
+        {/if}
       </div>
     {:else}
       <div class="h-screen flex flex-col items-center justify-center text-gray-400">
