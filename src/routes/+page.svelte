@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import GameCardWebSocket from '$lib/components/GameCardWebSocket.svelte';
+  import GameCard from '$lib/components/GameCard.svelte';
   import type { GHUBApp } from '$lib/types';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
@@ -139,11 +139,11 @@
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
         {#if loading}
           {#each Array(24) as _, index}
-            <GameCardWebSocket loading={true} tabindex={index} />
+            <GameCard loading={true} tabindex={index} />
           {/each}
         {:else}
           {#each $applicationsAsGHUBApps as game, index}
-            <GameCardWebSocket {game} tabindex={index} ongameUpdated={handleGameUpdated} />
+            <GameCard {game} tabindex={index} ongameUpdated={handleGameUpdated} />
           {/each}
         {/if}
       </div>
