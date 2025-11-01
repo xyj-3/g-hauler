@@ -2,7 +2,6 @@
   import type { GHUBApp, Command } from '$lib/types';
   import GeneralTab from '$components/tabs/GeneralTab.svelte';
   import CommandsTab from '$components/tabs/CommandsTab.svelte';
-  import DetectionTab from '$components/tabs/DetectionTab.svelte';
   import Modal from '$components/modal/Modal.svelte';
 
   interface GameEditModalProps {
@@ -51,7 +50,7 @@
   };
   let editedGame = $state<GHUBApp>(cloneGame(game));
   let isSaving = $state(false);
-  let activeTab = $state<'general' | 'commands' | 'detection'>('commands');
+  let activeTab = $state<'general' | 'commands'>('commands');
   // Update editedGame when game prop changes
   $effect(() => {
     editedGame = cloneGame(game);
@@ -117,12 +116,6 @@
         >
           Commands
         </button>
-        <button
-          onclick={() => activeTab = 'detection'}
-          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors font-dm-sans {activeTab === 'detection' ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:text-gray-300'}"
-        >
-          Detection
-        </button>
       </div>
     </div>
     <!-- Content -->
@@ -131,8 +124,6 @@
         <GeneralTab game={editedGame} />
       {:else if activeTab === 'commands'}
         <CommandsTab game={editedGame} />
-      {:else if activeTab === 'detection'}
-        <DetectionTab game={editedGame} />
       {/if}
     </div>
     <!-- Footer -->
