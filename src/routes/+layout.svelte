@@ -9,7 +9,7 @@
   import { invoke } from '@tauri-apps/api/core';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
-  import { initializeWebSocketStores } from '$lib/stores/websocket.svelte';
+  import { initializeWebSocketStores, cleanupWebSocketStores } from '$lib/stores/websocket.svelte';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -33,7 +33,7 @@
     dataPath = value;
   }
 
-  onMount(() => {
+  onMount(async () => {
     let minSplashTimeDone = false;
     let validationDone = false;
     let homeLoadDone = false;
@@ -76,14 +76,21 @@
       hideSplashIfReady();
     });
 
-    // Initialize WebSocket stores BEFORE connecting
-    initializeWebSocketStores();
+    // Initialize WebSocket stores BEFORE connecting - MUST await!
+    try {
+      await initializeWebSocketStores();
+      console.log('[Layout] WebSocket stores initialized successfully');
+    } catch (error) {
+      console.error('[Layout] Failed to initialize WebSocket stores:', error);
+    }
 
-    // Start WebSocket connection
+    // Start WebSocket connection after stores are initialized
     ws.autoConnect();
 
     return () => {
       unsubscribe();
+      // Don't cleanup WebSocket stores on unmount - they should persist
+      // Only cleanup would happen when the entire app closes
     };
   });
 </script>

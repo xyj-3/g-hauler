@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { listen, type UnlistenFn } from '@tauri-apps/api/event';
   import GameCard from '$lib/components/GameCard.svelte';
-  import type { GHUBApp } from '$lib/types';
+  import type { GHUBApp, WebSocketMessage } from '$lib/types';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
   import { applicationsAsGHUBApps, wsConnected } from '$lib/stores/websocket.svelte';
@@ -9,6 +10,7 @@
   let loading = $state(true);
   let error = $state<string | null>(null);
   let loadingTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let unlistenWebSocketMessage: UnlistenFn | null = null;
 
   // Maximum time to show loading before showing error (10 seconds)
   const LOADING_TIMEOUT_MS = 10000;
@@ -61,12 +63,18 @@
     console.log('[library] Game updated:', updatedGame.name);
   };
 
+  // Track if we've received a response from the server
+  let hasReceivedResponse = $state(false);
+
   // React to applications data arriving
   $effect(() => {
     const apps = $applicationsAsGHUBApps;
+
+    // If we have apps, clear loading state
     if (apps.length > 0 && loading) {
       console.log('[library] Applications loaded from store:', apps.length);
       loading = false;
+      hasReceivedResponse = true;
       homePageLoaded.set(true);
 
       // Clear the loading timeout since we successfully loaded
@@ -79,13 +87,38 @@
 
   // React to connection state changes
   $effect(() => {
-    if ($wsConnected) {
+    if ($wsConnected && !hasReceivedResponse) {
       console.log('[library] WebSocket connected, loading applications');
       loadApplications();
     }
   });
 
-  onMount(() => {
+  onMount(async () => {
+    // Listen for WebSocket messages to detect responses
+    unlistenWebSocketMessage = await listen('websocket-message', (event) => {
+      try {
+        const message: WebSocketMessage = typeof event.payload === 'string'
+          ? JSON.parse(event.payload)
+          : event.payload;
+
+        // Check if this is the applications response
+        if (message.path === '/applications') {
+          console.log('[library] Received /applications response');
+          hasReceivedResponse = true;
+          loading = false;
+          homePageLoaded.set(true);
+
+          // Clear the loading timeout since we got a response
+          if (loadingTimeoutId) {
+            clearTimeout(loadingTimeoutId);
+            loadingTimeoutId = null;
+          }
+        }
+      } catch (error) {
+        console.error('[library] Failed to parse WebSocket message:', error);
+      }
+    });
+
     // Check if WebSocket is already connected and we have no apps yet
     // This handles the case where the component remounts (e.g., hot reload)
     // but the WebSocket store persists with its connection state
@@ -96,6 +129,7 @@
       // If we already have apps in the store (from hot reload), don't show loading
       console.log('[library] onMount: Applications already in store, skipping load');
       loading = false;
+      hasReceivedResponse = true;
       homePageLoaded.set(true);
     }
   });
@@ -106,8 +140,16 @@
       clearTimeout(loadingTimeoutId);
     }
 
-    // Reset the store when leaving the page
-    homePageLoaded.set(false);
+    // Clean up WebSocket message listener
+    if (unlistenWebSocketMessage) {
+      unlistenWebSocketMessage();
+    }
+
+    // Don't reset homePageLoaded during hot reload - it causes splash screen to show unnecessarily
+    // Only reset when actually navigating away (not during hot module reload)
+    if (!import.meta.hot) {
+      homePageLoaded.set(false);
+    }
   });
 </script>
 

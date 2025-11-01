@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import { listen } from '@tauri-apps/api/event';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { ApplicationPayload, WebSocketMessage, GHUBApp } from '../types';
 import { applicationPayloadToGHUBApp } from '../types';
 
@@ -27,67 +27,104 @@ export const applicationsAsGHUBApps = derived(
 // ============ WebSocket Event Handling ============
 
 let initialized = false;
+let unlistenFunctions: UnlistenFn[] = [];
 
-export function initializeWebSocketStores() {
-  if (initialized) {
+// Track if we're in a hot reload scenario (dev mode)
+let isHotReload = false;
+if (import.meta.hot) {
+  import.meta.hot.on('vite:beforeUpdate', () => {
+    isHotReload = true;
+  });
+}
+
+export async function initializeWebSocketStores() {
+  // Allow re-initialization during hot reload in development
+  if (initialized && !isHotReload) {
     console.warn('[WebSocket Stores] Already initialized, skipping');
     return;
+  }
+
+  if (initialized && isHotReload) {
+    console.log('[WebSocket Stores] Hot reload detected, re-initializing');
+    // Clean up old listeners
+    unlistenFunctions.forEach(unlisten => unlisten());
+    unlistenFunctions = [];
+    isHotReload = false; // Reset the flag
   }
 
   initialized = true;
   console.log('[WebSocket Stores] Initializing event listeners');
 
-  // Connection state listeners
-  listen('websocket-connected', () => {
-    console.log('[WebSocket Stores] Connected');
-    wsConnected.set(true);
-    wsReconnecting.set(false);
-  });
+  try {
+    // Connection state listeners
+    const unlistenConnected = await listen('websocket-connected', () => {
+      console.log('[WebSocket Stores] Connected');
+      wsConnected.set(true);
+      wsReconnecting.set(false);
+    });
+    unlistenFunctions.push(unlistenConnected);
 
-  listen('websocket-disconnected', (event) => {
-    console.log('[WebSocket Stores] Disconnected:', event.payload);
-    wsConnected.set(false);
-  });
+    const unlistenDisconnected = await listen('websocket-disconnected', (event) => {
+      console.log('[WebSocket Stores] Disconnected:', event.payload);
+      wsConnected.set(false);
+    });
+    unlistenFunctions.push(unlistenDisconnected);
 
-  listen('websocket-reconnecting', (event) => {
-    console.log('[WebSocket Stores] Reconnecting:', event.payload);
-    wsReconnecting.set(true);
-  });
+    const unlistenReconnecting = await listen('websocket-reconnecting', (event) => {
+      console.log('[WebSocket Stores] Reconnecting:', event.payload);
+      wsReconnecting.set(true);
+    });
+    unlistenFunctions.push(unlistenReconnecting);
 
-  listen('websocket-reconnected', () => {
-    console.log('[WebSocket Stores] Reconnected');
-    wsConnected.set(true);
-    wsReconnecting.set(false);
-  });
+    const unlistenReconnected = await listen('websocket-reconnected', () => {
+      console.log('[WebSocket Stores] Reconnected');
+      wsConnected.set(true);
+      wsReconnecting.set(false);
+    });
+    unlistenFunctions.push(unlistenReconnected);
 
-  listen('websocket-reconnection-failed', () => {
-    console.log('[WebSocket Stores] Reconnection failed');
-    wsConnected.set(false);
-    wsReconnecting.set(false);
-  });
+    const unlistenReconnectionFailed = await listen('websocket-reconnection-failed', () => {
+      console.log('[WebSocket Stores] Reconnection failed');
+      wsConnected.set(false);
+      wsReconnecting.set(false);
+    });
+    unlistenFunctions.push(unlistenReconnectionFailed);
 
-  listen('websocket-closed', (event) => {
-    console.log('[WebSocket Stores] Closed:', event.payload);
-    wsConnected.set(false);
-  });
+    const unlistenClosed = await listen('websocket-closed', (event) => {
+      console.log('[WebSocket Stores] Closed:', event.payload);
+      wsConnected.set(false);
+    });
+    unlistenFunctions.push(unlistenClosed);
 
-  // Message routing listener
-  listen('websocket-message', (event) => {
-    try {
-      const message: WebSocketMessage = typeof event.payload === 'string'
-        ? JSON.parse(event.payload)
-        : event.payload;
+    // Message routing listener
+    const unlistenMessage = await listen('websocket-message', (event) => {
+      try {
+        const message: WebSocketMessage = typeof event.payload === 'string'
+          ? JSON.parse(event.payload)
+          : event.payload;
 
-      console.log('[WebSocket Stores] Message received:', message.path);
+        console.log('[WebSocket Stores] Message received:', message.path);
 
-      // Route message to appropriate store based on path
-      routeMessage(message);
-    } catch (error) {
-      console.error('[WebSocket Stores] Failed to parse message:', error, event.payload);
-    }
-  });
+        // Route message to appropriate store based on path
+        routeMessage(message);
+      } catch (error) {
+        console.error('[WebSocket Stores] Failed to parse message:', error, event.payload);
+      }
+    });
+    unlistenFunctions.push(unlistenMessage);
 
-  console.log('[WebSocket Stores] Initialization complete');
+    console.log('[WebSocket Stores] Initialization complete');
+  } catch (error) {
+    console.error('[WebSocket Stores] Failed to initialize event listeners:', error);
+    throw error;
+  }
+}
+
+export function cleanupWebSocketStores() {
+  console.log('[WebSocket Stores] Cleaning up event listeners');
+  unlistenFunctions.forEach(unlisten => unlisten());
+  unlistenFunctions = [];
+  initialized = false;
 }
 
 function routeMessage(message: WebSocketMessage) {
