@@ -9,6 +9,91 @@ mod tray;
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
 
+fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    let handle = app.handle().clone();
+
+    // Initialize singleton WebSocket client
+    let ws_client = Arc::new(websocket::WebSocketClient::new(handle.clone()));
+    app.manage(ws_client);
+
+    if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
+        eprintln!("Failed to initialize store: {}", e);
+    }
+
+    if let Err(e) = crate::applications::applications_json::initialize_applications_on_startup(&handle) {
+        eprintln!("Failed to initialize applications: {}", e);
+    }
+
+    if let Err(e) = crate::settings::validation::validate_registry(crate::settings::registry::all()) {
+        eprintln!("settings registry validation error: {e}");
+    }
+
+    if let Err(e) = crate::settings::sync::init(&handle) {
+        eprintln!("Settings system sync error: {}", e);
+    }
+
+    // Initialize system tray
+    if let Err(e) = crate::tray::create_tray(&handle) {
+        eprintln!("Failed to create system tray: {}", e);
+    }
+
+    // Set up window event handler for minimize to tray
+    if let Some(window) = handle.get_webview_window("main") {
+        let app_handle = handle.clone();
+        window.on_window_event(move |event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                // Check if minimize_to_tray is enabled
+                let should_minimize = crate::core::store::get_store_key(&app_handle, crate::core::constants::STORE_KEY_MINIMIZE_TO_TRAY)
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
+
+                if should_minimize {
+                    api.prevent_close();
+                    if let Some(window) = app_handle.get_webview_window("main") {
+                        let _ = window.hide();
+                    }
+                }
+            }
+        });
+    }
+
+    // Check if G HUB version has changed and reapply patches if needed
+    // This is done in a background task since it requires the WebSocket client
+    let handle_clone = handle.clone();
+    let ws_client_clone = app.state::<Arc<websocket::WebSocketClient>>().inner().clone();
+    tauri::async_runtime::spawn(async move {
+        // Give the app time to fully initialize before checking version
+        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+
+        // Check if G HUB version has changed
+        match crate::applications::ghub_version::has_version_changed(&handle_clone) {
+            Ok(true) => {
+                println!("G HUB version has changed - reapplying detection patches");
+
+                if let Err(e) = crate::ghub_game_patches::applier::reapply_saved_patches(
+                    &handle_clone,
+                    &ws_client_clone,
+                ).await {
+                    eprintln!("Warning: Failed to reapply saved detection patches: {}", e);
+                } else {
+                    // Update stored version after successful reapplication
+                    if let Err(e) = crate::applications::ghub_version::update_stored_version(&handle_clone) {
+                        eprintln!("Warning: Failed to update stored G HUB version: {}", e);
+                    }
+                }
+            }
+            Ok(false) => {
+                println!("G HUB version unchanged - skipping patch reapplication");
+            }
+            Err(e) => {
+                eprintln!("Could not check G HUB version: {} - skipping patch reapplication", e);
+            }
+        }
+    });
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -35,90 +120,7 @@ pub fn run() {
             applications: Mutex::new(Vec::new()),
             settings_state: Mutex::new(Default::default()),
         })
-        .setup(|app| {
-            let handle = app.handle().clone();
-            
-            // Initialize singleton WebSocket client
-            let ws_client = Arc::new(websocket::WebSocketClient::new(handle.clone()));
-            app.manage(ws_client);
-
-            if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
-                eprintln!("Failed to initialize store: {}", e);
-            }
-
-            if let Err(e) = crate::applications::applications_json::initialize_applications_on_startup(&handle) {
-                eprintln!("Failed to initialize applications: {}", e);
-            }
-
-            if let Err(e) = crate::settings::validation::validate_registry(crate::settings::registry::all()) {
-                eprintln!("settings registry validation error: {e}");
-            }
-
-            if let Err(e) = crate::settings::sync::init(&handle) {
-                eprintln!("Settings system sync error: {}", e);
-            }
-
-            // Initialize system tray
-            if let Err(e) = crate::tray::create_tray(&handle) {
-                eprintln!("Failed to create system tray: {}", e);
-            }
-
-            // Set up window event handler for minimize to tray
-            if let Some(window) = handle.get_webview_window("main") {
-                let app_handle = handle.clone();
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        // Check if minimize_to_tray is enabled
-                        let should_minimize = crate::core::store::get_store_key(&app_handle, crate::core::constants::STORE_KEY_MINIMIZE_TO_TRAY)
-                            .and_then(|v| v.as_bool())
-                            .unwrap_or(false);
-
-                        if should_minimize {
-                            api.prevent_close();
-                            if let Some(window) = app_handle.get_webview_window("main") {
-                                let _ = window.hide();
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Check if G HUB version has changed and reapply patches if needed
-            // This is done in a background task since it requires the WebSocket client
-            let handle_clone = handle.clone();
-            let ws_client_clone = app.state::<Arc<websocket::WebSocketClient>>().inner().clone();
-            tauri::async_runtime::spawn(async move {
-                // Give the app time to fully initialize before checking version
-                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
-
-                // Check if G HUB version has changed
-                match crate::applications::ghub_version::has_version_changed(&handle_clone) {
-                    Ok(true) => {
-                        println!("G HUB version has changed - reapplying detection patches");
-
-                        if let Err(e) = crate::ghub_game_patches::applier::reapply_saved_patches(
-                            &handle_clone,
-                            &ws_client_clone,
-                        ).await {
-                            eprintln!("Warning: Failed to reapply saved detection patches: {}", e);
-                        } else {
-                            // Update stored version after successful reapplication
-                            if let Err(e) = crate::applications::ghub_version::update_stored_version(&handle_clone) {
-                                eprintln!("Warning: Failed to update stored G HUB version: {}", e);
-                            }
-                        }
-                    }
-                    Ok(false) => {
-                        println!("G HUB version unchanged - skipping patch reapplication");
-                    }
-                    Err(e) => {
-                        eprintln!("Could not check G HUB version: {} - skipping patch reapplication", e);
-                    }
-                }
-            });
-
-            Ok(())
-        })
+        .setup(initialize_app)
         .invoke_handler(tauri::generate_handler![
             crate::core::store::store_get_key,
             crate::core::store::store_set_key,
