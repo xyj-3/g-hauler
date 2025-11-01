@@ -79,11 +79,11 @@
   };
 </script>
 
-<Modal 
-  open={isOpen} 
+<Modal
+  open={isOpen}
   onClose={handleClose}
   showCloseButton={false}
-  maxWidth="max-w-2xl"
+  maxWidth="max-w-2xl lg:max-w-4xl xl:max-w-5xl"
 >
   <div class="max-h-[90vh] overflow-hidden flex flex-col" style="margin: -2rem;">
     <!-- Header -->
@@ -119,12 +119,14 @@
       </div>
     </div>
     <!-- Content -->
-    <div class="flex-1 overflow-y-auto p-6">
-      {#if activeTab === 'general'}
-        <GeneralTab game={editedGame} />
-      {:else if activeTab === 'commands'}
-        <CommandsTab game={editedGame} />
-      {/if}
+    <div class="flex-1 overflow-hidden p-6">
+      <div class="h-full">
+        {#if activeTab === 'general'}
+          <GeneralTab game={editedGame} />
+        {:else if activeTab === 'commands'}
+          <CommandsTab game={editedGame} />
+        {/if}
+      </div>
     </div>
     <!-- Footer -->
     <div class="flex justify-end space-x-3 p-6 border-t border-gray-700">
