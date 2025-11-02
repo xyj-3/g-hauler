@@ -10,6 +10,7 @@
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
   import { initializeWebSocketStores, cleanupWebSocketStores } from '$lib/stores/websocket.svelte';
+  import { developerMode } from '$lib/stores/developerMode.svelte';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -33,7 +34,7 @@
     dataPath = value;
   }
 
-  onMount(async () => {
+  onMount(() => {
     let minSplashTimeDone = false;
     let validationDone = false;
     let homeLoadDone = false;
@@ -76,19 +77,48 @@
       hideSplashIfReady();
     });
 
-    // Initialize WebSocket stores BEFORE connecting - MUST await!
-    try {
-      await initializeWebSocketStores();
-      console.log('[Layout] WebSocket stores initialized successfully');
-    } catch (error) {
-      console.error('[Layout] Failed to initialize WebSocket stores:', error);
-    }
+    // Initialize WebSocket stores BEFORE connecting (async, but not awaited)
+    initializeWebSocketStores()
+      .then(() => {
+        console.log('[Layout] WebSocket stores initialized successfully');
+      })
+      .catch((error) => {
+        console.error('[Layout] Failed to initialize WebSocket stores:', error);
+      });
+
+    // Initialize developer mode (async, but not awaited)
+    developerMode.initialize()
+      .then(() => {
+        console.log('[Layout] Developer mode initialized successfully');
+      })
+      .catch((error) => {
+        console.error('[Layout] Failed to initialize developer mode:', error);
+      });
 
     // Start WebSocket connection after stores are initialized
     ws.autoConnect();
 
+    // Add keyboard shortcut for devtools (F12)
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'F12') {
+        event.preventDefault();
+        developerMode.toggleDevTools();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Disable context menu when not in developer mode
+    const handleContextMenu = (event: MouseEvent) => {
+      if (!developerMode.enabled) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener('contextmenu', handleContextMenu);
+
     return () => {
       unsubscribe();
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('contextmenu', handleContextMenu);
       // Don't cleanup WebSocket stores on unmount - they should persist
       // Only cleanup would happen when the entire app closes
     };

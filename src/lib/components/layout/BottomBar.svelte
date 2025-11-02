@@ -3,8 +3,9 @@
   import InfoModal from '$components/modal/InfoModal.svelte';
   import { Info } from 'lucide-svelte';
   import { siGithub, siDiscord } from 'simple-icons';
+  import { developerMode } from '$lib/stores/developerMode.svelte';
   let { dataPath = null, validationResult = null, showDataModal = false, openDataModal, closeDataModal, fetchDataPath } = $props();
-  
+
   // Info modal state
   let showInfoModal = $state(false);
   function openInfoModal() { showInfoModal = true; }
@@ -25,6 +26,11 @@
   </div>
   <!-- Icons on the right -->
   <div class="flex items-center space-x-2">
+    {#if developerMode.enabled}
+      <span class="text-white">
+        Developer Mode
+      </span>
+    {/if}
     <button type="button" class="p-1 cursor-pointer hover:text-blue-300 transition-colors" title="Info" onclick={openInfoModal}>
       <Info class="w-4 h-4" />
     </button>

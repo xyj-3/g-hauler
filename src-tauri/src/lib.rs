@@ -5,6 +5,7 @@ mod applications;
 mod ghub_game_patches;
 mod game_detection;
 mod tray;
+mod debug;
 
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
@@ -146,6 +147,10 @@ pub fn run() {
             crate::game_detection::commands::scan_installed_games,
             crate::game_detection::commands::quick_scan_games,
             crate::game_detection::commands::full_scan_games,
+            crate::debug::commands::is_developer_mode,
+            crate::debug::commands::open_devtools,
+            crate::debug::commands::close_devtools,
+            crate::debug::commands::is_devtools_open,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

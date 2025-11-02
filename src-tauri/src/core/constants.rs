@@ -3,6 +3,7 @@ pub const STORE_KEY_DATA_PATH: &str = "lghub_data_path";
 pub const STORE_KEY_LAST_GHUB_VERSION: &str = "last_ghub_version";
 pub const STORE_KEY_AUTOSTART: &str = "autostart";
 pub const STORE_KEY_MINIMIZE_TO_TRAY: &str = "minimize_to_tray";
+pub const STORE_KEY_DEVELOPER_MODE: &str = "developer_mode";
 
 // Store constants
 pub const STORE_FILENAME: &str = "settings.json";
