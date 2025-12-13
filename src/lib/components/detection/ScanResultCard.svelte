@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { DetectedGame } from '$lib/types';
+  import { developerMode } from '$lib/stores/developerMode.svelte';
 
   interface Props {
     game: DetectedGame;
@@ -84,7 +85,9 @@
     </div>
 
     <div class="space-y-1.5">
-      <p class="text-xs text-gray-400 font-mono">{getPlatformIdentifier(game)}</p>
+      {#if developerMode.enabled}
+        <p class="text-xs text-gray-400 font-mono">{getPlatformIdentifier(game)}</p>
+      {/if}
 
       {#if game.installPath}
         <p class="text-xs text-gray-500 truncate" title={game.installPath}>
