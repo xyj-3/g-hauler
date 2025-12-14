@@ -1,0 +1,2 @@
+# Treat screenshot images as binary files
+.github/screenshots/* binary

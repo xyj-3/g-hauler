@@ -1,6 +1,11 @@
 # G Hauler
 
-G Hauler is a fast and lightweight app for G HUB data management and game detection patching.
+<div align="center">
+  <img src=".github/screenshots/profiles.png" alt="G Hauler Library - Main game library view" width="800">
+  <img src=".github/screenshots/game_detection.png" alt="Fix Game Detection - Scan and add missing games" width="800">
+</div>
+
+A fast, lightweight, and secure desktop app for managing Logitech G HUB profiles and fixing game detection issues.
 
 ## Development
 
