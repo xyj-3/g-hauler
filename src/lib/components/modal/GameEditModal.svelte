@@ -13,6 +13,11 @@
 
   const { game, isOpen, onclose, onsave }: GameEditModalProps = $props();
 
+  // Map special profile names
+  const displayName = $derived(
+    game?.name === 'APPLICATION_NAME_DESKTOP' ? 'Desktop' : game?.name
+  );
+
   // Custom deep clone function for GHUBApp to avoid structuredClone issues
   const cloneGame = (gameObj: GHUBApp | null | undefined): GHUBApp => {
     if (!gameObj) {
@@ -89,7 +94,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-6 border-b border-gray-700">
       <h2 id="modal-title" class="text-xl font-semibold text-white font-dm-sans">
-        Edit Game - {game.name}
+        Edit Profile - {displayName}
       </h2>
       <button
         onclick={handleClose}

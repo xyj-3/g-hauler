@@ -15,6 +15,11 @@
   // Show skeleton when explicitly loading or when no game data
   const isLoading = $derived(loading || !game);
 
+  // Map special profile names
+  const displayName = $derived(
+    game?.name === 'APPLICATION_NAME_DESKTOP' ? 'Desktop' : game?.name
+  );
+
   let cardElement: HTMLButtonElement;
   let isVisible = $state(false);
   let imageLoaded = $state(false);
@@ -114,7 +119,7 @@
     onclick={handleCardClick}
     onkeydown={handleKeyDown}
     tabindex={tabindex}
-    aria-label="Select {game.name}"
+    aria-label="Select {displayName}"
   >
     <!-- Minimal border highlight -->
     <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 hover:border-blue-400/60 shadow-md hover:shadow-lg">
@@ -129,14 +134,41 @@
           onerror={handleImageError}
           loading="lazy"
         />
+      {:else if game.name === 'APPLICATION_NAME_DESKTOP'}
+        <!-- Desktop SVG icon for APPLICATION_NAME_DESKTOP profile -->
+        <div class="absolute inset-0 flex items-center justify-center p-8">
+          <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Monitor outer frame -->
+            <rect x="10" y="15" width="80" height="50" rx="3" fill="#374151" stroke="#4B5563" stroke-width="2"/>
+            <!-- Monitor screen -->
+            <rect x="14" y="19" width="72" height="42" rx="1.5" fill="#1F2937"/>
+            <!-- Screen content - window icon -->
+            <rect x="22" y="27" width="20" height="16" rx="1" fill="#3B82F6" opacity="0.6"/>
+            <rect x="44" y="27" width="20" height="16" rx="1" fill="#60A5FA" opacity="0.5"/>
+            <rect x="22" y="45" width="42" height="12" rx="1" fill="#93C5FD" opacity="0.4"/>
+            <!-- Monitor stand neck -->
+            <rect x="47" y="65" width="6" height="12" rx="1" fill="#374151"/>
+            <!-- Monitor stand base -->
+            <ellipse cx="50" cy="82" rx="18" ry="3.5" fill="#374151"/>
+            <path d="M 32 82 Q 32 78 50 78 Q 68 78 68 82" fill="#4B5563"/>
+            <!-- Shine effect on screen -->
+            <rect x="16" y="21" width="30" height="20" rx="1" fill="url(#shine)" opacity="0.15"/>
+            <defs>
+              <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
       {/if}
       <!-- Very subtle overlay -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0 opacity-0 hover:opacity-100 transition-opacity duration-200"></div>
     </div>
 
     <div class="mt-2.5 px-1">
-      <h3 class="text-white font-semibold text-sm leading-tight truncate font-dm-sans hover:text-blue-300 transition-colors" title={game.name}>
-        {game.name}
+      <h3 class="text-white font-semibold text-sm leading-tight truncate font-dm-sans hover:text-blue-300 transition-colors" title={displayName}>
+        {displayName}
       </h3>
     </div>
   </button>
