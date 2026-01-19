@@ -4,6 +4,7 @@
   import type { GameScanResult, ScanOptions } from '$lib/types';
   import CustomScanPanel from '$lib/components/detection/CustomScanPanel.svelte';
   import ScanResults from '$lib/components/detection/ScanResults.svelte';
+  import { detectionStore } from '$lib/stores/detection';
 
   // Detect the current OS
   const currentOS = osType();
@@ -21,18 +22,20 @@
     scanEaApp: true
   });
 
-  // State for scanning and results
+  // Local state (resets on component unmount)
   let isScanning = $state(false);
   let showLoadingUI = $state(false);
-  let scanResults = $state<GameScanResult | null>(null);
-  let selectedGames = $state<Set<string>>(new Set());
   let errorMessage = $state<string | null>(null);
   let showCustomScan = $state(false);
+
+  // Persistent state (survives navigation)
+  let scanResults = $derived(detectionStore.scanResults);
+  let selectedGames = $derived(detectionStore.selectedGames);
 
   async function handleScanForGames() {
     isScanning = true;
     errorMessage = null;
-    selectedGames = new Set();
+    detectionStore.clearSelectedGames();
     showCustomScan = false; // Close custom scan panel when starting scan
 
     // Only show loading UI if scan takes longer than 300ms
@@ -40,7 +43,7 @@
       if (isScanning) {
         showLoadingUI = true;
         // Clear results only when showing loading UI
-        scanResults = null;
+        detectionStore.setScanResults(null);
       }
     }, 300);
 
@@ -48,11 +51,11 @@
       const result = await invoke<GameScanResult>('scan_installed_games', {
         options: scanOptions
       });
-      scanResults = result;
+      detectionStore.setScanResults(result);
     } catch (error) {
       errorMessage = error instanceof Error ? error.message : String(error);
       console.error('Scan failed:', error);
-      scanResults = null;
+      detectionStore.setScanResults(null);
     } finally {
       clearTimeout(loadingTimeout);
       isScanning = false;
@@ -66,12 +69,10 @@
 
   function toggleGameSelection(gameId: string) {
     if (selectedGames.has(gameId)) {
-      selectedGames.delete(gameId);
+      detectionStore.removeSelectedGame(gameId);
     } else {
-      selectedGames.add(gameId);
+      detectionStore.addSelectedGame(gameId);
     }
-    // Create a new Set to trigger Svelte 5 reactivity
-    selectedGames = new Set(selectedGames);
   }
 
   function handleImportGames() {
@@ -81,14 +82,12 @@
 
   function handleSelectAll() {
     if (!scanResults) return;
-    scanResults.games.forEach(game => selectedGames.add(game.id));
-    selectedGames = new Set(selectedGames); // Trigger reactivity
+    const allGameIds = new Set(scanResults.games.map(game => game.id));
+    detectionStore.setSelectedGames(allGameIds);
   }
 
   function handleDeselectAll() {
-    if (!scanResults) return;
-    scanResults.games.forEach(game => selectedGames.delete(game.id));
-    selectedGames = new Set(selectedGames); // Trigger reactivity
+    detectionStore.clearSelectedGames();
   }
 </script>
 
