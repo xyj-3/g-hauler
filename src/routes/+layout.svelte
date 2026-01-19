@@ -9,8 +9,7 @@
   import { invoke } from '@tauri-apps/api/core';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
-  import { initializeWebSocketStores, cleanupWebSocketStores } from '$lib/stores/websocket.svelte';
-  import { developerMode } from '$lib/stores/developerMode.svelte';
+  import { ghub, userPreferences, developerMode } from '$lib/stores';
 
   type PathValidationResult = {
     data_path_exists: boolean;
@@ -77,22 +76,17 @@
       hideSplashIfReady();
     });
 
-    // Initialize WebSocket stores BEFORE connecting (async, but not awaited)
-    initializeWebSocketStores()
+    // Initialize stores
+    Promise.all([
+      ghub.initialize(),
+      userPreferences.initialize(),
+      developerMode.initialize()
+    ])
       .then(() => {
-        console.log('[Layout] WebSocket stores initialized successfully');
+        console.log('[Layout] Stores initialized successfully');
       })
       .catch((error) => {
-        console.error('[Layout] Failed to initialize WebSocket stores:', error);
-      });
-
-    // Initialize developer mode (async, but not awaited)
-    developerMode.initialize()
-      .then(() => {
-        console.log('[Layout] Developer mode initialized successfully');
-      })
-      .catch((error) => {
-        console.error('[Layout] Failed to initialize developer mode:', error);
+        console.error('[Layout] Failed to initialize stores:', error);
       });
 
     // Start WebSocket connection after stores are initialized
@@ -119,8 +113,7 @@
       unsubscribe();
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('contextmenu', handleContextMenu);
-      // Don't cleanup WebSocket stores on unmount - they should persist
-      // Only cleanup would happen when the entire app closes
+      ghub.destroy();
     };
   });
 </script>

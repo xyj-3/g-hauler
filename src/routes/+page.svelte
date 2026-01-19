@@ -5,7 +5,7 @@
   import type { GHUBApp, WebSocketMessage } from '$lib/types';
   import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
-  import { applicationsAsGHUBApps, wsConnected } from '$lib/stores/websocket.svelte';
+  import { ghub } from '$lib/stores';
 
   let loading = $state(true);
   let error = $state<string | null>(null);
@@ -68,7 +68,7 @@
 
   // React to applications data arriving
   $effect(() => {
-    const apps = $applicationsAsGHUBApps;
+    const apps = ghub.asGHUBApps;
 
     // If we have apps, clear loading state
     if (apps.length > 0 && loading) {
@@ -87,7 +87,7 @@
 
   // React to connection state changes
   $effect(() => {
-    if ($wsConnected && !hasReceivedResponse) {
+    if (ghub.connected && !hasReceivedResponse) {
       console.log('[library] WebSocket connected, loading applications');
       loadApplications();
     }
@@ -122,10 +122,10 @@
     // Check if WebSocket is already connected and we have no apps yet
     // This handles the case where the component remounts (e.g., hot reload)
     // but the WebSocket store persists with its connection state
-    if ($wsConnected && $applicationsAsGHUBApps.length === 0) {
+    if (ghub.connected && ghub.asGHUBApps.length === 0) {
       console.log('[library] onMount: WebSocket already connected, loading applications');
       loadApplications();
-    } else if ($applicationsAsGHUBApps.length > 0) {
+    } else if (ghub.asGHUBApps.length > 0) {
       // If we already have apps in the store (from hot reload), don't show loading
       console.log('[library] onMount: Applications already in store, skipping load');
       loading = false;
@@ -160,7 +160,7 @@
 
   <div class="max-w-[2000px] mx-auto">
     <!-- Debug info -->
-    {console.log('[library] Rendering - loading:', loading, 'error:', error, 'applications.length:', $applicationsAsGHUBApps.length)}
+    {console.log('[library] Rendering - loading:', loading, 'error:', error, 'applications.length:', ghub.asGHUBApps.length)}
 
     {#if error}
       <div class="text-center text-red-400 h-screen flex flex-col items-center justify-center">
@@ -176,7 +176,7 @@
           Retry
         </button>
       </div>
-    {:else if $applicationsAsGHUBApps.length > 0 || loading}
+    {:else if ghub.asGHUBApps.length > 0 || loading}
       <!-- Responsive grid -->
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-5 pb-4">
         {#if loading}
@@ -184,7 +184,7 @@
             <GameCard loading={true} tabindex={index} />
           {/each}
         {:else}
-          {#each $applicationsAsGHUBApps as game, index}
+          {#each ghub.asGHUBApps as game, index}
             <GameCard {game} tabindex={index} ongameUpdated={handleGameUpdated} />
           {/each}
         {/if}

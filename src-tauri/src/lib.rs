@@ -7,6 +7,7 @@ mod game_detection;
 mod integrations;
 mod tray;
 mod debug;
+mod preferences;
 
 use std::sync::{Arc, Mutex};
 use tauri::Manager;
@@ -153,6 +154,8 @@ pub fn run() {
             crate::debug::commands::close_devtools,
             crate::debug::commands::is_devtools_open,
             crate::integrations::igdb::check_igdb_auth,
+            crate::preferences::get_user_preferences,
+            crate::preferences::set_user_preferences,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -4,7 +4,7 @@
   import type { GameScanResult, ScanOptions } from '$lib/types';
   import CustomScanPanel from '$lib/components/detection/CustomScanPanel.svelte';
   import ScanResults from '$lib/components/detection/ScanResults.svelte';
-  import { detectionStore } from '$lib/stores/detection';
+  import { detectionStore } from '$lib/stores';
 
   // Detect the current OS
   const currentOS = osType();
