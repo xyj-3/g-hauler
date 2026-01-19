@@ -1,7 +1,7 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/core';
   import { type as osType } from '@tauri-apps/plugin-os';
-  import type { GameScanResult, ScanOptions } from '$lib/types';
+  import type { GameScanResult } from '$lib/types';
   import CustomScanPanel from '$lib/components/detection/CustomScanPanel.svelte';
   import ScanResults from '$lib/components/detection/ScanResults.svelte';
   import { detectionStore } from '$lib/stores';
@@ -11,32 +11,23 @@
   const isWindows = currentOS === 'windows';
   const isMacOS = currentOS === 'macos';
 
-  let scanOptions = $state<ScanOptions>({
-    scanSteam: true,
-    scanEpicGames: true,
-    scanUplay: true,
-    scanGogGalaxy: true,
-    scanRiotGames: true,
-    scanWinRegistry: false,
-    scanOsxBundle: false,
-    scanEaApp: true
-  });
-
-  // Local state (resets on component unmount)
+  // Local state
   let isScanning = $state(false);
   let showLoadingUI = $state(false);
   let errorMessage = $state<string | null>(null);
-  let showCustomScan = $state(false);
 
-  // Persistent state (survives navigation)
+  // Persistent state from store
   let scanResults = $derived(detectionStore.scanResults);
   let selectedGames = $derived(detectionStore.selectedGames);
+  let showCustomScan = $derived(detectionStore.showCustomScan);
 
   async function handleScanForGames() {
     isScanning = true;
     errorMessage = null;
     detectionStore.clearSelectedGames();
-    showCustomScan = false; // Close custom scan panel when starting scan
+    if (detectionStore.showCustomScan) {
+      detectionStore.toggleCustomScan(); // Close custom scan panel when starting scan
+    }
 
     // Only show loading UI if scan takes longer than 300ms
     const loadingTimeout = setTimeout(() => {
@@ -49,7 +40,7 @@
 
     try {
       const result = await invoke<GameScanResult>('scan_installed_games', {
-        options: scanOptions
+        options: detectionStore.scanOptions
       });
       detectionStore.setScanResults(result);
     } catch (error) {
@@ -64,7 +55,7 @@
   }
 
   function toggleCustomScan() {
-    showCustomScan = !showCustomScan;
+    detectionStore.toggleCustomScan();
   }
 
   function toggleGameSelection(gameId: string) {
@@ -129,7 +120,7 @@
 
     <!-- Custom Scan Configuration -->
     {#if showCustomScan}
-      <CustomScanPanel {scanOptions} {isWindows} {isMacOS} />
+      <CustomScanPanel scanOptions={detectionStore.scanOptions} {isWindows} {isMacOS} />
     {/if}
   </div>
 
