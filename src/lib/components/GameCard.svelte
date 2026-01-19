@@ -20,16 +20,16 @@
     game?.name === 'APPLICATION_NAME_DESKTOP' ? 'Desktop' : game?.name
   );
 
-  let cardElement: HTMLButtonElement;
+  let cardElement = $state<HTMLButtonElement>();
   let isVisible = $state(false);
   let imageLoaded = $state(false);
   let observer: IntersectionObserver;
   let showEditModal = $state(false);
 
   const handleCardClick = () => {
+    if (!game) return;
     console.log('Game selected:', game.name);
     showEditModal = true;
-    // Remove focus from the button to prevent persistent highlighting
     if (cardElement) {
       cardElement.blur();
     }
@@ -124,7 +124,7 @@
     <!-- Minimal border highlight -->
     <div class="relative aspect-[3/4] overflow-hidden rounded-lg transition-all duration-200 border-2 border-gray-700/50 hover:border-blue-400/60 shadow-md hover:shadow-lg">
       <div class="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-800"></div>
-      {#if isVisible && game.posterUrl}
+      {#if isVisible && game?.posterUrl}
         <img
           src={game.posterUrl}
           alt="{game.name} poster"
@@ -134,7 +134,7 @@
           onerror={handleImageError}
           loading="lazy"
         />
-      {:else if game.name === 'APPLICATION_NAME_DESKTOP'}
+      {:else if game?.name === 'APPLICATION_NAME_DESKTOP'}
         <!-- Desktop SVG icon for APPLICATION_NAME_DESKTOP profile -->
         <div class="absolute inset-0 flex items-center justify-center p-8">
           <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
