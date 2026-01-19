@@ -4,6 +4,7 @@ mod core;
 mod applications;
 mod ghub_game_patches;
 mod game_detection;
+mod integrations;
 mod tray;
 mod debug;
 
@@ -151,6 +152,7 @@ pub fn run() {
             crate::debug::commands::open_devtools,
             crate::debug::commands::close_devtools,
             crate::debug::commands::is_devtools_open,
+            crate::integrations::igdb::check_igdb_auth,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

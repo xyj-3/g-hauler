@@ -1,10 +1,18 @@
 <script lang="ts">
 	import { open as openDialog } from '@tauri-apps/plugin-dialog';
+	import { invoke } from '@tauri-apps/api/core';
 	import { ws } from '$lib/services/websocket';
+	import { developerMode } from '$lib/stores/developerMode.svelte';
+	import { onMount } from 'svelte';
 
 	interface AddGameOptions {
 		name?: string;
 		installed?: boolean;
+	}
+
+	interface IGDBAuthStatus {
+		authenticated: boolean;
+		message: string;
 	}
 
 	let { name = '', installed = true }: AddGameOptions = $props();
@@ -14,6 +22,30 @@
 	let filePath = $state('');
 	let isSubmitting = $state(false);
 	let submitMessage = $state('');
+	let igdbAuthStatus = $state<IGDBAuthStatus | null>(null);
+	let isCheckingAuth = $state(false);
+
+	async function checkIGDBAuth() {
+		isCheckingAuth = true;
+		try {
+			const status = await invoke<IGDBAuthStatus>('check_igdb_auth');
+			igdbAuthStatus = status;
+		} catch (error) {
+			console.error('Failed to check IGDB auth:', error);
+			igdbAuthStatus = {
+				authenticated: false,
+				message: 'Failed to check IGDB authentication status'
+			};
+		} finally {
+			isCheckingAuth = false;
+		}
+	}
+
+	onMount(() => {
+		if (developerMode.enabled) {
+			checkIGDBAuth();
+		}
+	});
 
 	async function handleBrowseFile() {
 		const selected = await openDialog({
@@ -63,13 +95,34 @@
 </script>
 
 <main class="w-full min-h-full px-6 py-4 text-white">
-	<h1 class="text-xl font-dm-sans mb-1">Add Games</h1>
+	<div class="flex items-center justify-between mb-1">
+		<h1 class="text-xl font-dm-sans">Add Games</h1>
+
+		{#if developerMode.enabled}
+			<div class="text-xs">
+				{#if isCheckingAuth}
+					<span class="text-gray-400">Checking IGDB...</span>
+				{:else if igdbAuthStatus}
+					{#if igdbAuthStatus.authenticated}
+						<span class="text-green-400">IGDB Connected</span>
+					{:else}
+						<button
+							type="button"
+							onclick={checkIGDBAuth}
+							class="text-red-400 hover:text-red-300 transition-colors underline"
+							title={igdbAuthStatus.message}
+						>
+							IGDB Disconnected
+						</button>
+					{/if}
+				{/if}
+			</div>
+		{/if}
+	</div>
 
 	<p class="text-xs text-gray-400 mb-3">
 		Add game profiles to G HUB. Use Fix Game Detection to automatically detect installed games.
 	</p>
-
-	<!-- Note: For a truly reactive status indicator, you'd need a separate component that polls the connection status -->
 
 	<form onsubmit={handleSubmit} class="max-w-md mx-auto mt-8 space-y-6">
 	<div class="space-y-2">
