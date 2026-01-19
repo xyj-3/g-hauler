@@ -2,7 +2,7 @@ use once_cell::sync::Lazy;
 use serde_json::json;
 
 use super::models::*;
-use crate::core::constants::{STORE_KEY_AUTOSTART, STORE_KEY_MINIMIZE_TO_TRAY};
+use crate::core::constants::{STORE_KEY_AUTOSTART, STORE_KEY_MINIMIZE_TO_TRAY, STORE_KEY_IGDB_CLIENT_ID, STORE_KEY_IGDB_CLIENT_SECRET};
 
 pub static SETTINGS_REGISTRY: Lazy<Vec<Setting>> = Lazy::new(|| {
     vec![
@@ -25,6 +25,32 @@ pub static SETTINGS_REGISTRY: Lazy<Vec<Setting>> = Lazy::new(|| {
             setting_type: SettingType::Toggle,
             requires_restart: false,
             system_managed: true,
+        },
+        Setting {
+            key: STORE_KEY_IGDB_CLIENT_ID.into(),
+            label: "IGDB Client ID".into(),
+            description: Some("Client ID for IGDB API authentication".into()),
+            category: SettingCategory::Advanced,
+            default_value: json!(""),
+            setting_type: SettingType::Text {
+                placeholder: Some("Enter your IGDB Client ID".into()),
+                validation: None,
+            },
+            requires_restart: false,
+            system_managed: false,
+        },
+        Setting {
+            key: STORE_KEY_IGDB_CLIENT_SECRET.into(),
+            label: "IGDB Client Secret".into(),
+            description: Some("Client Secret for IGDB API authentication".into()),
+            category: SettingCategory::Advanced,
+            default_value: json!(""),
+            setting_type: SettingType::Text {
+                placeholder: Some("Enter your IGDB Client Secret".into()),
+                validation: None,
+            },
+            requires_restart: false,
+            system_managed: false,
         },
     ]
 });

@@ -44,12 +44,24 @@
   }>();
 
   let saving = $state(false);
+  let textValue = $state('');
 
   function currentToggle(): boolean {
     // Backend guarantees booleans for toggle user_value/default_value
     const v = itemState?.user_value ?? item.default_value;
     return !!v;
   }
+
+  function currentText(): string {
+    const v = itemState?.user_value ?? item.default_value;
+    return String(v || '');
+  }
+
+  $effect(() => {
+    if (item.setting_type.type === 'text') {
+      textValue = currentText();
+    }
+  });
 
   async function applyValue(value: any) {
     if (saving) return;
@@ -91,6 +103,25 @@
         checked={currentToggle()}
         disabled={saving || (itemState && !itemState.capable)}
         onChange={({ checked }) => applyValue(checked)}
+      />
+    {:else if item.setting_type.type === 'text'}
+      <input
+        type="text"
+        id={`${item.key}-setting`}
+        class="px-3 py-2 bg-[#1a1a1a] border border-gray-600 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[300px]"
+        placeholder={item.setting_type.placeholder || ''}
+        bind:value={textValue}
+        disabled={saving || (itemState && !itemState.capable)}
+        onblur={() => {
+          if (textValue !== currentText()) {
+            applyValue(textValue);
+          }
+        }}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' && textValue !== currentText()) {
+            applyValue(textValue);
+          }
+        }}
       />
     {:else}
       <div class="text-sm text-gray-400">Unsupported type: {item.setting_type.type}</div>
