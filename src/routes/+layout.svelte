@@ -7,7 +7,6 @@
   import Sidebar from '$components/layout/Sidebar.svelte';
   import BottomBar from '$components/layout/BottomBar.svelte';
   import { invoke } from '@tauri-apps/api/core';
-  import { ws } from '$lib/services/websocket';
   import { homePageLoaded } from '$lib/stores/appState';
   import { ghub, userPreferences, developerMode } from '$lib/stores';
 
@@ -76,21 +75,18 @@
       hideSplashIfReady();
     });
 
-    // Initialize stores
+    // Initialize stores - ghub.initialize() now handles connection and loading
     Promise.all([
       ghub.initialize(),
       userPreferences.initialize(),
       developerMode.initialize()
     ])
       .then(() => {
-        console.log('[Layout] Stores initialized successfully');
+        console.log('[Layout] All stores initialized successfully');
       })
       .catch((error) => {
         console.error('[Layout] Failed to initialize stores:', error);
       });
-
-    // Start WebSocket connection after stores are initialized
-    ws.autoConnect();
 
     // Add keyboard shortcut for devtools (F12)
     const handleKeyDown = (event: KeyboardEvent) => {
