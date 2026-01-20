@@ -2,6 +2,7 @@
 	import { open as openDialog } from '@tauri-apps/plugin-dialog';
 	import { invoke } from '@tauri-apps/api/core';
 	import { ws } from '$lib/services/websocket';
+	import { applicationService } from '$lib/services/ghub/application.service';
 	import { developerMode } from '$lib/stores/developerMode.svelte';
 	import { onMount } from 'svelte';
 
@@ -75,8 +76,12 @@
 				throw new Error('WebSocket not connected. Please connect first.');
 			}
 
-			// Send the WebSocket message
-			await ws.setApplication(filePath, gameName, { isInstalled: gameInstalled });
+			// Add the application via the service
+			await applicationService.updateApplication({
+				applicationPath: filePath,
+				name: gameName,
+				isInstalled: gameInstalled
+			});
 
 			submitMessage = 'Game added successfully!';
 			

@@ -3,15 +3,17 @@
   import GeneralTab from '$components/tabs/GeneralTab.svelte';
   import CommandsTab from '$components/tabs/CommandsTab.svelte';
   import Modal from '$components/modal/Modal.svelte';
+  import { profileService } from '$lib/services/ghub/profile.service';
 
   interface GameEditModalProps {
     game: GHUBApp;
     isOpen: boolean;
     onclose?: () => void;
     onsave?: (game: GHUBApp) => Promise<void> | void;
+    ondelete?: (applicationId: string) => Promise<void> | void;
   }
 
-  const { game, isOpen, onclose, onsave }: GameEditModalProps = $props();
+  const { game, isOpen, onclose, onsave, ondelete }: GameEditModalProps = $props();
 
   // Map special profile names
   const displayName = $derived(
@@ -55,6 +57,8 @@
   };
   let editedGame = $state<GHUBApp>(cloneGame(game));
   let isSaving = $state(false);
+  let isDeleting = $state(false);
+  let showDeleteConfirm = $state(false);
   let activeTab = $state<'general' | 'commands'>('commands');
   // Update editedGame when game prop changes
   $effect(() => {
@@ -62,25 +66,49 @@
   });
 
   const handleClose = () => {
-    if (!isSaving) {
+    if (!isSaving && !isDeleting) {
+      showDeleteConfirm = false;
       onclose?.();
     }
   };
+
   const handleSave = async () => {
     if (isSaving) return;
-    
+
     try {
       isSaving = true;
       await onsave?.(editedGame);
-      // Close modal only on successful save
       handleClose();
     } catch (error) {
       console.error('Save failed:', error);
-      // Keep modal open on error so user can try again
-      // You could add error UI here if needed
     } finally {
       isSaving = false;
     }
+  };
+
+  const handleDeleteClick = () => {
+    showDeleteConfirm = true;
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (isDeleting) return;
+
+    try {
+      isDeleting = true;
+      await profileService.deleteProfile(game.applicationId);
+      await ondelete?.(game.applicationId);
+      handleClose();
+    } catch (error) {
+      console.error('Delete failed:', error);
+      alert(`Failed to delete profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      isDeleting = false;
+      showDeleteConfirm = false;
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    showDeleteConfirm = false;
   };
 </script>
 
@@ -134,26 +162,65 @@
       </div>
     </div>
     <!-- Footer -->
-    <div class="flex justify-end space-x-3 p-6 border-t border-gray-700">
-      <button
-        onclick={handleClose}
-        disabled={isSaving}
-        class="px-4 py-2 border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
-      >
-        Cancel
-      </button>
-      <button
-        onclick={handleSave}
-        disabled={isSaving}
-        class="px-4 py-2 bg-btn hover:bg-btn-hover disabled:bg-btn-disabled disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2"
-      >
-        {#if isSaving}
-          <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-          <span>Saving...</span>
+    <div class="flex justify-between items-center p-6 border-t border-gray-700">
+      <!-- Left side: Delete button -->
+      <div>
+        {#if !showDeleteConfirm}
+          <button
+            onclick={handleDeleteClick}
+            disabled={isSaving || isDeleting}
+            class="px-4 py-2 border border-red-600 text-red-400 hover:bg-red-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+          >
+            Delete Profile
+          </button>
         {:else}
-          <span>Save Changes</span>
+          <div class="flex items-center space-x-3">
+            <span class="text-sm text-gray-300">Are you sure?</span>
+            <button
+              onclick={handleDeleteConfirm}
+              disabled={isDeleting}
+              class="px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:bg-red-800 disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2 text-sm"
+            >
+              {#if isDeleting}
+                <div class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></div>
+                <span>Deleting...</span>
+              {:else}
+                <span>Yes, Delete</span>
+              {/if}
+            </button>
+            <button
+              onclick={handleDeleteCancel}
+              disabled={isDeleting}
+              class="px-3 py-1.5 border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-sm"
+            >
+              Cancel
+            </button>
+          </div>
         {/if}
-      </button>
+      </div>
+
+      <!-- Right side: Save/Cancel buttons -->
+      <div class="flex space-x-3">
+        <button
+          onclick={handleClose}
+          disabled={isSaving || isDeleting}
+          class="px-4 py-2 border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onclick={handleSave}
+          disabled={isSaving || isDeleting}
+          class="px-4 py-2 bg-btn hover:bg-btn-hover disabled:bg-btn-disabled disabled:cursor-not-allowed text-white rounded transition-colors flex items-center space-x-2"
+        >
+          {#if isSaving}
+            <div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+            <span>Saving...</span>
+          {:else}
+            <span>Save Changes</span>
+          {/if}
+        </button>
+      </div>
     </div>
   </div>
 </Modal>

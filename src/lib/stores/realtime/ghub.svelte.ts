@@ -2,6 +2,7 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 import type { ApplicationPayload, WebSocketMessage, GHUBApp } from '$lib/types';
 import { applicationPayloadToGHUBApp } from '$lib/types';
 import { ws } from '$lib/services/websocket';
+import { applicationService } from '$lib/services/ghub/application.service';
 
 type StoreStatus = 'disconnected' | 'connecting' | 'connected' | 'loading' | 'ready' | 'error';
 
@@ -155,7 +156,7 @@ class GHubStore {
 		}, 10000);
 
 		try {
-			await ws.getApplications();
+			await applicationService.requestApplications();
 			console.log('[GHubStore] Application request sent');
 		} catch (error) {
 			console.error('[GHubStore] Failed to request applications:', error);
