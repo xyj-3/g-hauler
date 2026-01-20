@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
+use std::sync::{Arc, Mutex};
+use std::time::{Duration, SystemTime};
+use tauri::{AppHandle, State};
 
 use crate::core::constants::{STORE_KEY_IGDB_CLIENT_ID, STORE_KEY_IGDB_CLIENT_SECRET};
 use crate::core::store::get_store_key;
@@ -13,6 +15,40 @@ pub struct TwitchTokenResponse {
     pub access_token: String,
     pub expires_in: u64,
     pub token_type: String,
+}
+
+/// Cache for storing IGDB authentication tokens
+#[derive(Debug, Default)]
+pub struct TokenCache {
+    access_token: Option<String>,
+    expires_at: Option<SystemTime>,
+}
+
+impl TokenCache {
+    /// Checks if the cached token is still valid
+    fn is_valid(&self) -> bool {
+        match (&self.access_token, self.expires_at) {
+            (Some(_), Some(expires_at)) => SystemTime::now() < expires_at,
+            _ => false,
+        }
+    }
+
+    /// Updates the cache with a new token and expiration time
+    fn update(&mut self, token: String, expires_in: u64) {
+        // Subtract 60 seconds buffer to refresh before actual expiration
+        let expiration = SystemTime::now() + Duration::from_secs(expires_in.saturating_sub(60));
+        self.access_token = Some(token);
+        self.expires_at = Some(expiration);
+    }
+
+    /// Gets the cached token if it's valid
+    fn get_token(&self) -> Option<&str> {
+        if self.is_valid() {
+            self.access_token.as_deref()
+        } else {
+            None
+        }
+    }
 }
 
 /// Error types for IGDB authentication
@@ -60,29 +96,36 @@ fn get_credentials(app_handle: &AppHandle) -> Result<(String, String), AuthError
 
 /// Authenticates with IGDB API using Twitch OAuth Client Credentials flow
 ///
-/// This function retrieves the Client ID and Client Secret from the app settings,
-/// then exchanges them for an access token using the Twitch OAuth endpoint.
+/// This function checks the token cache first. If a valid token exists, it returns
+/// immediately without making an HTTP request. Otherwise, it retrieves the Client ID
+/// and Client Secret from the app settings, exchanges them for an access token using
+/// the Twitch OAuth endpoint, and caches the result.
 ///
 /// # Arguments
 /// * `app_handle` - The Tauri application handle to access the store
+/// * `token_cache` - Shared token cache state
 ///
 /// # Returns
 /// * `Ok(TwitchTokenResponse)` - Contains the access token and expiration info
 /// * `Err(AuthError)` - If authentication fails
-///
-/// # Example
-/// ```rust,no_run
-/// use crate::integrations::igdb::authenticate;
-///
-/// async fn example(app_handle: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-///     let token_response = authenticate(app_handle).await?;
-///     println!("Access token: {}", token_response.access_token);
-///     println!("Expires in: {} seconds", token_response.expires_in);
-///     Ok(())
-/// }
-/// ```
-pub async fn authenticate(app_handle: &AppHandle) -> Result<TwitchTokenResponse, AuthError> {
-    // Retrieve credentials from store
+pub async fn authenticate(
+    app_handle: &AppHandle,
+    token_cache: &Arc<Mutex<TokenCache>>,
+) -> Result<TwitchTokenResponse, AuthError> {
+    // Check cache first
+    {
+        let cache = token_cache.lock().unwrap();
+        if let Some(token) = cache.get_token() {
+            // Return cached token without making HTTP request
+            return Ok(TwitchTokenResponse {
+                access_token: token.to_string(),
+                expires_in: 0, // Not needed when returning cached token
+                token_type: "Bearer".to_string(),
+            });
+        }
+    }
+
+    // Cache miss or expired - retrieve credentials from store
     let (client_id, client_secret) = get_credentials(app_handle)?;
 
     // Build the HTTP client
@@ -107,6 +150,12 @@ pub async fn authenticate(app_handle: &AppHandle) -> Result<TwitchTokenResponse,
     // Parse the response
     let token_response = response.json::<TwitchTokenResponse>().await?;
 
+    // Update cache with new token
+    {
+        let mut cache = token_cache.lock().unwrap();
+        cache.update(token_response.access_token.clone(), token_response.expires_in);
+    }
+
     Ok(token_response)
 }
 
@@ -120,10 +169,13 @@ pub struct AuthStatus {
 /// Tauri command to check IGDB authentication status
 ///
 /// This command attempts to authenticate with IGDB and returns the status.
-/// It's meant to be called from the frontend to verify credentials.
+/// It uses token caching to avoid unnecessary HTTP requests.
 #[tauri::command]
-pub async fn check_igdb_auth(app_handle: AppHandle) -> Result<AuthStatus, String> {
-    match authenticate(&app_handle).await {
+pub async fn check_igdb_auth(
+    app_handle: AppHandle,
+    token_cache: State<'_, Arc<Mutex<TokenCache>>>,
+) -> Result<AuthStatus, String> {
+    match authenticate(&app_handle, &token_cache).await {
         Ok(_) => Ok(AuthStatus {
             authenticated: true,
             message: "IGDB authentication successful".to_string(),

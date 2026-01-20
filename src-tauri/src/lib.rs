@@ -19,6 +19,10 @@ fn initialize_app(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>
     let ws_client = Arc::new(websocket::WebSocketClient::new(handle.clone()));
     app.manage(ws_client);
 
+    // Initialize IGDB token cache
+    let token_cache = Arc::new(Mutex::new(integrations::igdb::TokenCache::default()));
+    app.manage(token_cache);
+
     if let Err(e) = tauri::async_runtime::block_on(crate::core::store::initialize_store(&handle)) {
         eprintln!("Failed to initialize store: {}", e);
     }
